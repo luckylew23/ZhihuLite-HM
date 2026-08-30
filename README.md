@@ -1,5 +1,7 @@
 # zhihu--HMOS
 
+> HarmonyOS NEXT 移植版知乎第三方客户端（zhihu--）的鸿蒙壳工程：ArkTS 壳 + RNOH 垫片 + 构建脚本 + 文档。前端源码见 [zhihu--](https://github.com/luckylew23/zhihu--) fork 的 `hmos` 分支。
+
 [zhihu--](https://github.com/luckylew23/zhihu--)（基于 React Native + Expo 的第三方知乎客户端）的 **HarmonyOS NEXT** 移植版：通过 [React Native OpenHarmony (RNOH)](https://github.com/react-native-ohos/react-native-openharmony) 在纯 ArkTS 运行时（无安卓兼容层）运行。
 
 与上游 Expo 版相互独立，版本号和发布节奏自主管理，不影响原作者的主版本发布。
