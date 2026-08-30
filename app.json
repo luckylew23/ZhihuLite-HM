@@ -1,0 +1,289 @@
+{
+  "expo": {
+    "name": "知乎--",
+    "slug": "ZhihuMinusMinus",
+    "version": "0.4.2",
+    "orientation": "default",
+    "icon": "./assets/images/icon.png",
+    "scheme": "zhihu--",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/android-icon-monochrome.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.huamu013.ZhihuMinusMinus",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "splash": {
+        "backgroundColor": "#ffffff",
+        "dark": {
+          "backgroundColor": "#121212",
+          "image": "./assets/images/android-icon-monochrome.png"
+        }
+      }
+    },
+    "android": {
+      "splash": {
+        "backgroundColor": "#ffffff",
+        "image": "./assets/images/android-icon-monochrome.png",
+        "dark": {
+          "backgroundColor": "#121212",
+          "image": "./assets/images/android-icon-monochrome.png"
+        }
+      },
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "com.huamu013.ZhihuMinusMinus",
+      "permissions": [
+        "REQUEST_INSTALL_PACKAGES"
+      ],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "https",
+              "host": "www.zhihu.com",
+              "pathPrefix": "/question/"
+            },
+            {
+              "scheme": "https",
+              "host": "www.zhihu.com",
+              "pathPrefix": "/answer/"
+            },
+            {
+              "scheme": "https",
+              "host": "www.zhihu.com",
+              "pathPrefix": "/article/"
+            },
+            {
+              "scheme": "https",
+              "host": "www.zhihu.com",
+              "pathPrefix": "/pin/"
+            },
+            {
+              "scheme": "https",
+              "host": "www.zhihu.com",
+              "pathPrefix": "/people/"
+            },
+            {
+              "scheme": "https",
+              "host": "www.zhihu.com",
+              "pathPrefix": "/topic/"
+            },
+            {
+              "scheme": "https",
+              "host": "www.zhihu.com",
+              "pathPrefix": "/column/"
+            },
+            {
+              "scheme": "https",
+              "host": "www.zhihu.com",
+              "pathPrefix": "/collection/"
+            },
+            {
+              "scheme": "https",
+              "host": "zhihu.com",
+              "pathPrefix": "/question/"
+            },
+            {
+              "scheme": "https",
+              "host": "zhihu.com",
+              "pathPrefix": "/answer/"
+            },
+            {
+              "scheme": "https",
+              "host": "zhihu.com",
+              "pathPrefix": "/article/"
+            },
+            {
+              "scheme": "https",
+              "host": "zhihu.com",
+              "pathPrefix": "/pin/"
+            },
+            {
+              "scheme": "https",
+              "host": "zhihu.com",
+              "pathPrefix": "/people/"
+            },
+            {
+              "scheme": "https",
+              "host": "zhihu.com",
+              "pathPrefix": "/topic/"
+            },
+            {
+              "scheme": "https",
+              "host": "zhihu.com",
+              "pathPrefix": "/column/"
+            },
+            {
+              "scheme": "https",
+              "host": "zhihu.com",
+              "pathPrefix": "/collection/"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        },
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "https",
+              "host": "zhuanlan.zhihu.com",
+              "pathPrefix": "/p/"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        },
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "https",
+              "host": "oia.zhihu.com",
+              "pathPrefix": "/question/"
+            },
+            {
+              "scheme": "https",
+              "host": "oia.zhihu.com",
+              "pathPrefix": "/questions/"
+            },
+            {
+              "scheme": "https",
+              "host": "oia.zhihu.com",
+              "pathPrefix": "/answer/"
+            },
+            {
+              "scheme": "https",
+              "host": "oia.zhihu.com",
+              "pathPrefix": "/answers/"
+            },
+            {
+              "scheme": "https",
+              "host": "oia.zhihu.com",
+              "pathPrefix": "/article/"
+            },
+            {
+              "scheme": "https",
+              "host": "oia.zhihu.com",
+              "pathPrefix": "/articles/"
+            },
+            {
+              "scheme": "https",
+              "host": "oia.zhihu.com",
+              "pathPrefix": "/pin/"
+            },
+            {
+              "scheme": "https",
+              "host": "oia.zhihu.com",
+              "pathPrefix": "/pins/"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        },
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "zhihu"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableShrinkResourcesInReleaseBuilds": true,
+            "enableMinifyInReleaseBuilds": true,
+            "useLegacyPackaging": true
+          }
+        }
+      ],
+      "expo-web-browser",
+      "expo-sharing",
+      "expo-file-system",
+      [
+        "@sentry/react-native",
+        {
+          "organization": "huamumu",
+          "project": "zhihuminusminus"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "sentryDsn": "https://93a6099dd49b040d9c516485eb3c72f6@o4511051860672512.ingest.de.sentry.io/4511051866112080",
+      "releaseNotes": {
+        "v0.4.2": [
+          "回答加载优化: 复用推荐流已包含的完整回答正文，减少进入详情和长按预览时的重复请求。",
+          "回答横向浏览优化: 在空闲时预取相邻回答，并避免未聚焦页面提前挂载完整富文本内容。",
+          "富文本维护与性能基线: 集中渲染实现、真实内容案例、分析工具、回归测试与 Android 真机记录。"
+        ],
+        "v0.4.0": [
+          "图片保存与长按交互优化: 增加长按图片保存到本地相册。",
+          "本地内容过滤系统: 新增「过滤与推荐」设置页面，支持针对关键词、作者及内容的屏蔽规则配置与实时效果预览。"
+        ],
+        "v0.3.0": [
+          "推荐流本地去重（实验性）: 为「推荐」与「同城」Tab 增加可选的本地已看去重，支持基于曝光判定（面积≥50% 且停留≥800ms）快照式过滤已看内容，支持 SQLite 自动淘汰清理与账号隔离管理；可在「外观与定制 → 实验性功能」中开启。",
+          "优雅 404 无知识荒原展示: 详情页与内容加载针对 404 错误禁止无效重试，第一时间呈现“荒原”占位及返回导航；静默拦截控制台日志堆栈与无效链接弹窗。"
+        ],
+        "v0.2.0": [
+          "导航栏自适应与发布页定制: 允许自由隐藏/展示“发布”栏目；重构顶部胶囊导航栏渐隐与平滑指示动画，解决多栏目切换时的错位与抖动问题。",
+          "多款精选调和主题色: 重构主题配色面板，新增樱花粉、蜜桃粉、极客靛、薄荷青、翡翠绿等多款高颜值为阅读优化的主题预设。"
+        ],
+        "v0.1.1": [
+          "全新主题自由定制配色系统: 新增以计算及主题钩子形式渲染的主题配色方案，允许在暗黑模式与明亮模式下跟随用户选择进行实时自适应变色。",
+          "修复多处硬编码样式: 重构并统一了包括回答详情页、作者卡片、文章详情页、动态 Moments 页、搜索页面、我的关注页、收藏夹列表和 CollectionSelectorModal 中的知乎官方蓝色与静态收藏金色图标，全数收纳进动态主题色拦截引擎中。",
+          "修复 CollectionSelectorModal 页面中 React 规则 Hooks 顺序调用报错导致崩溃的严重问题。"
+        ],
+        "v0.0.13": [
+          "ZSE 签名算法重构: 引入 zhi-purity 纯 JS 实现，全面替换旧版 JS/Rust 混合逻辑，彻底解决签名失败导致的 403 问题，提升 API 调用成功率。",
+          "环境兼容性增强: 针对 React Native 环境优化加密核心，移除对 Node.js 原生模块的依赖。"
+        ],
+        "v0.0.12": [
+          "基础稳定性优化: 修复了若干 UI 细节与已知的小概率崩溃问题。"
+        ]
+      },
+      "status": "🚀 v0.4.2 - 富文本性能与回答加载优化",
+      "lastUpdated": "2026-08-30",
+      "eas": {
+        "projectId": "faa0f061-50e6-4ec4-bb6f-accda0dbd24f"
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "app": {
+    "bundleName": "com.huamu013.ZhihuMinusMinus",
+    "bundleType": "app",
+    "vendor": "zhihu--",
+    "versionCode": 41,
+    "versionName": "0.4.1",
+    "minAPIVersion": "5.0.0(12)",
+    "targetAPIVersion": "5.0.0(12)",
+    "apiReleaseType": "Release",
+    "icon": "$media:app_icon",
+    "label": "$string:app_name"
+  }
+}

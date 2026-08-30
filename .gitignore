@@ -1,0 +1,63 @@
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env*.local
+
+# typescript
+*.tsbuildinfo
+
+# generated native folders
+/ios
+/android
+/build
+
+# HarmonyOS (HMOS) build artifacts
+/oh_modules/
+/.hvigor/
+harmony/oh_modules/
+harmony/**/oh_modules/
+harmony/entry/build/
+harmony/build/
+harmony/.hvigor/
+harmony/**/node_modules/
+harmony/codecache/
+# JS bundle + 资源由 scripts/build-ohos-bundle.js 生成，属构建产物
+harmony/entry/src/main/resources/rawfile/
+ohos-bundle/
+*.hap
+*.hsp
+*.har
+
+# 签名：仓库只保留脚本与公开证书，私钥(p12)/profile(p7b) 本地保存
+harmony/signing/*.p7b
+harmony/signing/verify-*

@@ -1,0 +1,23 @@
+{
+  "modelVersion": "6.0.0",
+  "dependencies": {
+    // 本工程不走 RNOH 的 hvigor 打包插件（JS bundle 由 scripts/build-ohos-bundle.js 产出），
+    // 因此这里保持为空。若日后改用官方插件链，需先安装
+    // npm i -D @react-native-oh/react-native-harmony-cli@0.84.3，再填：
+    // "@rnoh/hvigor-plugin": "file:../../node_modules/@react-native-oh/react-native-harmony-cli/harmony/rnoh-hvigor-plugin-0.84.3.tgz"
+  },
+  "execution": {
+    // "analyze": "normal",
+    "incremental": true,
+    "parallel": true
+  },
+  "logging": {
+    // "level": "info"
+  },
+  "debugging": {
+    // "stacktrace": false
+  },
+  "nodeOptions": {
+    // "maxOldSpaceSize": 8192
+  }
+}

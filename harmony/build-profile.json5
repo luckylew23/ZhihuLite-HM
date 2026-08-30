@@ -1,0 +1,36 @@
+{
+  "app": {
+    "signingConfigs": [],
+    // 说明：JS bundle 不由 hvigor 产出，而是 scripts/build-ohos-bundle.js（Metro）
+    // 预先生成到 entry/src/main/resources/rawfile/bundle.harmony.js，
+    // 由 pages/index.ets 的 ResourceJSBundleProvider 在运行时加载。
+    // 因此这里不需要（也不能有）旧 RNOH 插件的 app.buildOption.rnoh / sourceRoots 配置。
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "",
+        "compatibleSdkVersion": "5.0.0(12)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true
+          }
+        }
+      }
+    ],
+    "buildModeSet": [
+      { "name": "debug" },
+      { "name": "release" }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        { "name": "default", "applyToProducts": ["default"] }
+      ]
+    }
+  ]
+}
