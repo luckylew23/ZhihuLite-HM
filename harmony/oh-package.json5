@@ -1,12 +1,8 @@
 {
   "modelVersion": "6.0.0",
-  "name": "zhihu--",
-  "version": "0.4.1",
-  "description": "Zhihu-- HarmonyOS (HMOS) 工程，由 React Native OpenHarmony 驱动",
-  "main": "",
-  "author": "",
-  "license": "GPL-3.0",
-  "dependencies": {
-    "@rnoh/react-native-openharmony": "0.84.3"
-  }
+  "name": "zhihu-hmos",
+  "version": "0.4.2",
+  "description": "知乎-- HarmonyOS NEXT 壳工程（ArkWeb 加载 Expo Web 单文件产物）",
+  "dependencies": {},
+  "devDependencies": {}
 }

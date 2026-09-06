@@ -1,0 +1,57 @@
+{
+  "name": "zhihu---ohos",
+  "version": "0.4.1",
+  "description": "HarmonyOS NEXT（HMOS 构建，构建标志 HMOS_BUILD=1）专用依赖清单。原 package.json 保持为 Android/iOS/Web 上游清单，本文件为 OHOS 专用清单，二者独立维护以保证与上游 rebase 零冲突。",
+  "private": true,
+  "scripts": {
+    "ohos:bundle": "node scripts/build-ohos-bundle.js",
+    "ohos:bundle:dev": "node scripts/build-ohos-bundle.js --dev",
+    "ohos:verify": "node scripts/verify-ohos.js",
+    "ohos:start": "HMOS_BUILD=1 npx react-native start",
+    "ohos:build": "cd harmony && hvigorw assembleHap --mode module -p product=default",
+    "ohos:install": "npm install --no-save && npm install --no-save -C harmony || true"
+  },
+  "dependencies": {
+    "react-native": "0.83.2",
+    "@react-navigation/native": "^7.1.28",
+    "@react-navigation/stack": "^7.0.0",
+    "@react-navigation/bottom-tabs": "^7.0.0",
+    "@tanstack/react-query": "^5.90.21",
+    "axios": "^1.13.6",
+    "nativewind": "^4.2.2",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "zustand": "^5.0.11",
+    "tailwindcss": "^3.4.19",
+
+    "react-native-gesture-handler": "~2.30.0",
+    "react-native-reanimated": "4.2.1",
+    "react-native-worklets": "^0.7.0",
+    "react-native-safe-area-context": "~5.6.2",
+    "react-native-screens": "~4.23.0",
+    "react-native-svg": "15.15.3",
+    "react-native-webview": "13.16.0",
+    "react-native-pager-view": "8.0.0",
+    "react-native-render-html": "^6.3.4",
+    "@shopify/flash-list": "2.0.2",
+    "react-native-root-toast": "^4.0.1",
+    "react-native-image-zoom-viewer": "^3.0.1",
+    "@react-native-masked-view/masked-view": "0.3.2",
+
+    "@react-native-ohos/async-storage": "^1.21.1",
+    "@react-native-ohos/clipboard": "^1.16.3",
+    "@react-native-ohos/flash-list": "^1.8.3",
+    "@expo/vector-icons": "^14.0.0"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.2",
+    "@types/react": "~19.2.2",
+    "babel-preset-expo": "~55.0.8",
+    "babel-plugin-module-resolver": "^5.0.2"
+  },
+  "notes": {
+    "react-native": "HMOS 构建保留标准 react-native 包（RNOH 在原生层接管运行时，@react-native-ohos/react-native 在 npm/ohpm 上并不存在）。metro.config.js 在 HMOS_BUILD=1 时使用独立的 Metro 默认配置并叠加 platform/ohos/shims/* 别名层。",
+    "expo-*": "全部通过 platform/ohos/shims/* 垫片兼容，无需安装对应 expo 包；但 babel 编译链仍需 babel-preset-expo（devDependency）以正确转换上游 TS/JSX 代码。",
+    "未列出的第三方库": "若其存在 @react-native-ohos/* 端口且已发布，请在安装时一并替换为 OHOS 版本（详见 EXPO_OHOS_MAPPING.md）。注意 sqlite-storage / media-library 等 @react-native-ohos/* 子包并未发布，相关垫片已做内存/分享降级。"
+  }
+}

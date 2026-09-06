@@ -1,14 +1,3 @@
-// MyAbilityStage —— 应用级 AbilityStage，用于注入 RN OHOS 能力包。
-import { AbilityStage, Want } from '@kit.AbilityKit';
-import { RNAbilityPackage } from '@rnoh/react-native-openharmony';
-
-export default class MyAbilityStage extends AbilityStage {
-  configure() {
-    this.context.getApplicationContext().setColorMode(0);
-  }
-
-  onCreate() {
-    const abilityPackage = new RNAbilityPackage();
-    this.context.abilityPackage = abilityPackage;
-  }
-}
+// 该文件已废弃 —— WebView 壳方案不需要 AbilityStage，也未在 module.json5 中引用。
+// 待删除：工程已移除 @rnoh/react-native-openharmony 依赖，此处若保留旧 import 会导致编译失败。
+export {};

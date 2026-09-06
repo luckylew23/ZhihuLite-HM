@@ -1,16 +1,18 @@
 {
   "app": {
     "signingConfigs": [],
-    // 说明：JS bundle 不由 hvigor 产出，而是 scripts/build-ohos-bundle.js（Metro）
-    // 预先生成到 entry/src/main/resources/rawfile/bundle.harmony.js，
-    // 由 pages/index.ets 的 ResourceJSBundleProvider 在运行时加载。
-    // 因此这里不需要（也不能有）旧 RNOH 插件的 app.buildOption.rnoh / sourceRoots 配置。
+    // 与 Tydora-HMOS（已验证可产出可安装 hap）保持一致的 SDK 设定：
+    //   - runtimeOS: OpenHarmony —— 对应 local.properties 里的
+    //     sdk.dir=/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony
+    //   - compileSdkVersion 20 / compatibleSdkVersion "6.0.0(20)"
+    //     signing/sign.sh 里 hap-sign-tool 的 -compatibleVersion 必须同为 20。
     "products": [
       {
         "name": "default",
         "signingConfig": "",
-        "compatibleSdkVersion": "5.0.0(12)",
-        "runtimeOS": "HarmonyOS",
+        "compileSdkVersion": 20,
+        "compatibleSdkVersion": "6.0.0(20)",
+        "runtimeOS": "OpenHarmony",
         "buildOption": {
           "strictMode": {
             "caseSensitiveCheck": true,

@@ -1,19 +1,24 @@
 {
   "apiType": "stageMode",
+  "buildOption": {
+  },
   "buildOptionSet": [
     {
       "name": "release",
       "arkOptions": {
         "obfuscation": {
           "ruleOptions": {
-            "enable": true,
-            "files": ["./obfuscation-rules.txt"]
+            // 关闭混淆：工程内没有 obfuscation-rules.txt，开启会直接构建失败。
+            "enable": false,
+            "files": [
+              "./obfuscation-rules.txt"
+            ]
           }
         }
       }
     }
   ],
   "targets": [
-    { "name": "default", "runtimeOS": "HarmonyOS" }
+    { "name": "default" }
   ]
 }

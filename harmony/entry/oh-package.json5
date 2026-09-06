@@ -1,12 +1,8 @@
 {
   "modelVersion": "6.0.0",
   "name": "entry",
-  "version": "0.4.1",
-  "description": "Zhihu-- HMOS entry module",
+  "version": "0.4.2",
+  "description": "知乎-- HMOS entry module（ArkWeb 壳）",
   "main": "",
-  "author": "",
-  "license": "GPL-3.0",
-  "dependencies": {
-    "@rnoh/react-native-openharmony": "0.84.3"
-  }
+  "dependencies": {}
 }
