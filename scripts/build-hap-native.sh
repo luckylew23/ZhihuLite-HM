@@ -43,4 +43,4 @@ bash ./hvigorw assembleHap --mode module -p product=default -p buildMode="$MODE"
 echo "✍️  自签 …"
 bash signing/sign.sh
 
-echo "✅ 产物: $NATIVE/entry/build/default/outputs/default/zhihu--hmos-native-1.1.0-signed.hap"
+echo "✅ 产物: $NATIVE/entry/build/default/outputs/default/ZhihuLite-HM-signed.hap"

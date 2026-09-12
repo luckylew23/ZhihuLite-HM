@@ -1,29 +1,31 @@
 {
   "app": {
     "signingConfigs": [],
-    // 与 Tydora-HMOS（已验证可产出可安装 hap）保持一致的 SDK 设定：
-    //   - runtimeOS: OpenHarmony —— 对应 local.properties 里的
-    //     sdk.dir=/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony
-    //   - compileSdkVersion 20 / compatibleSdkVersion "6.0.0(20)"
-    //     signing/sign.sh 里 hap-sign-tool 的 -compatibleVersion 必须同为 20。
+    // ZhihuLite-HM —— HarmonyOS NEXT 原生工程。
+    // runtimeOS: HarmonyOS —— 真机安装需 DevEco 自动签名（华为开发者签名链）。
+    // 签名材料由 DevEco Studio 自动生成并写入 signingConfigs。
     "products": [
       {
         "name": "default",
-        "signingConfig": "",
-        "compileSdkVersion": 22,
+        "signingConfig": "default",
         "compatibleSdkVersion": "6.0.2(22)",
-        "runtimeOS": "OpenHarmony",
+        "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
             "caseSensitiveCheck": true,
             "useNormalizedOHMUrl": true
           }
-        }
+        },
+        "targetSdkVersion": ""
       }
     ],
     "buildModeSet": [
-      { "name": "debug" },
-      { "name": "release" }
+      {
+        "name": "debug"
+      },
+      {
+        "name": "release"
+      }
     ]
   },
   "modules": [
@@ -31,7 +33,12 @@
       "name": "entry",
       "srcPath": "./entry",
       "targets": [
-        { "name": "default", "applyToProducts": ["default"] }
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
       ]
     }
   ]
