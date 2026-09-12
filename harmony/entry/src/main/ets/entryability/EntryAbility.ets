@@ -9,12 +9,15 @@
 import { AbilityConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
+import { setAppContext } from '../bridge/ZhihuBridge';
 
 const DOMAIN: number = 0x0000;
 const TAG: string = 'ZhihuEntry';
 
 export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+    // 供 ZhihuBridge 持久化 Cookie Jar（preferences 需要 Context）
+    setAppContext(this.context);
     hilog.info(DOMAIN, TAG, 'Ability onCreate');
   }
 

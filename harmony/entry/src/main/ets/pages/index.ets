@@ -13,6 +13,7 @@
 // ----------------------------------------------------------------------------
 import { webview } from '@kit.ArkWeb';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { ZhihuBridge } from '../bridge/ZhihuBridge';
 
 const DOMAIN: number = 0x0000;
 const TAG: string = 'ZhihuWeb';
@@ -21,10 +22,19 @@ const TAG: string = 'ZhihuWeb';
 @Component
 struct Index {
   controller: webview.WebviewController = new webview.WebviewController();
+  // 原生网络桥：把知乎域名的请求从 Web 侧（会被 CORS 拦）转到 @ohos.net.http
+  zhihuBridge: ZhihuBridge = new ZhihuBridge();
 
   build() {
     Column() {
       Web({ src: $rawfile('index.html'), controller: this.controller })
+        .javaScriptProxy({
+          object: this.zhihuBridge,
+          name: '__zhihuBridge',
+          methodList: ['getCookies', 'setCookie', 'clearCookies'],
+          asyncMethodList: ['request', 'bootstrap'],
+          controller: this.controller,
+        })
         .javaScriptAccess(true)
         .domStorageAccess(true)
         .databaseAccess(true)
@@ -40,6 +50,16 @@ struct Index {
         })
         .onPageEnd(() => {
           hilog.info(DOMAIN, TAG, 'web page end');
+          // 预热游客 cookie（d_c0 等）：页面就绪后再拉，避免和首屏抢带宽。
+          // 失败不影响匿名可读的游客 feed 接口，仅登录态相关功能受限。
+          try {
+            this.controller.runJavaScript(
+              '(function(){ if (window.__zhihuBridge && window.__zhihuBridge.bootstrap) ' +
+                '{ window.__zhihuBridge.bootstrap(); } })();',
+            );
+          } catch (e) {
+            hilog.warn(DOMAIN, TAG, 'bootstrap call failed: %{public}s', JSON.stringify(e));
+          }
         })
         .onErrorReceive((event) => {
           if (event && event.error && event.error.getErrorInfo()) {

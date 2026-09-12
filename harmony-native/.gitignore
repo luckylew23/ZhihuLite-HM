@@ -1,0 +1,17 @@
+# 构建产物与缓存（勿提交）
+entry/build/
+oh_modules/
+.hvigor/
+.hvigor-output/
+build/
+
+# 本地配置（SDK 路径等，因人而异）
+local.properties
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# macOS
+.DS_Store

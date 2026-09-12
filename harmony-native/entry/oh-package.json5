@@ -1,0 +1,8 @@
+{
+  "modelVersion": "6.0.0",
+  "name": "entry",
+  "version": "1.0.0",
+  "description": "知乎-- HMOS native entry module（ArkTS + ArkUI）",
+  "main": "",
+  "dependencies": {}
+}

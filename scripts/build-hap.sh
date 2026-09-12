@@ -36,13 +36,16 @@ echo "▶ [1/2] assembleHap (mode=$MODE) …"
 # 清掉 RNOH 遗留的 ArkTS 文件。它们 import '@rnoh/react-native-openharmony'，
 # 而该依赖已从 oh-package.json5 移除，留着会让 ArkTS 编译直接失败。
 ETS_DIR="$ROOT/harmony/entry/src/main/ets"
-rm -f "$ETS_DIR/EntryAbility.ts" "$ETS_DIR/MyAbilityStage.ts" "$ETS_DIR/RNPackages.ts"
+for f in "$ETS_DIR/EntryAbility.ts" "$ETS_DIR/MyAbilityStage.ts" "$ETS_DIR/RNPackages.ts"; do
+  [ -f "$f" ] && mv "$f" /tmp/ 2>/dev/null || true
+done
 
 # 只剩公开证书、没有私钥(p12) 的残缺签名物料会让签发失败，一并清掉重新生成。
 if [ -d "$ROOT/harmony/signing" ] && [ ! -f "$ROOT/harmony/signing/oh-ca.p12" ]; then
   echo "🧹 清理残缺的签名物料（只有 .cer 没有 .p12）"
-  rm -f "$ROOT/harmony/signing"/*.cer "$ROOT/harmony/signing"/debug-profile.json \
-        "$ROOT/harmony/signing"/verify-* 2>/dev/null || true
+  for f in "$ROOT/harmony/signing"/*.cer "$ROOT/harmony/signing"/debug-profile.json "$ROOT/harmony/signing"/verify-*; do
+    [ -f "$f" ] && mv "$f" /tmp/ 2>/dev/null || true
+  done
 fi
 
 # hvigorfile.ts 的 `import { appTasks } from '@ohos/hvigor-ohos-plugin'` 走 Node CJS 解析，

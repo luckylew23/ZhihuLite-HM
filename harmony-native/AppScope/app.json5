@@ -1,0 +1,11 @@
+{
+  "app": {
+    "bundleName": "com.zhihu.minusminus.hmos",
+    "bundleType": "app",
+    "vendor": "zhihu--",
+    "versionCode": 131,
+    "versionName": "0.1",
+    "icon": "$media:app_icon",
+    "label": "$string:app_name"
+  }
+}

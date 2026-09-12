@@ -39,6 +39,53 @@ if [ ! -x "$ZHIHU_SRC/node_modules/.bin/expo" ]; then
   exit 1
 fi
 
+# ---------------------------------------------------------------------------
+# 导出期间的临时改动（脚本退出时自动还原，上游工程最终保持原样）
+#
+#   1) metro.config.js -> scripts/metro.web.config.js
+#      web 平台下把 react-native-pager-view 解析到库自带的 index.web.js。
+#      否则其 main/module 指向 native-only 实现，会 import
+#      react-native/Libraries/Utilities/codegenNativeCommands，
+#      Metro 直接报 "Importing native-only module ... on web" 而打包失败。
+#      该覆盖仅在 platform==='web' 生效，Android/iOS 解析不变。
+#
+#   2) 临时移走 app/index.tsx
+#      该路由只有一个 <Redirect href="/(tabs)"/>。在 ArkWeb 的 resource://
+#      水合场景下这个重定向不生效，App 会停在只有导航栏标题 "index" 的空壳，
+#      真机表现为「启动一片白屏，只有上方 index 一个词」。
+#      移走后 '/' 直接解析到 app/(tabs)/index.tsx，首屏即真正首页。
+# ---------------------------------------------------------------------------
+export HMOS_ROOT="$ROOT"   # metro.web.config.js 用它定位 platform/web/shims/*
+METRO_SRC="$ROOT/scripts/metro.web.config.js"
+METRO_DST="$ZHIHU_SRC/metro.config.js"
+METRO_BAK=""
+INDEX_SRC="$ZHIHU_SRC/app/index.tsx"
+INDEX_BAK="$ZHIHU_SRC/app/index.tsx.hmos-bak"
+
+restore_all() {
+  if [ -n "${METRO_BAK:-}" ] && [ -f "$METRO_BAK" ]; then
+    cp "$METRO_BAK" "$METRO_DST"
+    rm -f "$METRO_BAK"
+  fi
+  if [ -f "$INDEX_BAK" ]; then
+    mv "$INDEX_BAK" "$INDEX_SRC"
+  fi
+  return 0
+}
+trap restore_all EXIT INT TERM
+
+if [ -f "$METRO_SRC" ]; then
+  METRO_BAK="$(mktemp "${TMPDIR:-/tmp}/zhihu-metro.XXXXXX")"
+  cp "$METRO_DST" "$METRO_BAK"
+  cp "$METRO_SRC" "$METRO_DST"
+  echo "   ✓ 临时启用 Web 专用 metro 配置（导出后还原）"
+fi
+
+if [ -f "$INDEX_SRC" ]; then
+  mv "$INDEX_SRC" "$INDEX_BAK"
+  echo "   ✓ 临时移走 app/index.tsx（避免卡在重定向空壳，导出后还原）"
+fi
+
 run_export() {
   ( cd "$ZHIHU_SRC" && CI=1 NODE_OPTIONS=--max-old-space-size=8192 \
       ./node_modules/.bin/expo export --platform web --output-dir dist-web "$@" )

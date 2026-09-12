@@ -1,0 +1,5 @@
+#!/bin/sh
+# 项目级 hvigorw 包装：直接委托 DevEco 自带的全局 hvigor。
+# 全局 hvigorw 通过 $0 定位 hvigorw.js，因此用 exec 透传、$0 指向全局脚本路径，
+# 同时保留当前工作目录（harmony/）作为项目根。
+exec /Applications/DevEco-Studio.app/Contents/tools/hvigor/bin/hvigorw "$@"

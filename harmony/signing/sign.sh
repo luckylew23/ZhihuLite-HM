@@ -58,6 +58,18 @@ fi
 IN="${1:-$ROOT/entry/build/default/outputs/default/entry-default-unsigned.hap}"
 OUT="${2:-$ROOT/entry/build/default/outputs/default/zhihu--default-signed.hap}"
 
+# 把 IN/OUT 解析成绝对路径：本脚本后续会 cd 到 $ROOT/signing，
+# 若调用方传入相对路径，cd 后相对基准会错位导致 sign-app 读不到输入。
+_resolve() {
+  local p="$1"
+  case "$p" in
+    /*) echo "$p" ;;
+    *)  local d; d="$(cd "$(dirname "$p")" 2>/dev/null && pwd)"; echo "${d:+$d/}$(basename "$p")" ;;
+  esac
+}
+IN="$(_resolve "$IN")"
+OUT="$(_resolve "$OUT")"
+
 if [ ! -f "$IN" ]; then
   echo "❌ 未找到待签名包：$IN" >&2
   exit 1
@@ -130,7 +142,7 @@ echo "==> [5/5] 签名 hap"
 "$JAVA" -jar "$ST" sign-app -mode localSign -keyAlias app-sign-key -keyPwd "$PWD_" \
   -appCertFile app-cert.cer -profileFile debug.p7b -inFile "$IN" \
   -signAlg SHA256withECDSA -keystoreFile app-sign.p12 -keystorePwd "$PWD_" \
-  -outFile "$OUT" -compatibleVersion 20
+  -outFile "$OUT" -compatibleVersion 22
 
 echo "==> 验证签名"
 "$JAVA" -jar "$ST" verify-app -inFile "$OUT" -outCertChain verify-cert.cer -outProfile verify-profile.p7b && echo "VERIFY OK"

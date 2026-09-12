@@ -1,0 +1,8 @@
+{
+  "modelVersion": "6.0.0",
+  "name": "zhihu-hmos-native",
+  "version": "1.0.0",
+  "description": "知乎-- HarmonyOS NEXT 原生版（方案B：业务逻辑复用 + ArkTS UI 重写）",
+  "dependencies": {},
+  "devDependencies": {}
+}

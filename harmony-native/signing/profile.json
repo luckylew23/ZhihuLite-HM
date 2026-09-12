@@ -1,0 +1,35 @@
+{
+  "version-name": "2.0.0",
+  "version-code": 2,
+  "uuid": "a7f3d2c1-8b90-4e5f-b2a1-3c4d5e6f7081",
+  "validity": {
+    "not-before": 1786986691,
+    "not-after": 2102433091
+  },
+  "type": "debug",
+  "bundle-info": {
+    "developer-id": "Tydora",
+    "development-certificate": "MIIB_TCCAaOgAwIBAgIEfh-TojAKBggqhkjOPQQDAjBaMQswCQYDVQQGEwJDTjEPMA0GA1UECgwGVHlkb3JhMQ8wDQYDVQQLDAZUeWRvcmExKTAnBgNVBAMMIEFwcGxpY2F0aW9uIFNpZ25hdHVyZSBTZXJ2aWNlIENBMB4XDTI2MDgxODE2NTY0MVoXDTM2MDgxNTE2NTY0MVowRjELMAkGA1UEBhMCQ04xDzANBgNVBAoMBlR5ZG9yYTEPMA0GA1UECwwGVHlkb3JhMRUwEwYDVQQDDAxUeWRvcmEgRGVidWcwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAARkYgisfBBmDxqZHuUoqKCHunNU0cXWBZwN74S39Urms0h1NPK37XMJ5vY0V3Gn6JnO1gh5gv7UBJOwW1EK9s8Bo2swaTAdBgNVHQ4EFgQUtlsHliYIohYLEY9GsodbOf_1768wCQYDVR0TBAIwADAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwMwGAYMKwYBBAGPWwKCeAEDBAgwBgIBAQoBADAKBggqhkjOPQQDAgNIADBFAiEApwTaTjnAXb-a220Y5LyNxemWyk9nb5-1G-yhfPTzRpECICal44BN-oCB4mNfWYRpbwQNhaEH8WsZ00sfPDmaUwd8",
+    "bundle-name": "com.tydora.editor",
+    "apl": "normal",
+    "app-feature": "hos_normal_app"
+  },
+  "acls": {
+    "allowed-acls": [
+      ""
+    ]
+  },
+  "permissions": {
+    "allowed-acls": [
+      ""
+    ],
+    "restricted-permissions": [
+      ""
+    ]
+  },
+  "debug-info": {
+    "device-ids": [],
+    "device-id-type": "udid"
+  },
+  "issuer": "pki_internal"
+}

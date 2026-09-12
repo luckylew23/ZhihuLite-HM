@@ -1,0 +1,139 @@
+/**
+ * pages/PinDetailPage —— 想法（图文）详情。
+ * 上游：app/pin/[id].tsx。
+ * 结构：自绘导航栏 + 作者 + 正文纯文本 + 正文内图片 + 点赞/评论。
+ * 降级：HTML 正文剥标签为纯文本；图片从 content_html 的 <img src> 抽取后单独渲染。
+ */
+
+import { router } from '@kit.ArkUI';
+import { getPin, ZhihuPinDetail } from '../api/pin';
+import { ZhihuColors } from '../utils/theme';
+import { formatDateTime } from '../utils/date';
+import { getZhihuErrorMessage } from '../utils/zhihuError';
+import { DetailNavBar } from '../components/detail/DetailNavBar';
+import { StatusView } from '../components/detail/StatusView';
+import { extractImageUrls, formatCount, readStringParam, stripHtml } from '../components/detail/detailUtils';
+
+@Entry
+@Component
+struct PinDetailPage {
+  @State pinId: string = '';
+  @State loading: boolean = true;
+  @State error: string = '';
+  @State pin: ZhihuPinDetail | null = null;
+  @State images: string[] = [];
+  private bodyText: string = '';
+
+  aboutToAppear(): void {
+    const p = router.getParams() as Record<string, object>;
+    this.pinId = readStringParam(p, 'id');
+    this.load();
+  }
+
+  private async load(): Promise<void> {
+    this.loading = true;
+    this.error = '';
+    try {
+      const pin: ZhihuPinDetail = await getPin(this.pinId);
+      this.pin = pin;
+      const html: string = pin.content_html ?? pin.content ?? '';
+      this.bodyText = stripHtml(html);
+      this.images = extractImageUrls(html);
+    } catch (e) {
+      this.error = getZhihuErrorMessage(e as object);
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  private onComment(): void {
+    router.pushUrl({
+      url: 'pages/CommentsPage',
+      params: { resourceType: 'pins', resourceId: this.pinId },
+    });
+  }
+
+  build() {
+    Column() {
+      DetailNavBar({ title: '想法' })
+
+      if (this.loading) {
+        StatusView({ loading: true })
+      } else if (this.error.length > 0) {
+        StatusView({ error: this.error, onRetry: () => { this.load(); } })
+      } else if (this.pin !== null && this.pin.author !== undefined) {
+        Scroll() {
+          Column({ space: 12 }) {
+            Row({ space: 10 }) {
+              Image(this.pin.author.avatar_url)
+                .width(40).height(40).borderRadius(20)
+                .objectFit(ImageFit.Cover)
+                .backgroundColor(ZhihuColors.backgroundTertiary)
+              Column({ space: 2 }) {
+                Text(this.pin.author.name)
+                  .fontSize(15).fontWeight(FontWeight.Medium).fontColor(ZhihuColors.text)
+                if (this.pin.created && this.pin.created > 0) {
+                  Text(formatDateTime(this.pin.created))
+                    .fontSize(12).fontColor(ZhihuColors.textTertiary)
+                }
+              }
+              .alignItems(HorizontalAlign.Start)
+              .layoutWeight(1)
+            }
+            .width('100%')
+            .alignItems(VerticalAlign.Center)
+
+            if (this.bodyText.length > 0) {
+              Text(this.bodyText)
+                .fontSize(16)
+                .fontColor(ZhihuColors.text)
+                .lineHeight(26)
+                .width('100%')
+                .textAlign(TextAlign.Start)
+            }
+
+            if (this.images.length > 0) {
+              ForEach(this.images, (url: string) => {
+                Image(url)
+                  .width('100%')
+                  .borderRadius(8)
+                  .objectFit(ImageFit.Contain)
+                  .backgroundColor(ZhihuColors.backgroundTertiary)
+                  .margin({ top: 4 })
+              }, (url: string, index: number) => String(index) + '-' + url)
+            }
+          }
+          .width('100%')
+          .padding(16)
+        }
+        .layoutWeight(1)
+        .width('100%')
+        .scrollBar(BarState.Off)
+        .backgroundColor(ZhihuColors.backgroundSecondary)
+
+        Row({ space: 4 }) {
+          Row({ space: 4 }) {
+            Text('▲').fontSize(14).fontColor(ZhihuColors.textSecondary)
+            Text(formatCount(this.pin.like_count ?? 0)).fontSize(14).fontColor(ZhihuColors.textSecondary)
+          }
+          .layoutWeight(1).justifyContent(FlexAlign.Center).padding({ top: 12, bottom: 12 })
+
+          Row({ space: 4 }) {
+            Text('💬').fontSize(14).fontColor(ZhihuColors.textSecondary)
+            Text(formatCount(this.pin.comment_count ?? 0)).fontSize(14).fontColor(ZhihuColors.textSecondary)
+          }
+          .layoutWeight(1).justifyContent(FlexAlign.Center).padding({ top: 12, bottom: 12 })
+          .onClick(() => {
+            this.onComment();
+          })
+        }
+        .width('100%')
+        .backgroundColor(ZhihuColors.backgroundSecondary)
+        .border({ width: { top: 0.5 }, color: ZhihuColors.border })
+      }
+    }
+    .width('100%')
+    .height('100%')
+    .backgroundColor(ZhihuColors.background)
+  }
+}

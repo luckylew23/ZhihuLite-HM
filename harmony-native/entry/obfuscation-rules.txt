@@ -1,0 +1,12 @@
+# ArkTS 混淆规则（entry）
+# ---------------------------------------------------------------------------
+# 本工程为纯 ArkTS WebView 壳，release 构建默认**关闭**混淆
+# （build-profile.json5 中 ruleOptions.enable = false），
+# 但 hvigor 仍要求该文件存在，否则报 00304036 Not Found。
+# 若将来开启混淆，在此补充 -keep 规则即可。
+# ---------------------------------------------------------------------------
+
+# 基础开关
+-enable-property-obfuscation
+-enable-toplevel-obfuscation
+-compact

@@ -1,0 +1,6 @@
+{
+  "rules": {
+    "@pkgspec/require-dev-dependencies-in-package-json": "warn",
+    "no-var-keyword": "warn"
+  }
+}
