@@ -31,7 +31,7 @@ export struct CollectionRow {
       Column({ space: 2 }) {
         Text(this.title)
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(16)
+          .fontSize(17)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.text)
           .maxLines(1)
@@ -39,7 +39,7 @@ export struct CollectionRow {
         if (this.description.length > 0) {
           Text(this.description)
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(12)
+            .fontSize(13)
             .fontColor(ZhihuColors.textTertiary)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })

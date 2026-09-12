@@ -51,7 +51,7 @@ export struct HotCard {
           }
           Text(this.item.title)
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(15)
+            .fontSize(16)
             .fontWeight(FontWeight.Medium)
             .fontColor(ZhihuColors.text)
             .maxLines(2)
@@ -65,7 +65,7 @@ export struct HotCard {
         if (this.item.excerpt.length > 0) {
           Text(this.item.excerpt)
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(13)
+            .fontSize(14)
             .fontColor(ZhihuColors.textSecondary)
             .maxLines(2)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -76,12 +76,12 @@ export struct HotCard {
         Row({ space: 8 }) {
           if (this.item.hotValue.length > 0) {
             Text(this.item.hotValue)
-              .copyOption(CopyOptions.LocalDevice).fontSize(12).fontColor(ZhihuColors.textTertiary)
+              .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
           }
           if (this.item.answerCount > 0) {
             Text(String(this.item.answerCount) + ' 回答')
               .copyOption(CopyOptions.LocalDevice)
-              .fontSize(12)
+              .fontSize(13)
               .fontColor(ZhihuColors.textTertiary)
           }
         }

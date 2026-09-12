@@ -108,10 +108,22 @@ interface RawZhihuMemberActivityTarget {
   id?: string | number;
   type?: string;
   url?: string;
+  title?: string;
+  excerpt?: string;
+  excerpt_title?: string;
+  content?: string | ZhihuMemberActivityContentSegment[];
+  image_url?: string;
+  thumbnail?: string;
+  voteup_count?: number;
+  reaction_count?: number;
+  comment_count?: number;
+  favlists_count?: number;
   created?: number;
   created_time?: number;
   reaction_relation?: { vote?: number | string };
   relationship?: { voting?: number | string };
+  author?: ZhihuAuthor;
+  question?: ZhihuMemberActivityQuestionRef;
 }
 
 interface RawZhihuMemberActivity {
@@ -237,7 +249,7 @@ export const getRecentMemberActivities = async (
   const url =
     'https://api.zhihu.com/moments/recent/people/' +
     encodeURIComponent(String(memberId)) +
-    '?action=down&offset=' + String(cursor.offset) +
+    '/activities?action=down&offset=' + String(cursor.offset) +
     '&page_num=' + String(cursor.pageNum);
 
   const headers: Record<string, string> = getZhihuAppEndpointHeaders(url);
@@ -276,6 +288,18 @@ export const getRecentMemberActivities = async (
       id: getRecentActivityTargetId(rawTarget),
       type: rawTarget.type === 'moments_pin' ? 'pin' : rawTarget.type,
       url: rawTarget.url,
+      title: rawTarget.title,
+      excerpt: rawTarget.excerpt,
+      excerpt_title: rawTarget.excerpt_title,
+      content: rawTarget.content,
+      image_url: rawTarget.image_url,
+      thumbnail: rawTarget.thumbnail,
+      voteup_count: rawTarget.voteup_count,
+      reaction_count: rawTarget.reaction_count,
+      comment_count: rawTarget.comment_count,
+      favlists_count: rawTarget.favlists_count,
+      author: rawTarget.author,
+      question: rawTarget.question,
       created:
         rawTarget.created !== undefined
           ? rawTarget.created

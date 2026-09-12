@@ -72,7 +72,7 @@ struct PublishQuestionPage {
       Blank()
       Text('提问题')
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(17)
+        .fontSize(18)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.text)
       Blank()
@@ -81,7 +81,7 @@ struct PublishQuestionPage {
       } else {
         Text('发布')
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(15)
+          .fontSize(16)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.primary)
           .onClick(() => {
@@ -101,12 +101,12 @@ struct PublishQuestionPage {
       Blank()
       Text('发布内容前请先登录知乎账号')
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(14)
+        .fontSize(15)
         .fontColor(ZhihuColors.textSecondary)
       Button('去登录')
         .width(200)
         .height(42)
-        .fontSize(15)
+        .fontSize(16)
         .backgroundColor(ZhihuColors.primary)
         .onClick(() => {
           router.pushUrl({ url: 'pages/LoginPage' });
@@ -136,14 +136,14 @@ struct PublishQuestionPage {
         TextArea({ text: $$this.content, placeholder: '补充问题背景和细节（可选）' })
           .width('100%')
           .height(320)
-          .fontSize(15)
+          .fontSize(16)
           .placeholderColor(ZhihuColors.textTertiary)
           .backgroundColor(ZhihuColors.backgroundSecondary)
 
         if (this.error.length > 0) {
           Text(this.error)
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(13)
+            .fontSize(14)
             .fontColor(ZhihuColors.danger)
             .width('100%')
         }

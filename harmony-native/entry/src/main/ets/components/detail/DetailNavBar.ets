@@ -21,7 +21,7 @@ export struct DetailNavBar {
         })
       Text(this.title)
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(17)
+        .fontSize(18)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.text)
         .maxLines(1)

@@ -70,10 +70,21 @@ struct AnswerDetailPage {
     }
   }
 
+  /** 赞同者列表（对齐上游 app/answer/[id].tsx 赞同数入口）。 */
+  private openVoters(): void {
+    router.pushUrl({
+      url: 'pages/VotersPage',
+      params: {
+        contentType: 'answer',
+        contentId: this.answerId,
+        count: String(this.voteCount),
+      },
+    });
+  }
+
   private onComment(): void {
     router.pushUrl({
-      url: 'pages/CommentsPage',
-      params: { resourceType: 'answers', resourceId: this.answerId },
+      url: 'pages/CommentsPage',      params: { resourceType: 'answers', resourceId: this.answerId },
     });
   }
 
@@ -136,11 +147,11 @@ struct AnswerDetailPage {
               Column({ space: 2 }) {
                 Text(this.answer.author.name)
                   .copyOption(CopyOptions.LocalDevice)
-                  .fontSize(15).fontWeight(FontWeight.Medium).fontColor(ZhihuColors.text)
+                  .fontSize(16).fontWeight(FontWeight.Medium).fontColor(ZhihuColors.text)
                 if (this.answer.author.headline && this.answer.author.headline.length > 0) {
                   Text(this.answer.author.headline)
                     .copyOption(CopyOptions.LocalDevice)
-                    .fontSize(12).fontColor(ZhihuColors.textTertiary)
+                    .fontSize(13).fontColor(ZhihuColors.textTertiary)
                     .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
                 }
               }
@@ -153,7 +164,7 @@ struct AnswerDetailPage {
             // 正文（纯文本降级）
             Text(this.bodyText)
               .copyOption(CopyOptions.LocalDevice)
-              .fontSize(16)
+              .fontSize(17)
               .fontColor(ZhihuColors.text)
               .lineHeight(26)
               .width('100%')
@@ -162,7 +173,7 @@ struct AnswerDetailPage {
             if (this.metaText().length > 0) {
               Text(this.metaText())
                 .copyOption(CopyOptions.LocalDevice)
-                .fontSize(12)
+                .fontSize(13)
                 .fontColor(ZhihuColors.textTertiary)
                 .width('100%')
             }
@@ -180,12 +191,15 @@ struct AnswerDetailPage {
           Row({ space: 4 }) {
             Text(this.voting === 1 ? '▲' : '△')
               .copyOption(CopyOptions.LocalDevice)
-              .fontSize(14)
+              .fontSize(15)
               .fontColor(this.voting === 1 ? ZhihuColors.primary : ZhihuColors.textSecondary)
             Text(formatCount(this.voteCount))
               .copyOption(CopyOptions.LocalDevice)
-              .fontSize(14)
+              .fontSize(15)
               .fontColor(this.voting === 1 ? ZhihuColors.primary : ZhihuColors.textSecondary)
+              .onClick(() => {
+                this.openVoters();
+              })
           }
           .layoutWeight(1)
           .justifyContent(FlexAlign.Center)
@@ -197,11 +211,11 @@ struct AnswerDetailPage {
           Row({ space: 4 }) {
             Text(this.voting === -1 ? '▼' : '▽')
               .copyOption(CopyOptions.LocalDevice)
-              .fontSize(14)
+              .fontSize(15)
               .fontColor(this.voting === -1 ? ZhihuColors.danger : ZhihuColors.textSecondary)
             Text('反对')
               .copyOption(CopyOptions.LocalDevice)
-              .fontSize(14)
+              .fontSize(15)
               .fontColor(this.voting === -1 ? ZhihuColors.danger : ZhihuColors.textSecondary)
           }
           .layoutWeight(1)
@@ -213,9 +227,9 @@ struct AnswerDetailPage {
 
           Row({ space: 4 }) {
             Text('💬')
-              .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
+              .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textSecondary)
             Text(formatCount(this.answer.comment_count))
-              .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
+              .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textSecondary)
           }
           .layoutWeight(1)
           .justifyContent(FlexAlign.Center)
@@ -226,9 +240,9 @@ struct AnswerDetailPage {
 
           Row({ space: 4 }) {
             Text('★')
-              .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
+              .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textSecondary)
             Text('收藏')
-              .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
+              .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textSecondary)
           }
           .layoutWeight(1)
           .justifyContent(FlexAlign.Center)

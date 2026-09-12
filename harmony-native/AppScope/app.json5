@@ -1,9 +1,9 @@
 {
   "app": {
-    "bundleName": "com.zhihu.minusminus.hmos",
+    "bundleName": "com.zhihulite.hmos",
     "bundleType": "app",
-    "vendor": "zhihu--",
-    "versionCode": 1,
+    "vendor": "ZhihuLite-HM",
+    "versionCode": 133,
     "versionName": "0.1",
     "icon": "$media:app_icon",
     "label": "$string:app_name"

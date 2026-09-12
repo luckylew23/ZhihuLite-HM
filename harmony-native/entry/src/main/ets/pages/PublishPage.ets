@@ -67,12 +67,12 @@ struct PublishPage {
       Column({ space: 3 }) {
         Text(item.title)
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(17)
+          .fontSize(18)
           .fontWeight(FontWeight.Bold)
           .fontColor(ZhihuColors.text)
         Text(item.subtitle)
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(13)
+          .fontSize(14)
           .fontColor(ZhihuColors.textSecondary)
       }
       .alignItems(HorizontalAlign.Start)
@@ -118,7 +118,7 @@ struct PublishPage {
           })
         Text('发布内容')
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(17)
+          .fontSize(18)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.text)
           .layoutWeight(1)
@@ -138,7 +138,7 @@ struct PublishPage {
           .fontColor(ZhihuColors.text)
         Text('让世界看到你的思考')
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(14)
+          .fontSize(15)
           .fontColor(ZhihuColors.textSecondary)
       }
       .width('100%')

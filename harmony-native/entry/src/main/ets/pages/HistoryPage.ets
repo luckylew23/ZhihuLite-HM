@@ -192,14 +192,14 @@ export struct HistoryPage {
       if (this.selecting) {
         Text(this.isSelected(this.makeKey(item)) ? '●' : '○')
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(16)
+          .fontSize(17)
           .fontColor(this.isSelected(this.makeKey(item))
             ? ZhihuColors.primary : ZhihuColors.textTertiary)
       }
       Column({ space: 6 }) {
         Text(item.data.header.title)
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(15)
+          .fontSize(16)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.text)
           .maxLines(2)
@@ -208,7 +208,7 @@ export struct HistoryPage {
         if (item.data.content.summary.length > 0) {
           Text(item.data.content.summary)
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(13)
+            .fontSize(14)
             .fontColor(ZhihuColors.textSecondary)
             .maxLines(2)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -218,13 +218,13 @@ export struct HistoryPage {
           Text(item.data.matrix.length > 0 && item.data.matrix[0].data
             ? item.data.matrix[0].data.text : '')
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(12)
+            .fontSize(13)
             .fontColor(ZhihuColors.textTertiary)
             .layoutWeight(1)
           Text(item.data.extra.read_time > 0
             ? formatDate(item.data.extra.read_time) : '')
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(12)
+            .fontSize(13)
             .fontColor(ZhihuColors.textTertiary)
         }
         .width('100%')
@@ -256,13 +256,13 @@ export struct HistoryPage {
         Row({ space: 8 }) {
           LoadingProgress().width(18).height(18).color(ZhihuColors.textTertiary)
           Text('加载中…')
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
         }
         .justifyContent(FlexAlign.Center).width('100%').padding(12)
       } else if (this.isEnd && this.items.length > 0) {
         Text('— 没有更多了 —')
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(13).fontColor(ZhihuColors.textTertiary)
+          .fontSize(14).fontColor(ZhihuColors.textTertiary)
           .width('100%').textAlign(TextAlign.Center).padding(12)
       }
     }
@@ -281,7 +281,7 @@ export struct HistoryPage {
         Column({ space: 16 }) {
           Blank()
           Text('登录后才能查看浏览历史')
-            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textSecondary)
           Button('登录知乎')
             .width(220).height(44).backgroundColor(ZhihuColors.primary)
             .onClick(() => {
@@ -294,15 +294,15 @@ export struct HistoryPage {
         Column({ space: 8 }) {
           LoadingProgress().width(48).height(48).color(ZhihuColors.primary)
           Text('加载中…')
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
         }
         .width('100%').layoutWeight(1).justifyContent(FlexAlign.Center)
       } else if (this.error.length > 0 && this.items.length === 0) {
         Column({ space: 16 }) {
           Text(this.error)
-            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textSecondary)
           Button('重试')
-            .fontSize(14).backgroundColor(ZhihuColors.primary)
+            .fontSize(15).backgroundColor(ZhihuColors.primary)
             .onClick(() => {
               this.loadFirst();
             })
@@ -311,7 +311,7 @@ export struct HistoryPage {
       } else if (this.items.length === 0) {
         Column() {
           Text('这里空空如也')
-            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textTertiary)
         }
         .width('100%').layoutWeight(1).justifyContent(FlexAlign.Center)
       } else {
@@ -338,7 +338,7 @@ export struct HistoryPage {
           Button('删除选中 (' + String(this.selectedKeys.length) + ')')
             .width('90%')
             .height(44)
-            .fontSize(15)
+            .fontSize(16)
             .fontColor(ZhihuColors.textInverse)
             .backgroundColor(ZhihuColors.danger)
             .margin({ bottom: 16 })

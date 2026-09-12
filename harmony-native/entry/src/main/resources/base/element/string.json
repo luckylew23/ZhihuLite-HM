@@ -1,6 +1,6 @@
 {
   "string": [
-    { "name": "app_name", "value": "知乎--" },
+    { "name": "app_name", "value": "ZhihuLite-HM" },
     { "name": "module_desc", "value": "Zhihu-- HMOS native module" },
     { "name": "EntryAbility_desc", "value": "Zhihu-- HarmonyOS entry ability" },
     { "name": "EntryAbility_label", "value": "知乎--" }

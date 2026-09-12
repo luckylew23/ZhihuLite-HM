@@ -126,7 +126,7 @@ export const getQuestion = async (
     return res.data;
   }
 
-  const requestUrl = buildZhihuAppQuestionUrl(id, include ?? QUESTION_INCLUDE);
+  const requestUrl = buildZhihuAppQuestionUrl(id, include ?? APP_QUESTION_INCLUDE);
   const res = await zhihuClient.get<ZhihuQuestionDetail>(requestUrl, {
     headers: getZhihuAppEndpointHeaders(requestUrl),
   });

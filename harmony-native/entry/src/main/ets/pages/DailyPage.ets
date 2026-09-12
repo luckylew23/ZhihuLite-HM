@@ -126,7 +126,7 @@ export struct DailyPage {
       Column({ space: 6 }) {
         Text(item.title ?? '')
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(15)
+          .fontSize(16)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.text)
           .maxLines(3)
@@ -135,7 +135,7 @@ export struct DailyPage {
         if (item.hint && item.hint.length > 0) {
           Text(item.hint)
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(12)
+            .fontSize(13)
             .fontColor(ZhihuColors.textTertiary)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -161,7 +161,7 @@ export struct DailyPage {
         Row({ space: 8 }) {
           LoadingProgress().width(18).height(18).color(ZhihuColors.textTertiary)
           Text('加载更早…')
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
         }
         .justifyContent(FlexAlign.Center)
         .width('100%')
@@ -169,7 +169,7 @@ export struct DailyPage {
       } else if (this.stories.length > 0) {
         Text('— 已加载全部日报 —')
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(13)
+          .fontSize(14)
           .fontColor(ZhihuColors.textTertiary)
           .width('100%')
           .textAlign(TextAlign.Center)
@@ -183,7 +183,7 @@ export struct DailyPage {
     Row() {
       Text(this.date.length > 0 ? formatDailyDate(this.date) + ' 日报' : '日报')
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(14)
+        .fontSize(15)
         .fontWeight(FontWeight.Bold)
         .fontColor(ZhihuColors.primary)
     }
@@ -228,7 +228,7 @@ export struct DailyPage {
         Column({ space: 8 }) {
           LoadingProgress().width(48).height(48).color(ZhihuColors.primary)
           Text('日报加载中…')
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
         }
       }
 
@@ -237,10 +237,10 @@ export struct DailyPage {
         Column({ space: 16 }) {
           Text(this.error)
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(14)
+            .fontSize(15)
             .fontColor(ZhihuColors.textSecondary)
           Button('重试')
-            .fontSize(14)
+            .fontSize(15)
             .backgroundColor(ZhihuColors.primary)
             .onClick(() => {
               this.loadLatest();

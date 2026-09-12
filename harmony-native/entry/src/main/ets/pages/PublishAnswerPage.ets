@@ -92,7 +92,7 @@ struct PublishAnswerPage {
       Blank()
       Text('写回答')
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(17)
+        .fontSize(18)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.text)
       Blank()
@@ -101,7 +101,7 @@ struct PublishAnswerPage {
       } else {
         Text('发布')
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(15)
+          .fontSize(16)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.primary)
           .onClick(() => {
@@ -121,12 +121,12 @@ struct PublishAnswerPage {
       Blank()
       Text('发布回答前请先登录知乎账号')
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(14)
+        .fontSize(15)
         .fontColor(ZhihuColors.textSecondary)
       Button('去登录')
         .width(200)
         .height(42)
-        .fontSize(15)
+        .fontSize(16)
         .backgroundColor(ZhihuColors.primary)
         .onClick(() => {
           router.pushUrl({ url: 'pages/LoginPage' });
@@ -145,7 +145,7 @@ struct PublishAnswerPage {
         TextInput({ text: $$this.questionId, placeholder: '问题 ID（如 123456789）' })
           .width('100%')
           .height(52)
-          .fontSize(16)
+          .fontSize(17)
           .placeholderColor(ZhihuColors.textTertiary)
           .backgroundColor(ZhihuColors.backgroundSecondary)
           .type(InputType.Number)
@@ -156,14 +156,14 @@ struct PublishAnswerPage {
         TextArea({ text: $$this.content, placeholder: '写下你的回答…' })
           .width('100%')
           .height(360)
-          .fontSize(15)
+          .fontSize(16)
           .placeholderColor(ZhihuColors.textTertiary)
           .backgroundColor(ZhihuColors.backgroundSecondary)
 
         if (this.error.length > 0) {
           Text(this.error)
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(13)
+            .fontSize(14)
             .fontColor(ZhihuColors.danger)
             .width('100%')
         }

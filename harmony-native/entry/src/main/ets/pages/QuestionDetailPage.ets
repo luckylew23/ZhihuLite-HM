@@ -147,7 +147,10 @@ struct QuestionDetailPage {
     if (!guardLogin()) {
       return;
     }
-    // 写回答编辑器暂未在本期移植，仅占位入口。
+    router.pushUrl({
+      url: 'pages/PublishAnswerPage',
+      params: { questionId: this.qId },
+    });
   }
 
   /** 用系统浏览器打开外部链接（媒体报道等）。 */
@@ -216,12 +219,12 @@ struct QuestionDetailPage {
         Column({ space: 2 }) {
           Text('媒体报道')
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(13)
+            .fontSize(14)
             .fontWeight(FontWeight.Medium)
             .fontColor(ZhihuColors.text)
           Text(this.mediaTitle().length > 0 ? this.mediaTitle() : this.mediaUrl())
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(13)
+            .fontSize(14)
             .fontColor(ZhihuColors.textSecondary)
             .maxLines(2)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -232,7 +235,7 @@ struct QuestionDetailPage {
 
         Text('↗')
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(16)
+          .fontSize(17)
           .fontColor(ZhihuColors.primary)
       }
       .width('100%')
@@ -267,7 +270,7 @@ struct QuestionDetailPage {
 
         Text(this.detailText())
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(14)
+          .fontSize(15)
           .fontColor(ZhihuColors.textSecondary)
           .lineHeight(21)
           .width('100%')
@@ -278,7 +281,7 @@ struct QuestionDetailPage {
         if ((this.question?.detail ?? '').length > 0) {
           Text(this.detailExpanded ? '收起' : '展开全文')
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(13)
+            .fontSize(14)
             .fontWeight(FontWeight.Medium)
             .fontColor(ZhihuColors.primary)
             .onClick(() => {
@@ -295,7 +298,7 @@ struct QuestionDetailPage {
   actionButton(label: string, isActive: boolean, onClick: () => void) {
     Text(label)
       .copyOption(CopyOptions.LocalDevice)
-      .fontSize(13)
+      .fontSize(14)
       .fontWeight(FontWeight.Medium)
       .fontColor(ZhihuColors.primary)
       .layoutWeight(1)
@@ -311,7 +314,7 @@ struct QuestionDetailPage {
     Column({ space: 4 }) {
       Text(label)
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(14)
+        .fontSize(15)
         .fontColor(this.sortBy === mode ? ZhihuColors.primary : ZhihuColors.textSecondary)
         .fontWeight(this.sortBy === mode ? FontWeight.Bold : FontWeight.Normal)
       if (this.sortBy === mode) {
@@ -335,7 +338,7 @@ struct QuestionDetailPage {
         Row({ space: 8 }) {
           LoadingProgress().width(20).height(20).color(ZhihuColors.primary)
           Text('问题加载中…')
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
         }
         .justifyContent(FlexAlign.Center)
         .width('100%')
@@ -343,8 +346,8 @@ struct QuestionDetailPage {
       } else if (this.qError.length > 0) {
         Column({ space: 12 }) {
           Text(this.qError)
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textSecondary)
-          Button('重试').fontSize(13).backgroundColor(ZhihuColors.primary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
+          Button('重试').fontSize(14).backgroundColor(ZhihuColors.primary)
             .onClick(() => {
               this.loadQuestion();
             })
@@ -367,7 +370,7 @@ struct QuestionDetailPage {
             ForEach(this.question.topics, (topic: ZhihuTopic) => {
               Text(topic.name)
                 .copyOption(CopyOptions.LocalDevice)
-                .fontSize(12)
+                .fontSize(13)
                 .fontColor(ZhihuColors.primary)
                 .padding({ left: 12, right: 12, top: 5, bottom: 5 })
                 .borderRadius(14)
@@ -390,7 +393,7 @@ struct QuestionDetailPage {
         // 5. 关注·浏览数据行
         Text((this.followerCount) + ' 关注 · ' + (this.question?.visit_count ?? 0) + ' 浏览')
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(13)
+          .fontSize(14)
           .fontColor(ZhihuColors.textTertiary)
           .width('100%')
 
@@ -412,7 +415,7 @@ struct QuestionDetailPage {
         Row() {
           Text((this.question?.answer_count ?? 0) + ' 个回答')
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(15)
+            .fontSize(16)
             .fontWeight(FontWeight.Medium)
             .fontColor(ZhihuColors.text)
             .layoutWeight(1)
@@ -436,7 +439,7 @@ struct QuestionDetailPage {
         Row({ space: 8 }) {
           LoadingProgress().width(16).height(16).color(ZhihuColors.textTertiary)
           Text('加载中…')
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
         }
         .justifyContent(FlexAlign.Center)
         .width('100%')
@@ -444,7 +447,7 @@ struct QuestionDetailPage {
       } else if (this.isEnd && this.answers.length > 0) {
         Text('— 没有更多回答了 —')
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(13)
+          .fontSize(14)
           .fontColor(ZhihuColors.textTertiary)
           .width('100%')
           .textAlign(TextAlign.Center)
@@ -486,7 +489,7 @@ struct QuestionDetailPage {
           Column({ space: 8 }) {
             LoadingProgress().width(40).height(40).color(ZhihuColors.primary)
             Text('回答加载中…')
-              .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
+              .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
           }
           .width('100%')
           .padding(60)
@@ -494,8 +497,8 @@ struct QuestionDetailPage {
         if (this.answersError.length > 0 && this.answers.length === 0) {
           Column({ space: 16 }) {
             Text(this.answersError)
-              .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
-            Button('重试').fontSize(14).backgroundColor(ZhihuColors.primary)
+              .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textSecondary)
+            Button('重试').fontSize(15).backgroundColor(ZhihuColors.primary)
               .onClick(() => {
                 this.loadAnswers(true);
               })
@@ -506,7 +509,7 @@ struct QuestionDetailPage {
         if (!this.answersLoading && this.answersError.length === 0 && this.answers.length === 0 && !this.loadingQ) {
           Text('暂无回答')
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(14)
+            .fontSize(15)
             .fontColor(ZhihuColors.textTertiary)
             .width('100%')
             .padding(60)

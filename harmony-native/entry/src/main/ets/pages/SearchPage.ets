@@ -333,12 +333,12 @@ struct SearchPage {
         })
       Row() {
         Text('🔍')
-          .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary).margin({ right: 6 })
+          .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary).margin({ right: 6 })
         TextInput({ placeholder: '搜索知乎内容…', text: this.query })
           .layoutWeight(1)
           .height(36)
           .backgroundColor(Color.Transparent)
-          .fontSize(14)
+          .fontSize(15)
           .placeholderColor(ZhihuColors.textTertiary)
           .onChange((v: string) => {
             this.onInputChange(v);
@@ -371,7 +371,7 @@ struct SearchPage {
       .alignItems(VerticalAlign.Center)
       Text('搜索')
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(15)
+        .fontSize(16)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.primary)
         .padding({ left: 6, right: 6 })
@@ -392,7 +392,7 @@ struct SearchPage {
         Column() {
           Text(label)
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(16)
+            .fontSize(17)
             .fontColor(this.activeTab === index ? ZhihuColors.primary : ZhihuColors.textSecondary)
             .fontWeight(this.activeTab === index ? FontWeight.Bold : FontWeight.Normal)
           Divider()
@@ -419,9 +419,9 @@ struct SearchPage {
       // 筛选 pill（带激活数 badge）
       Row({ space: 6 }) {
         Text('≡')
-          .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.primary)
-        Text('筛选')
           .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.primary)
+        Text('筛选')
+          .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.primary)
         if (this.timeFilter.length > 0) {
           Stack() {
             Text('1')
@@ -441,10 +441,10 @@ struct SearchPage {
       Row({ space: 4 }) {
         Text('时间：' + timeLabel(this.timeFilter))
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(14)
+          .fontSize(15)
           .fontColor(ZhihuColors.primary)
         Text('▾')
-          .copyOption(CopyOptions.LocalDevice).fontSize(11).fontColor(ZhihuColors.primary)
+          .copyOption(CopyOptions.LocalDevice).fontSize(12).fontColor(ZhihuColors.primary)
       }
       .height(34)
       .padding({ left: 12, right: 12 })
@@ -454,7 +454,7 @@ struct SearchPage {
       Blank()
       Text('重置')
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(14)
+        .fontSize(15)
         .fontColor(ZhihuColors.textSecondary)
         .onClick(() => {
           this.resetFilter();
@@ -483,14 +483,14 @@ struct SearchPage {
     Row({ space: 8 }) {
       Text('“' + this.submitted + '”的结果')
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(13)
+        .fontSize(14)
         .fontColor(ZhihuColors.textTertiary)
         .maxLines(1)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
         .layoutWeight(1)
       Text('已加载 ' + this.loadedCount() + ' 条')
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(13)
+        .fontSize(14)
         .fontColor(ZhihuColors.textTertiary)
     }
     .width('100%')
@@ -509,10 +509,10 @@ struct SearchPage {
         ListItem() {
           Row({ space: 12 }) {
             Text('🔍')
-              .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
+              .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textTertiary)
             Text(s.query)
               .copyOption(CopyOptions.LocalDevice)
-              .fontSize(15)
+              .fontSize(16)
               .fontColor(ZhihuColors.text)
               .layoutWeight(1)
           }
@@ -541,10 +541,10 @@ struct SearchPage {
         .backgroundColor(ZhihuColors.backgroundTertiary)
       Column({ space: 3 }) {
         Text(p.name)
-          .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.text).maxLines(1)
+          .copyOption(CopyOptions.LocalDevice).fontSize(16).fontColor(ZhihuColors.text).maxLines(1)
         Text(p.headline)
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(13)
+          .fontSize(14)
           .fontColor(ZhihuColors.textSecondary)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -565,7 +565,7 @@ struct SearchPage {
       if (item.author.avatar.length === 0 || item.author.name === '匿名用户') {
         Text('匿名用户')
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(14)
+          .fontSize(15)
           .fontColor(ZhihuColors.textSecondary)
           .width('100%')
           .textAlign(TextAlign.Center)
@@ -579,7 +579,7 @@ struct SearchPage {
             .backgroundColor(ZhihuColors.backgroundTertiary)
           Text(item.author.name)
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(14)
+            .fontSize(15)
             .fontColor(ZhihuColors.text)
             .maxLines(1)
             .layoutWeight(1)
@@ -590,7 +590,7 @@ struct SearchPage {
       if (item.title.length > 0) {
         Text(item.title)
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(16)
+          .fontSize(17)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.text)
           .maxLines(2)
@@ -603,7 +603,7 @@ struct SearchPage {
         Row({ space: 10 }) {
           Text(item.excerpt)
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(14)
+            .fontSize(15)
             .fontColor(ZhihuColors.textSecondary)
             .maxLines(3)
             .lineHeight(20)
@@ -625,27 +625,27 @@ struct SearchPage {
       Row({ space: 18 }) {
         Row({ space: 4 }) {
           Text('▲')
-            .copyOption(CopyOptions.LocalDevice).fontSize(12).fontColor(ZhihuColors.textTertiary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
           Text(formatCount(item.voteCount))
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textSecondary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
         }
         Row({ space: 4 }) {
           Text('○')
-            .copyOption(CopyOptions.LocalDevice).fontSize(12).fontColor(ZhihuColors.textTertiary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
           Text(formatCount(item.commentCount))
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textSecondary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
         }
         if (item.favlistsCount !== undefined && item.favlistsCount > 0) {
           Row({ space: 4 }) {
             Text('☆')
-              .copyOption(CopyOptions.LocalDevice).fontSize(12).fontColor(ZhihuColors.textTertiary)
+              .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
             Text(formatCount(item.favlistsCount))
-              .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textSecondary)
+              .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
           }
         }
         Blank()
         Text('···')
-          .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
+          .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
       }
       .width('100%')
     }
@@ -681,11 +681,11 @@ struct SearchPage {
             Row({ space: 8 }) {
               LoadingProgress().width(16).height(16).color(ZhihuColors.textTertiary)
               Text('加载中…')
-                .copyOption(CopyOptions.LocalDevice).fontSize(12).fontColor(ZhihuColors.textTertiary)
+                .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
             }
           } else if (this.isEnd && (this.feedResults.length > 0 || this.peopleResults.length > 0)) {
             Text('— 没有更多了 —')
-              .copyOption(CopyOptions.LocalDevice).fontSize(12).fontColor(ZhihuColors.textTertiary)
+              .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
           }
         }
         .width('100%')
@@ -717,7 +717,7 @@ struct SearchPage {
         Column() {
           Text('搜索你想知道的内容')
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(15)
+            .fontSize(16)
             .fontColor(ZhihuColors.textTertiary)
         }
         .width('100%')
@@ -727,7 +727,7 @@ struct SearchPage {
         Column({ space: 8 }) {
           LoadingProgress().width(40).height(40).color(ZhihuColors.primary)
           Text('搜索中…')
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
         }
         .width('100%')
         .layoutWeight(1)
@@ -735,7 +735,7 @@ struct SearchPage {
       } else if (this.error.length > 0) {
         Column({ space: 16 }) {
           Text(this.error)
-            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textSecondary)
           Button('重试')
             .backgroundColor(ZhihuColors.primary)
             .onClick(() => {
@@ -748,9 +748,9 @@ struct SearchPage {
       } else if (this.feedResults.length === 0 && this.peopleResults.length === 0) {
         Column({ space: 8 }) {
           Text('没有找到相关内容')
-            .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textSecondary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(16).fontColor(ZhihuColors.textSecondary)
           Text('换个关键词试试')
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
         }
         .width('100%')
         .layoutWeight(1)

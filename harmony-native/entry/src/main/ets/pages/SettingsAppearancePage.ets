@@ -93,7 +93,7 @@ struct SettingsAppearancePage {
     Row() {
       Text(option.label)
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(16)
+        .fontSize(17)
         .fontColor(ZhihuColors.text)
         .layoutWeight(1)
       if (this.mode === option.value) {
@@ -123,7 +123,7 @@ struct SettingsAppearancePage {
         Column({ space: 0 }) {
           Text('主题模式')
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(13)
+            .fontSize(14)
             .fontColor(ZhihuColors.textSecondary)
             .width('100%')
             .padding({ left: 4, top: 4, bottom: 8 })
@@ -139,14 +139,14 @@ struct SettingsAppearancePage {
 
           Text('选择后立即生效；“系统”跟随系统深浅色模式。')
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(12)
+            .fontSize(13)
             .fontColor(ZhihuColors.textTertiary)
             .width('100%')
             .padding({ left: 4, top: 16, bottom: 4 })
 
           Text('栏目展示')
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(13)
+            .fontSize(14)
             .fontColor(ZhihuColors.textSecondary)
             .width('100%')
             .padding({ left: 4, top: 12, bottom: 8 })
@@ -156,7 +156,7 @@ struct SettingsAppearancePage {
               Row({ space: 12 }) {
                 Text(opt.label)
                   .copyOption(CopyOptions.LocalDevice)
-                  .fontSize(16)
+                  .fontSize(17)
                   .fontColor(ZhihuColors.text)
                   .layoutWeight(1)
                 Toggle({ type: ToggleType.Switch, isOn: this.isTabOn(opt.key) })
@@ -180,7 +180,7 @@ struct SettingsAppearancePage {
 
           Text('控制首页底栏可见栏目；个人中心与发布固定显示。')
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(12)
+            .fontSize(13)
             .fontColor(ZhihuColors.textTertiary)
             .width('100%')
             .padding({ left: 4, top: 12 })

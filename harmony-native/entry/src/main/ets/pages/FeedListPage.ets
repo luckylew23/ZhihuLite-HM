@@ -157,6 +157,16 @@ export struct FeedListPage {
         url: 'pages/PinDetailPage',
         params: { id: item.id },
       });
+    } else if (t === 'videos') {
+      router.pushUrl({
+        url: 'pages/VideoPage',
+        params: {
+          id: item.id,
+          title: item.title ?? '',
+          author: item.author?.name ?? '',
+          description: item.excerpt ?? '',
+        },
+      });
     } else {
       // 无法识别类型保留跳旧 DetailPage
       router.pushUrl({
@@ -188,7 +198,7 @@ export struct FeedListPage {
         Row({ space: 8 }) {
           LoadingProgress().width(18).height(18).color(ZhihuColors.textTertiary)
           Text('加载中…')
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
         }
         .justifyContent(FlexAlign.Center)
         .width('100%')
@@ -196,7 +206,7 @@ export struct FeedListPage {
       } else if (this.isEnd && (this.items.length > 0 || this.hotItems.length > 0)) {
         Text('— 没有更多了 —')
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(13)
+          .fontSize(14)
           .fontColor(ZhihuColors.textTertiary)
           .width('100%')
           .textAlign(TextAlign.Center)
@@ -210,11 +220,11 @@ export struct FeedListPage {
     Row({ space: 8 }) {
       Text('🔍')
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(15)
+        .fontSize(16)
         .fontColor(ZhihuColors.textTertiary)
       Text('搜索知乎')
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(14)
+        .fontSize(15)
         .fontColor(ZhihuColors.textTertiary)
         .layoutWeight(1)
     }
@@ -306,7 +316,7 @@ export struct FeedListPage {
         Column({ space: 8 }) {
           LoadingProgress().width(48).height(48).color(ZhihuColors.primary)
           Text('加载中…')
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
         }
       }
 
@@ -315,10 +325,10 @@ export struct FeedListPage {
         Column({ space: 16 }) {
           Text(this.error)
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(14)
+            .fontSize(15)
             .fontColor(ZhihuColors.textSecondary)
           Button('重试')
-            .fontSize(14)
+            .fontSize(15)
             .backgroundColor(ZhihuColors.primary)
             .onClick(() => {
               this.loadFirst();

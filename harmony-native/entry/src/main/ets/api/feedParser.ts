@@ -26,7 +26,7 @@ export interface HotItem {
   labelArea: { type: string; text?: string; normal_color?: string } | null;
 }
 
-export type FeedCardType = 'answers' | 'articles' | 'pins' | 'questions';
+export type FeedCardType = 'answers' | 'articles' | 'pins' | 'questions' | 'videos';
 
 /**
  * 归一化回答的付费类型。
@@ -46,6 +46,7 @@ function toFeedType(type: string | undefined): FeedCardType | null {
   if (type === 'article') return 'articles';
   if (type === 'pin') return 'pins';
   if (type === 'question') return 'questions';
+  if (type === 'zvideo' || type === 'video') return 'videos';
   return null;
 }
 

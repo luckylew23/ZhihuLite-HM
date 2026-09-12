@@ -29,9 +29,11 @@ interface FollowTabItem {
   intro: string;
   avatar: string;
   meta: string;
+  id?: string;
 }
 
 interface ColumnListItem {
+  id?: string | number;
   title?: string;
   intro?: string;
   image_url?: string;
@@ -165,6 +167,7 @@ struct FollowManagePage {
         intro: c.intro ?? '',
         avatar: c.image_url ?? '',
         meta: this.metaOf(c.followers, c.articles_count),
+        id: c.id !== undefined ? String(c.id) : '',
       });
     }
     return out;
@@ -261,7 +264,7 @@ struct FollowManagePage {
         Column({ space: 6 }) {
           Text(tab.label)
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(15)
+            .fontSize(16)
             .fontWeight(this.currentTab === index ? FontWeight.Bold : FontWeight.Normal)
             .fontColor(this.currentTab === index ? ZhihuColors.primary : ZhihuColors.textSecondary)
           Divider()
@@ -284,8 +287,7 @@ struct FollowManagePage {
   @Builder
   itemRow(item: FollowTabItem) {
     Row({ space: 14 }) {
-      if (item.avatar.length > 0) {
-        Image(item.avatar)
+      if (item.avatar.length > 0) {        Image(item.avatar)
           .width(52)
           .height(52)
           .borderRadius(26)
@@ -305,7 +307,7 @@ struct FollowManagePage {
       Column({ space: 4 }) {
         Text(item.name)
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(16)
+          .fontSize(17)
           .fontWeight(FontWeight.Bold)
           .fontColor(ZhihuColors.text)
           .maxLines(1)
@@ -313,21 +315,21 @@ struct FollowManagePage {
         if (item.intro.length > 0) {
           Text(item.intro)
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(13)
+            .fontSize(14)
             .fontColor(ZhihuColors.textSecondary)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
         }
         Text(item.meta)
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(12)
+          .fontSize(13)
           .fontColor(ZhihuColors.textTertiary)
       }
       .alignItems(HorizontalAlign.Start)
       .layoutWeight(1)
       Text('已关注')
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(13)
+        .fontSize(14)
         .fontColor(ZhihuColors.textSecondary)
         .padding({ left: 14, right: 14, top: 7, bottom: 7 })
         .backgroundColor(ZhihuColors.backgroundTertiary)
@@ -335,6 +337,19 @@ struct FollowManagePage {
     }
     .width('100%')
     .padding({ left: 16, right: 16, top: 14, bottom: 14 })
+    .onClick(() => {
+      this.openRow(item);
+    })
+  }
+
+  /** 条目点击：专栏行 → 专栏详情；其余 tab 暂不跳转。 */
+  private openRow(item: FollowTabItem): void {
+    if (this.currentTab === 1 && item.id !== undefined && item.id.length > 0) {
+      router.pushUrl({
+        url: 'pages/ColumnPage',
+        params: { id: item.id },
+      });
+    }
   }
 
   build() {
@@ -345,7 +360,7 @@ struct FollowManagePage {
         Column() {
           Text('加载中…')
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(14)
+            .fontSize(15)
             .fontColor(ZhihuColors.textTertiary)
         }
         .width('100%')
@@ -355,7 +370,7 @@ struct FollowManagePage {
         Column() {
           Text('暂无数据')
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(14)
+            .fontSize(15)
             .fontColor(ZhihuColors.textTertiary)
         }
         .width('100%')

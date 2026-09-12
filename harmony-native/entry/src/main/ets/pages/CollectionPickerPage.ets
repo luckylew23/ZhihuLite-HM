@@ -190,7 +190,7 @@ struct CollectionPickerPage {
         }
         Text(this.creating ? '新建收藏夹' : '收藏至收藏夹')
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(16)
+          .fontSize(17)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.text)
         Blank()
@@ -199,7 +199,7 @@ struct CollectionPickerPage {
             Text('+')
               .copyOption(CopyOptions.LocalDevice).fontSize(18).fontColor(ZhihuColors.primary)
             Text('新建')
-              .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.primary)
+              .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.primary)
           }
           .padding(8)
           .onClick(() => {
@@ -226,7 +226,7 @@ struct CollectionPickerPage {
       } else if (!authStore.isLoggedIn) {
         Column({ space: 16 }) {
           Text('登录后可查看并管理收藏夹')
-            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textSecondary)
           Button('去登录')
             .backgroundColor(ZhihuColors.primary)
             .onClick(() => {
@@ -240,7 +240,7 @@ struct CollectionPickerPage {
         Column({ space: 8 }) {
           LoadingProgress().width(40).height(40).color(ZhihuColors.primary)
           Text('加载中…')
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
         }
         .width('100%')
         .layoutWeight(1)
@@ -248,7 +248,7 @@ struct CollectionPickerPage {
       } else if (this.error.length > 0) {
         Column({ space: 16 }) {
           Text(this.error)
-            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textSecondary)
           Button('重试')
             .backgroundColor(ZhihuColors.primary)
             .onClick(() => {
@@ -289,7 +289,7 @@ struct CollectionPickerPage {
           .height(50)
           .backgroundColor(ZhihuColors.primary)
           .fontColor(ZhihuColors.textInverse)
-          .fontSize(16)
+          .fontSize(17)
           .margin({ bottom: 16, top: 8 })
           .onClick(() => {
             router.back();
@@ -299,7 +299,7 @@ struct CollectionPickerPage {
       if (this.toast.length > 0) {
         Text(this.toast)
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(12)
+          .fontSize(13)
           .fontColor(ZhihuColors.textInverse)
           .backgroundColor('#b3000000')
           .borderRadius(6)

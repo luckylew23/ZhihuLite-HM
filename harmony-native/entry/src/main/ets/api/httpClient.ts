@@ -577,6 +577,9 @@ class ZhihuHttpClient {
       case 'DELETE': return http.RequestMethod.DELETE;
       case 'HEAD': return http.RequestMethod.HEAD;
       case 'OPTIONS': return http.RequestMethod.OPTIONS;
+      // 已知限制：@ohos.net.http 的 RequestMethod 枚举无 PATCH（SDK 未提供），
+      // 映射为 POST。上游 article.ts 草稿保存用 PATCH，zhuanlan 对 POST 兼容，
+      // 属可接受降级（AUDIT M7）。
       case 'PATCH': return http.RequestMethod.POST;
       default: return http.RequestMethod.GET;
     }

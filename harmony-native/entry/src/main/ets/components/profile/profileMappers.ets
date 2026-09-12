@@ -207,8 +207,8 @@ export function feedDetailUrl(item: FeedItem): string {
   if (item.type === 'questions') {
     return 'pages/QuestionDetailPage';
   }
-  if (item.type === 'video') {
-    return 'pages/VideoDetailPage';
+  if (item.type === 'video' || item.type === 'videos') {
+    return 'pages/VideoPage';
   }
   return 'pages/AnswerDetailPage';
 }

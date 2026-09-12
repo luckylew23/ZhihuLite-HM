@@ -73,7 +73,7 @@ struct DetailPage {
           })
         Text('详情')
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(16)
+          .fontSize(17)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.text)
         Blank()
@@ -97,7 +97,7 @@ struct DetailPage {
           if (this.excerpt.length > 0) {
             Text(this.excerpt)
               .copyOption(CopyOptions.LocalDevice)
-              .fontSize(15)
+              .fontSize(16)
               .fontColor(ZhihuColors.textSecondary)
               .width('100%')
               .textAlign(TextAlign.Start)
@@ -107,7 +107,7 @@ struct DetailPage {
           Button('在浏览器打开原文')
             .width('100%')
             .height(44)
-            .fontSize(15)
+            .fontSize(16)
             .backgroundColor(ZhihuColors.primary)
             .onClick(() => {
               this.openInBrowser();
@@ -115,7 +115,7 @@ struct DetailPage {
 
           Text('完整详情（回答/文章正文、评论、赞同）将在下一版本接入')
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(12)
+            .fontSize(13)
             .fontColor(ZhihuColors.textTertiary)
             .width('100%')
             .textAlign(TextAlign.Center)

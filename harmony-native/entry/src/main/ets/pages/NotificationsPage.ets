@@ -13,11 +13,18 @@ import { ZhihuColors } from '../utils/theme';
 import { formatRelativeTime } from '../utils/date';
 import { getZhihuErrorMessage } from '../utils/zhihuError';
 
+interface NTarget {
+  id?: string | number;
+  type?: string;
+  link?: string;
+}
+
 interface NContent {
   verb?: string;
   text?: string;
   title?: string;
   sub_text?: string;
+  target?: NTarget;
 }
 
 interface NItem {
@@ -66,6 +73,41 @@ struct NotificationsPage {
 
   aboutToAppear(): void {
     this.loadFirst();
+  }
+
+  /** 通知条目点击分发（对齐上游 notifications/index.tsx:149-169）。 */
+  private openItem(item: NItem): void {
+    const link = item.content?.target?.link ?? '';
+    if (link.length > 0) {
+      if (link.includes('/answer/')) {
+        const id = link.split('/answer/')[1];
+        if (id !== undefined && id.length > 0) {
+          router.pushUrl({ url: 'pages/AnswerDetailPage', params: { id: id } });
+          return;
+        }
+      }
+      if (link.includes('/question/')) {
+        const id = link.split('/question/')[1];
+        if (id !== undefined && id.length > 0) {
+          router.pushUrl({ url: 'pages/QuestionDetailPage', params: { id: id } });
+          return;
+        }
+      }
+    }
+    const targetType = item.content?.target?.type ?? item.type ?? '';
+    const targetId = item.content?.target?.id !== undefined
+      ? String(item.content?.target?.id)
+      : item.id;
+    if (targetId.length === 0) {
+      return;
+    }
+    if (targetType === 'answer') {
+      router.pushUrl({ url: 'pages/AnswerDetailPage', params: { id: targetId } });
+    } else if (targetType === 'article') {
+      router.pushUrl({ url: 'pages/ArticleDetailPage', params: { id: targetId } });
+    } else if (targetType === 'member') {
+      router.pushUrl({ url: 'pages/PeoplePage', params: { token: targetId } });
+    }
   }
 
   private iconColor(item: NItem): string {
@@ -182,7 +224,7 @@ struct NotificationsPage {
       Blank()
       Text('消息通知')
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(17)
+        .fontSize(18)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.text)
       Blank()
@@ -191,7 +233,7 @@ struct NotificationsPage {
       } else {
         Text('全部已读')
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(14)
+          .fontSize(15)
           .fontColor(ZhihuColors.primary)
           .onClick(() => {
             this.markAllRead();
@@ -210,7 +252,7 @@ struct NotificationsPage {
       ForEach(TABS, (tab: NotifyTab) => {
         Text(tab.label)
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(13)
+          .fontSize(14)
           .fontWeight(this.tabValue === tab.value ? FontWeight.Bold : FontWeight.Normal)
           .fontColor(this.tabValue === tab.value ? ZhihuColors.primary : ZhihuColors.textSecondary)
           .padding({ left: 14, right: 14, top: 7, bottom: 7 })
@@ -234,7 +276,7 @@ struct NotificationsPage {
         Row({ space: 8 }) {
           LoadingProgress().width(16).height(16).color(ZhihuColors.textTertiary)
           Text('加载中…')
-            .copyOption(CopyOptions.LocalDevice).fontSize(12).fontColor(ZhihuColors.textTertiary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
         }
         .justifyContent(FlexAlign.Center)
         .width('100%')
@@ -242,7 +284,7 @@ struct NotificationsPage {
       } else if (this.isEnd && this.items.length > 0) {
         Text('— 没有更多了 —')
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(12)
+          .fontSize(13)
           .fontColor(ZhihuColors.textTertiary)
           .width('100%')
           .textAlign(TextAlign.Center)
@@ -266,19 +308,19 @@ struct NotificationsPage {
               Row() {
                 Text(item.content?.verb ?? '系统通知')
                   .copyOption(CopyOptions.LocalDevice)
-                  .fontSize(13)
+                  .fontSize(14)
                   .fontWeight(FontWeight.Bold)
                   .fontColor(this.iconColor(item))
                 Blank()
                 Text(formatRelativeTime(item.create_time ?? 0))
                   .copyOption(CopyOptions.LocalDevice)
-                  .fontSize(11)
+                  .fontSize(12)
                   .fontColor(ZhihuColors.textTertiary)
               }
               .width('100%')
               Text(this.bodyText(item))
                 .copyOption(CopyOptions.LocalDevice)
-                .fontSize(13)
+                .fontSize(14)
                 .fontColor(ZhihuColors.text)
                 .maxLines(3)
                 .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -292,6 +334,9 @@ struct NotificationsPage {
           .backgroundColor(ZhihuColors.backgroundSecondary)
           .borderRadius(10)
         }
+        .onClick(() => {
+          this.openItem(item);
+        })
       }, (item: NItem, index: number) => String(index) + '-' + item.id)
       ListItem() {
         this.footer()
@@ -312,12 +357,12 @@ struct NotificationsPage {
       Blank()
       Text('查看消息通知前请先登录知乎账号')
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(14)
+        .fontSize(15)
         .fontColor(ZhihuColors.textSecondary)
       Button('去登录')
         .width(200)
         .height(42)
-        .fontSize(15)
+        .fontSize(16)
         .backgroundColor(ZhihuColors.primary)
         .onClick(() => {
           router.pushUrl({ url: 'pages/LoginPage' });
@@ -340,7 +385,7 @@ struct NotificationsPage {
           Column({ space: 8 }) {
             LoadingProgress().width(40).height(40).color(ZhihuColors.primary)
             Text('加载中…')
-              .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
+              .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
           }
           .width('100%')
           .layoutWeight(1)
@@ -348,9 +393,9 @@ struct NotificationsPage {
         } else if (this.error.length > 0 && this.items.length === 0) {
           Column({ space: 16 }) {
             Text(this.error)
-              .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
+              .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textSecondary)
             Button('重试')
-              .fontSize(14)
+              .fontSize(15)
               .backgroundColor(ZhihuColors.primary)
               .onClick(() => {
                 this.loadFirst();
@@ -363,7 +408,7 @@ struct NotificationsPage {
           Column({ space: 8 }) {
             Blank()
             Text('暂无通知')
-              .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
+              .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textTertiary)
             Blank()
           }
           .width('100%')

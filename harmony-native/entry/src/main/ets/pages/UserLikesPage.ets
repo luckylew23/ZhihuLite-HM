@@ -99,7 +99,7 @@ export struct UserLikesPage {
       Blank()
       Text('登录后才能查看我赞过的内容')
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(14)
+        .fontSize(15)
         .fontColor(ZhihuColors.textSecondary)
       Button('登录知乎')
         .width(220)
@@ -130,7 +130,7 @@ export struct UserLikesPage {
   tabItem(key: string) {
     Text(key)
       .copyOption(CopyOptions.LocalDevice)
-      .fontSize(15)
+      .fontSize(16)
       .fontWeight(this.activeTab === (key === '文章' ? 'articles' : 'answers')
         ? FontWeight.Bold : FontWeight.Normal)
       .fontColor(this.activeTab === (key === '文章' ? 'articles' : 'answers')
@@ -150,13 +150,13 @@ export struct UserLikesPage {
         Row({ space: 8 }) {
           LoadingProgress().width(18).height(18).color(ZhihuColors.textTertiary)
           Text('加载中…')
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
         }
         .justifyContent(FlexAlign.Center).width('100%').padding(12)
       } else if (this.isEnd && this.items.length > 0) {
         Text('— 没有更多了 —')
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(13).fontColor(ZhihuColors.textTertiary)
+          .fontSize(14).fontColor(ZhihuColors.textTertiary)
           .width('100%').textAlign(TextAlign.Center).padding(12)
       }
     }
@@ -173,15 +173,15 @@ export struct UserLikesPage {
           Column({ space: 8 }) {
             LoadingProgress().width(48).height(48).color(ZhihuColors.primary)
             Text('加载中…')
-              .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
+              .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
           }
           .width('100%').layoutWeight(1).justifyContent(FlexAlign.Center)
         } else if (this.error.length > 0 && this.items.length === 0) {
           Column({ space: 16 }) {
             Text(this.error)
-              .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
+              .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textSecondary)
             Button('重试')
-              .fontSize(14)
+              .fontSize(15)
               .backgroundColor(ZhihuColors.primary)
               .onClick(() => {
                 this.loadFirst();
@@ -191,7 +191,7 @@ export struct UserLikesPage {
         } else if (this.items.length === 0) {
           Column() {
             Text('还没有点赞过内容')
-              .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
+              .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textTertiary)
           }
           .width('100%').layoutWeight(1).justifyContent(FlexAlign.Center)
         } else {

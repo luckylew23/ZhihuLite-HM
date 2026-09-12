@@ -104,7 +104,7 @@ struct ChatPage {
       Blank()
       Text(this.peerName)
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(17)
+        .fontSize(18)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.text)
         .maxLines(1)
@@ -127,7 +127,7 @@ struct ChatPage {
             Column() {
               Text(this.bubbleText(msg))
                 .copyOption(CopyOptions.LocalDevice)
-                .fontSize(15)
+                .fontSize(16)
                 .fontColor(this.isMe(msg) ? ZhihuColors.textInverse : ZhihuColors.text)
                 .padding({ left: 14, right: 14, top: 9, bottom: 9 })
                 .backgroundColor(this.isMe(msg) ? ZhihuColors.primary : ZhihuColors.backgroundSecondary)
@@ -163,7 +163,7 @@ struct ChatPage {
         Button('发送')
           .width(64)
           .height(38)
-          .fontSize(14)
+          .fontSize(15)
           .backgroundColor(this.input.trim().length > 0
             ? ZhihuColors.primary
             : ZhihuColors.backgroundTertiary)
@@ -186,12 +186,12 @@ struct ChatPage {
       Blank()
       Text('发私信前请先登录知乎账号')
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(14)
+        .fontSize(15)
         .fontColor(ZhihuColors.textSecondary)
       Button('去登录')
         .width(200)
         .height(42)
-        .fontSize(15)
+        .fontSize(16)
         .backgroundColor(ZhihuColors.primary)
         .onClick(() => {
           router.pushUrl({ url: 'pages/LoginPage' });
@@ -212,7 +212,7 @@ struct ChatPage {
         Column({ space: 8 }) {
           LoadingProgress().width(40).height(40).color(ZhihuColors.primary)
           Text('加载中…')
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
         }
         .width('100%')
         .layoutWeight(1)
@@ -220,9 +220,9 @@ struct ChatPage {
       } else if (this.error.length > 0 && this.messages.length === 0) {
         Column({ space: 16 }) {
           Text(this.error)
-            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textSecondary)
           Button('重试')
-            .fontSize(14)
+            .fontSize(15)
             .backgroundColor(ZhihuColors.primary)
             .onClick(() => {
               this.loadHistory();
@@ -236,7 +236,7 @@ struct ChatPage {
         if (this.error.length > 0) {
           Text(this.error)
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(12)
+            .fontSize(13)
             .fontColor(ZhihuColors.danger)
             .width('100%')
             .padding({ left: 16, bottom: 4 })

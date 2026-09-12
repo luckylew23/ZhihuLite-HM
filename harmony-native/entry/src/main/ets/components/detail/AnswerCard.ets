@@ -85,7 +85,7 @@ export struct AnswerCard {
         Column({ space: 2 }) {
           Text(this.item.author.name)
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(14)
+            .fontSize(15)
             .fontWeight(FontWeight.Medium)
             .fontColor(ZhihuColors.text)
             .maxLines(1)
@@ -93,7 +93,7 @@ export struct AnswerCard {
           if (this.item.author.headline && this.item.author.headline.length > 0) {
             Text(this.item.author.headline)
               .copyOption(CopyOptions.LocalDevice)
-              .fontSize(12)
+              .fontSize(13)
               .fontColor(ZhihuColors.textTertiary)
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -109,7 +109,7 @@ export struct AnswerCard {
       if (this.summary.length > 0) {
         Text(this.summary)
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(15)
+          .fontSize(16)
           .fontColor(ZhihuColors.text)
           .lineHeight(23)
           .maxLines(6)
@@ -126,11 +126,11 @@ export struct AnswerCard {
         Row({ space: 4 }) {
           Text('▲')
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(12)
+            .fontSize(13)
             .fontColor(this.voted === 1 ? ZhihuColors.primary : ZhihuColors.textTertiary)
           Text(formatCount(this.voteCount))
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(13)
+            .fontSize(14)
             .fontColor(this.voted === 1 ? ZhihuColors.primary : ZhihuColors.textSecondary)
         }
         .padding({ left: 8, right: 8, top: 4, bottom: 4 })
@@ -140,9 +140,9 @@ export struct AnswerCard {
 
         Row({ space: 4 }) {
           Text('💬')
-            .copyOption(CopyOptions.LocalDevice).fontSize(12).fontColor(ZhihuColors.textTertiary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
           Text(formatCount(this.item.comment_count))
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textSecondary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
         }
         .padding({ left: 8, right: 8, top: 4, bottom: 4 })
         .onClick(() => {
@@ -151,9 +151,9 @@ export struct AnswerCard {
 
         Row({ space: 4 }) {
           Text('★')
-            .copyOption(CopyOptions.LocalDevice).fontSize(12).fontColor(ZhihuColors.textTertiary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
           Text('收藏')
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textSecondary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
         }
         .padding({ left: 8, right: 8, top: 4, bottom: 4 })
         .onClick(() => {

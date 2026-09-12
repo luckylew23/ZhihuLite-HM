@@ -30,7 +30,7 @@ profile = {
     "bundle-info": {
         "developer-id": "ZhihuMinusMinus",
         "development-certificate": leaf_cert,
-        "bundle-name": "com.zhihu.minusminus.hmos",
+        "bundle-name": "com.zhihulite.hmos",
         "apl": "normal",
         "app-feature": "hos_normal_app",
     },

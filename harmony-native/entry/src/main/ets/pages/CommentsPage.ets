@@ -319,7 +319,7 @@ struct CommentsPage {
       Column({ space: 2 }) {
         Text(this.memberName(child) + '：' + stripHtml(child.content))
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(13)
+          .fontSize(14)
           .fontColor(ZhihuColors.text)
           .width('100%')
           .textAlign(TextAlign.Start)
@@ -339,19 +339,19 @@ struct CommentsPage {
           Row({ space: 6 }) {
             LoadingProgress().width(14).height(14).color(ZhihuColors.textTertiary)
             Text('回复加载中…')
-              .copyOption(CopyOptions.LocalDevice).fontSize(12).fontColor(ZhihuColors.textTertiary)
+              .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
           }
           .width('100%')
         } else if (this.childList.length === 0) {
           Text('暂无回复')
-            .copyOption(CopyOptions.LocalDevice).fontSize(12).fontColor(ZhihuColors.textTertiary).width('100%')
+            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary).width('100%')
         } else {
           ForEach(this.childList, (child: CommentItem) => {
             this.childRow(child)
           }, (child: CommentItem) => String(child.id))
           Text('收起回复')
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(12)
+            .fontSize(13)
             .fontColor(ZhihuColors.primary)
             .width('100%')
             .onClick(() => {
@@ -367,7 +367,7 @@ struct CommentsPage {
         }, (child: CommentItem, index: number) => String(child.id) + '-' + String(index))
         Text('查看全部 ' + item.child_comment_count + ' 条回复 →')
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(12)
+          .fontSize(13)
           .fontColor(ZhihuColors.primary)
           .width('100%')
           .onClick(() => {
@@ -395,7 +395,7 @@ struct CommentsPage {
           .backgroundColor(ZhihuColors.backgroundTertiary)
         Text(this.memberName(item))
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(15)
+          .fontSize(16)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.text)
           .layoutWeight(1)
@@ -405,7 +405,7 @@ struct CommentsPage {
       // 正文
       Text(stripHtml(item.content))
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(15)
+        .fontSize(16)
         .fontColor(ZhihuColors.text)
         .width('100%')
         .textAlign(TextAlign.Start)
@@ -416,7 +416,7 @@ struct CommentsPage {
         if (this.metaText(item).length > 0) {
           Text(this.metaText(item))
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(12)
+            .fontSize(13)
             .fontColor(ZhihuColors.textTertiary)
             .layoutWeight(1)
         } else {
@@ -426,11 +426,11 @@ struct CommentsPage {
         Row({ space: 4 }) {
           Text('▲')
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(12)
+            .fontSize(13)
             .fontColor(this.liked(item) ? ZhihuColors.primary : ZhihuColors.textTertiary)
           Text(String(this.voteCount(item)))
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(12)
+            .fontSize(13)
             .fontColor(ZhihuColors.textTertiary)
         }
         .padding({ left: 8, right: 8 })
@@ -440,7 +440,7 @@ struct CommentsPage {
 
         Text('回复')
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(12)
+          .fontSize(13)
           .fontColor(ZhihuColors.textTertiary)
           .padding({ left: 8, right: 4 })
           .onClick(() => {
@@ -460,11 +460,11 @@ struct CommentsPage {
         Row() {
           Text('登录后即可参与评论')
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(14)
+            .fontSize(15)
             .fontColor(ZhihuColors.textTertiary)
             .layoutWeight(1)
           Button('去登录')
-            .fontSize(13)
+            .fontSize(14)
             .height(34)
             .backgroundColor(ZhihuColors.primary)
             .onClick(() => {
@@ -479,12 +479,12 @@ struct CommentsPage {
           Row({ space: 8 }) {
             Text('回复 ' + this.replyToName)
               .copyOption(CopyOptions.LocalDevice)
-              .fontSize(12)
+              .fontSize(13)
               .fontColor(ZhihuColors.primary)
               .layoutWeight(1)
             Text('取消')
               .copyOption(CopyOptions.LocalDevice)
-              .fontSize(12)
+              .fontSize(13)
               .fontColor(ZhihuColors.textTertiary)
               .onClick(() => {
                 this.cancelReply();
@@ -500,13 +500,13 @@ struct CommentsPage {
             .backgroundColor(ZhihuColors.backgroundTertiary)
             .borderRadius(20)
             .padding({ left: 14, right: 14 })
-            .fontSize(14)
+            .fontSize(15)
             .onChange((v: string) => {
               this.inputText = v;
             })
           Text(this.submitting ? '…' : '发布')
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(15)
+            .fontSize(16)
             .fontWeight(FontWeight.Medium)
             .fontColor(ZhihuColors.primary)
             .padding({ left: 6, right: 6 })
@@ -542,7 +542,7 @@ struct CommentsPage {
           .layoutWeight(1)
         Text(this.orderBy === 'score' ? '默认' : '最新')
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(14)
+          .fontSize(15)
           .fontColor(ZhihuColors.primary)
           .padding(8)
           .onClick(() => {
@@ -558,7 +558,7 @@ struct CommentsPage {
         Column({ space: 8 }) {
           LoadingProgress().width(40).height(40).color(ZhihuColors.primary)
           Text('评论加载中…')
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
         }
         .width('100%')
         .layoutWeight(1)
@@ -566,7 +566,7 @@ struct CommentsPage {
       } else if (this.error.length > 0 && this.comments.length === 0) {
         Column({ space: 16 }) {
           Text(this.error)
-            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textSecondary)
           Button('重试')
             .backgroundColor(ZhihuColors.primary)
             .onClick(() => {
@@ -583,12 +583,12 @@ struct CommentsPage {
               Column({ space: 4 }) {
                 Text('正在讨论')
                   .copyOption(CopyOptions.LocalDevice)
-                  .fontSize(12)
+                  .fontSize(13)
                   .fontWeight(FontWeight.Bold)
                   .fontColor(ZhihuColors.primary)
                 Text(this.quote)
                   .copyOption(CopyOptions.LocalDevice)
-                  .fontSize(13)
+                  .fontSize(14)
                   .fontColor(ZhihuColors.textSecondary)
                   .maxLines(3)
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -622,12 +622,12 @@ struct CommentsPage {
                 Row({ space: 8 }) {
                   LoadingProgress().width(16).height(16).color(ZhihuColors.textTertiary)
                   Text('加载中…')
-                    .copyOption(CopyOptions.LocalDevice).fontSize(12).fontColor(ZhihuColors.textTertiary)
+                    .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
                 }
               } else if (this.isEnd && this.comments.length > 0) {
                 Text('— 没有更多评论了 —')
                   .copyOption(CopyOptions.LocalDevice)
-                  .fontSize(12)
+                  .fontSize(13)
                   .fontColor(ZhihuColors.textTertiary)
               }
             }
@@ -647,7 +647,7 @@ struct CommentsPage {
       if (this.toast.length > 0) {
         Text(this.toast)
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(12)
+          .fontSize(13)
           .fontColor(ZhihuColors.textInverse)
           .backgroundColor('#b3000000')
           .borderRadius(6)

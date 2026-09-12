@@ -206,7 +206,7 @@ struct TopicPage {
       Row() {
         Text('精华')
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(15)
+          .fontSize(16)
           .fontColor(this.tab === 'top-answers' ? ZhihuColors.primary : ZhihuColors.textSecondary)
           .fontWeight(this.tab === 'top-answers' ? FontWeight.Bold : FontWeight.Normal)
       }
@@ -218,7 +218,7 @@ struct TopicPage {
       Row() {
         Text('等待回答')
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(15)
+          .fontSize(16)
           .fontColor(this.tab === 'unanswered' ? ZhihuColors.primary : ZhihuColors.textSecondary)
           .fontWeight(this.tab === 'unanswered' ? FontWeight.Bold : FontWeight.Normal)
       }
@@ -238,14 +238,14 @@ struct TopicPage {
         Row({ space: 8 }) {
           LoadingProgress().width(20).height(20).color(ZhihuColors.primary)
           Text('话题加载中…')
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
         }
         .justifyContent(FlexAlign.Center).width('100%').padding(24)
       } else if (this.error.length > 0) {
         Column({ space: 12 }) {
           Text(this.error)
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textSecondary)
-          Button('重试').fontSize(13).backgroundColor(ZhihuColors.primary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
+          Button('重试').fontSize(14).backgroundColor(ZhihuColors.primary)
             .onClick(() => { this.loadTopic(); })
         }
         .width('100%').padding(20)
@@ -258,12 +258,12 @@ struct TopicPage {
             Text(formatCount(this.followerCount) + ' 关注者 · ' +
               formatCount(this.topic.questions_count) + ' 问题')
               .copyOption(CopyOptions.LocalDevice)
-              .fontSize(12).fontColor(ZhihuColors.textTertiary)
+              .fontSize(13).fontColor(ZhihuColors.textTertiary)
           }
           .alignItems(HorizontalAlign.Start).layoutWeight(1)
           Text(this.following ? '已关注' : '+ 关注')
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(13).fontWeight(FontWeight.Medium)
+            .fontSize(14).fontWeight(FontWeight.Medium)
             .fontColor(this.following ? ZhihuColors.textSecondary : ZhihuColors.textInverse)
             .padding({ left: 14, right: 14, top: 7, bottom: 7 })
             .borderRadius(15)
@@ -275,7 +275,7 @@ struct TopicPage {
         if (this.topic.introduction.length > 0) {
           Text(this.topic.introduction)
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(14).fontColor(ZhihuColors.textSecondary).lineHeight(21)
+            .fontSize(15).fontColor(ZhihuColors.textSecondary).lineHeight(21)
             .maxLines(4).textOverflow({ overflow: TextOverflow.Ellipsis })
             .width('100%').textAlign(TextAlign.Start)
         }
@@ -294,13 +294,13 @@ struct TopicPage {
         Row({ space: 8 }) {
           LoadingProgress().width(16).height(16).color(ZhihuColors.textTertiary)
           Text('加载中…')
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
         }
         .justifyContent(FlexAlign.Center).width('100%').padding(12)
       } else if (this.isEnd && this.cards.length > 0) {
         Text('— 没有更多内容了 —')
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(13).fontColor(ZhihuColors.textTertiary)
+          .fontSize(14).fontColor(ZhihuColors.textTertiary)
           .width('100%').textAlign(TextAlign.Center).padding(12)
       }
     }
@@ -328,7 +328,7 @@ struct TopicPage {
                 }
                 Text(card.authorName)
                   .copyOption(CopyOptions.LocalDevice)
-                  .fontSize(13).fontColor(ZhihuColors.textSecondary)
+                  .fontSize(14).fontColor(ZhihuColors.textSecondary)
                   .maxLines(1).layoutWeight(1)
               }
               .width('100%').alignItems(VerticalAlign.Center)
@@ -336,22 +336,22 @@ struct TopicPage {
               if (card.title.length > 0) {
                 Text(card.title)
                   .copyOption(CopyOptions.LocalDevice)
-                  .fontSize(16).fontWeight(FontWeight.Medium).fontColor(ZhihuColors.text)
+                  .fontSize(17).fontWeight(FontWeight.Medium).fontColor(ZhihuColors.text)
                   .maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
                   .width('100%')
               }
               if (card.excerpt.length > 0) {
                 Text(card.excerpt)
                   .copyOption(CopyOptions.LocalDevice)
-                  .fontSize(14).fontColor(ZhihuColors.textSecondary)
+                  .fontSize(15).fontColor(ZhihuColors.textSecondary)
                   .maxLines(3).textOverflow({ overflow: TextOverflow.Ellipsis })
                   .lineHeight(21).width('100%')
               }
               Row({ space: 14 }) {
                 Text('▲ ' + formatCount(card.voteCount))
-                  .copyOption(CopyOptions.LocalDevice).fontSize(12).fontColor(ZhihuColors.textTertiary)
+                  .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
                 Text('💬 ' + formatCount(card.commentCount))
-                  .copyOption(CopyOptions.LocalDevice).fontSize(12).fontColor(ZhihuColors.textTertiary)
+                  .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
               }
               .width('100%')
             }

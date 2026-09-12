@@ -89,7 +89,7 @@ export struct ProfilePage {
   iconBadge(glyph: string) {
     Text(glyph)
       .copyOption(CopyOptions.LocalDevice)
-      .fontSize(15)
+      .fontSize(16)
       .fontColor(ZhihuColors.primary)
       .width(36)
       .height(36)
@@ -99,7 +99,7 @@ export struct ProfilePage {
   }
 
   @Builder
-  statItem(label: string, value: number, clickable: boolean) {
+  statItem(label: string, value: number, clickable: boolean, route?: string) {
     Column({ space: 4 }) {
       Text(String(value))
         .copyOption(CopyOptions.LocalDevice)
@@ -108,13 +108,23 @@ export struct ProfilePage {
         .fontColor(ZhihuColors.text)
       Text(label)
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(12)
+        .fontSize(13)
         .fontColor(ZhihuColors.textSecondary)
     }
     .layoutWeight(1)
     .onClick(() => {
-      if (clickable) {
-        router.pushUrl({ url: 'pages/FollowManagePage' });
+      if (clickable && route !== undefined) {
+        if (route.length === 0) {
+          router.pushUrl({ url: 'pages/FollowManagePage' });
+        } else {
+          router.pushUrl({
+            url: 'pages/PeoplePage',
+            params: {
+              urlToken: this.me?.url_token ?? '',
+              initialTab: route,
+            },
+          });
+        }
       }
     })
   }
@@ -125,13 +135,13 @@ export struct ProfilePage {
       this.iconBadge(item.glyph)
       Text(item.label)
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(16)
+        .fontSize(17)
         .fontColor(ZhihuColors.text)
         .layoutWeight(1)
       if (item.badge.length > 0) {
         Text(item.badge)
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(13)
+          .fontSize(14)
           .fontColor(ZhihuColors.textTertiary)
       }
       Text('›')
@@ -155,7 +165,7 @@ export struct ProfilePage {
       this.iconBadge('昼')
       Text('主题模式')
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(16)
+        .fontSize(17)
         .fontColor(ZhihuColors.text)
         .layoutWeight(1)
         .onClick(() => {
@@ -176,7 +186,7 @@ export struct ProfilePage {
   themePill(label: string, value: ThemeMode) {
     Text(label)
       .copyOption(CopyOptions.LocalDevice)
-      .fontSize(12)
+      .fontSize(13)
       .fontColor(this.themeMode === value ? ZhihuColors.textInverse : ZhihuColors.text)
       .fontWeight(this.themeMode === value ? FontWeight.Bold : FontWeight.Normal)
       .padding({ left: 12, right: 12, top: 6, bottom: 6 })
@@ -193,12 +203,12 @@ export struct ProfilePage {
       Blank()
       Text('登录后同步你的关注、收藏与创作')
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(14)
+        .fontSize(15)
         .fontColor(ZhihuColors.textSecondary)
       Button('登录知乎')
         .width(220)
         .height(44)
-        .fontSize(16)
+        .fontSize(17)
         .backgroundColor(ZhihuColors.primary)
         .onClick(() => {
           router.pushUrl({ url: 'pages/LoginPage' });
@@ -231,7 +241,7 @@ export struct ProfilePage {
               .fontColor(ZhihuColors.text)
             Text('点击查看个人主页')
               .copyOption(CopyOptions.LocalDevice)
-              .fontSize(13)
+              .fontSize(14)
               .fontColor(ZhihuColors.textSecondary)
           }
           .alignItems(HorizontalAlign.Start)
@@ -249,10 +259,10 @@ export struct ProfilePage {
 
         // 统计 4 列
         Row() {
-          this.statItem('回答', this.me?.answer_count ?? 0, false)
-          this.statItem('文章', this.me?.articles_count ?? 0, false)
-          this.statItem('关注', this.me?.following_count ?? 0, true)
-          this.statItem('粉丝', this.me?.followers_count ?? 0, false)
+          this.statItem('回答', this.me?.answer_count ?? 0, true, 'answers')
+          this.statItem('文章', this.me?.articles_count ?? 0, true, 'articles')
+          this.statItem('关注', this.me?.following_count ?? 0, true, '')
+          this.statItem('粉丝', this.me?.followers_count ?? 0, true, 'followers')
         }
         .width('100%')
         .padding({ top: 16, bottom: 16 })
@@ -264,6 +274,8 @@ export struct ProfilePage {
           this.menuRow({ glyph: '藏', label: '我的收藏', route: 'pages/CollectionsListPage', badge: '' })
           Divider().strokeWidth(0.5).color(ZhihuColors.divider).margin({ left: 64 })
           this.menuRow({ glyph: '历', label: '最近浏览', route: 'pages/HistoryPage', badge: '' })
+          Divider().strokeWidth(0.5).color(ZhihuColors.divider).margin({ left: 64 })
+          this.menuRow({ glyph: '信', label: '我的私信', route: 'pages/InboxPage', badge: '' })
         }
         .width('100%')
         .backgroundColor(ZhihuColors.backgroundSecondary)
@@ -283,12 +295,12 @@ export struct ProfilePage {
             this.iconBadge('号')
             Text('切换账号')
               .copyOption(CopyOptions.LocalDevice)
-              .fontSize(16)
+              .fontSize(17)
               .fontColor(ZhihuColors.text)
               .layoutWeight(1)
             Text('1 个账号')
               .copyOption(CopyOptions.LocalDevice)
-              .fontSize(13)
+              .fontSize(14)
               .fontColor(ZhihuColors.textTertiary)
             Text('›')
               .copyOption(CopyOptions.LocalDevice)
@@ -311,7 +323,7 @@ export struct ProfilePage {
         // 退出账号
         Text('退出账号')
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(16)
+          .fontSize(17)
           .fontColor(ZhihuColors.danger)
           .width('100%')
           .height(52)

@@ -124,7 +124,7 @@ struct PublishPinPage {
       Blank()
       Text('发想法')
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(17)
+        .fontSize(18)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.text)
       Blank()
@@ -134,7 +134,7 @@ struct PublishPinPage {
         } else {
           Text('发布')
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(15)
+            .fontSize(16)
             .fontWeight(FontWeight.Medium)
             .fontColor(ZhihuColors.textInverse)
             .height(36)
@@ -161,12 +161,12 @@ struct PublishPinPage {
       Blank()
       Text('发布想法前请先登录知乎账号')
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(14)
+        .fontSize(15)
         .fontColor(ZhihuColors.textSecondary)
       Button('去登录')
         .width(200)
         .height(42)
-        .fontSize(15)
+        .fontSize(16)
         .backgroundColor(ZhihuColors.primary)
         .onClick(() => {
           router.pushUrl({ url: 'pages/LoginPage' });
@@ -192,7 +192,7 @@ struct PublishPinPage {
               .backgroundColor(ZhihuColors.backgroundTertiary)
             Stack() {
               Text('✕')
-                .copyOption(CopyOptions.LocalDevice).fontSize(11).fontColor(ZhihuColors.textInverse)
+                .copyOption(CopyOptions.LocalDevice).fontSize(12).fontColor(ZhihuColors.textInverse)
             }
             .width(20)
             .height(20)
@@ -214,10 +214,10 @@ struct PublishPinPage {
   addImageButton() {
     Row({ space: 8 }) {
       Text('🖼')
-        .copyOption(CopyOptions.LocalDevice).fontSize(16).fontColor(ZhihuColors.primary)
+        .copyOption(CopyOptions.LocalDevice).fontSize(17).fontColor(ZhihuColors.primary)
       Text('添加图片 (' + this.images.length + '/' + MAX_IMAGES + ')')
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(15)
+        .fontSize(16)
         .fontColor(ZhihuColors.primary)
     }
     .width('100%')
@@ -238,7 +238,7 @@ struct PublishPinPage {
         TextInput({ text: $$this.title, placeholder: '标题（可选）' })
           .width('100%')
           .height(50)
-          .fontSize(17)
+          .fontSize(18)
           .fontWeight(FontWeight.Medium)
           .placeholderColor(ZhihuColors.textTertiary)
           .backgroundColor(Color.Transparent)
@@ -249,7 +249,7 @@ struct PublishPinPage {
         TextArea({ text: $$this.content, placeholder: '这一刻的想法…' })
           .width('100%')
           .height(220)
-          .fontSize(16)
+          .fontSize(17)
           .placeholderColor(ZhihuColors.textTertiary)
           .backgroundColor(Color.Transparent)
 
@@ -260,7 +260,7 @@ struct PublishPinPage {
         if (this.error.length > 0) {
           Text(this.error)
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(13)
+            .fontSize(14)
             .fontColor(ZhihuColors.danger)
             .width('100%')
         }

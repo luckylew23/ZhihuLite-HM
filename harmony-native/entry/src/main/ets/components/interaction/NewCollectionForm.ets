@@ -24,7 +24,7 @@ export struct NewCollectionForm {
     Column({ space: 12 }) {
       Text('标题')
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(15)
+        .fontSize(16)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.text)
         .width('100%')
@@ -34,14 +34,14 @@ export struct NewCollectionForm {
         .backgroundColor(ZhihuColors.backgroundTertiary)
         .borderRadius(12)
         .padding({ left: 14, right: 14 })
-        .fontSize(15)
+        .fontSize(16)
         .onChange((v: string) => {
           this.title = v;
         })
 
       Text('描述（可选）')
         .copyOption(CopyOptions.LocalDevice)
-        .fontSize(15)
+        .fontSize(16)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.text)
         .width('100%')
@@ -52,7 +52,7 @@ export struct NewCollectionForm {
         .backgroundColor(ZhihuColors.backgroundTertiary)
         .borderRadius(12)
         .padding(12)
-        .fontSize(15)
+        .fontSize(16)
         .onChange((v: string) => {
           this.description = v;
         })
@@ -60,9 +60,9 @@ export struct NewCollectionForm {
       Row() {
         Column({ space: 2 }) {
           Text('公开收藏夹')
-            .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.text)
+            .copyOption(CopyOptions.LocalDevice).fontSize(16).fontColor(ZhihuColors.text)
           Text('公开后其他用户可见')
-            .copyOption(CopyOptions.LocalDevice).fontSize(12).fontColor(ZhihuColors.textTertiary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
         }
         .alignItems(HorizontalAlign.Start)
         .layoutWeight(1)
@@ -80,7 +80,7 @@ export struct NewCollectionForm {
         .height(50)
         .backgroundColor(ZhihuColors.primary)
         .fontColor(ZhihuColors.textInverse)
-        .fontSize(16)
+        .fontSize(17)
         .margin({ top: 12 })
         .enabled(!this.pending)
         .onClick(() => {

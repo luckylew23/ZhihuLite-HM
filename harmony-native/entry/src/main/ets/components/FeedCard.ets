@@ -42,14 +42,14 @@ export struct FeedCard {
         Column({ space: 2 }) {
           Text(this.item.author.name)
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(14)
+            .fontSize(15)
             .fontColor(ZhihuColors.text)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
           if (this.item.actionText && this.item.actionText.length > 0) {
             Text(this.item.actionText)
               .copyOption(CopyOptions.LocalDevice)
-              .fontSize(12)
+              .fontSize(13)
               .fontColor(ZhihuColors.textTertiary)
               .maxLines(1)
           }
@@ -74,7 +74,7 @@ export struct FeedCard {
       if (this.item.title.length > 0) {
         Text(this.item.title)
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(16)
+          .fontSize(17)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.text)
           .maxLines(2)
@@ -87,7 +87,7 @@ export struct FeedCard {
       if (this.item.excerpt.length > 0) {
         Text(this.item.excerpt)
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(14)
+          .fontSize(15)
           .fontColor(ZhihuColors.textSecondary)
           .maxLines(3)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -110,20 +110,20 @@ export struct FeedCard {
       Row({ space: 16 }) {
         Row({ space: 4 }) {
           Text('▲')
-            .copyOption(CopyOptions.LocalDevice).fontSize(12).fontColor(ZhihuColors.textTertiary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
           Text(formatCount(this.item.voteCount))
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textSecondary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
         }
         Row({ space: 4 }) {
           Text('评论')
-            .copyOption(CopyOptions.LocalDevice).fontSize(12).fontColor(ZhihuColors.textTertiary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
           Text(formatCount(this.item.commentCount))
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textSecondary)
+            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
         }
         if (this.item.favlistsCount && this.item.favlistsCount > 0) {
           Text(formatCount(this.item.favlistsCount) + ' 收藏')
             .copyOption(CopyOptions.LocalDevice)
-            .fontSize(13)
+            .fontSize(14)
             .fontColor(ZhihuColors.textSecondary)
         }
         Blank()
