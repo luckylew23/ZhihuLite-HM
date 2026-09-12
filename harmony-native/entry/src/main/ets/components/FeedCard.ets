@@ -41,12 +41,14 @@ export struct FeedCard {
           .backgroundColor(ZhihuColors.backgroundTertiary)
         Column({ space: 2 }) {
           Text(this.item.author.name)
+            .copyOption(CopyOptions.LocalDevice)
             .fontSize(14)
             .fontColor(ZhihuColors.text)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
           if (this.item.actionText && this.item.actionText.length > 0) {
             Text(this.item.actionText)
+              .copyOption(CopyOptions.LocalDevice)
               .fontSize(12)
               .fontColor(ZhihuColors.textTertiary)
               .maxLines(1)
@@ -57,6 +59,7 @@ export struct FeedCard {
 
         if (this.item.isLabeled) {
           Text('广告')
+            .copyOption(CopyOptions.LocalDevice)
             .fontSize(10)
             .fontColor(ZhihuColors.textTertiary)
             .padding({ left: 6, right: 6, top: 2, bottom: 2 })
@@ -70,6 +73,7 @@ export struct FeedCard {
       // 标题
       if (this.item.title.length > 0) {
         Text(this.item.title)
+          .copyOption(CopyOptions.LocalDevice)
           .fontSize(16)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.text)
@@ -82,6 +86,7 @@ export struct FeedCard {
       // 摘要
       if (this.item.excerpt.length > 0) {
         Text(this.item.excerpt)
+          .copyOption(CopyOptions.LocalDevice)
           .fontSize(14)
           .fontColor(ZhihuColors.textSecondary)
           .maxLines(3)
@@ -104,21 +109,27 @@ export struct FeedCard {
       // 统计行
       Row({ space: 16 }) {
         Row({ space: 4 }) {
-          Text('▲').fontSize(12).fontColor(ZhihuColors.textTertiary)
-          Text(formatCount(this.item.voteCount)).fontSize(13).fontColor(ZhihuColors.textSecondary)
+          Text('▲')
+            .copyOption(CopyOptions.LocalDevice).fontSize(12).fontColor(ZhihuColors.textTertiary)
+          Text(formatCount(this.item.voteCount))
+            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textSecondary)
         }
         Row({ space: 4 }) {
-          Text('评论').fontSize(12).fontColor(ZhihuColors.textTertiary)
-          Text(formatCount(this.item.commentCount)).fontSize(13).fontColor(ZhihuColors.textSecondary)
+          Text('评论')
+            .copyOption(CopyOptions.LocalDevice).fontSize(12).fontColor(ZhihuColors.textTertiary)
+          Text(formatCount(this.item.commentCount))
+            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textSecondary)
         }
         if (this.item.favlistsCount && this.item.favlistsCount > 0) {
           Text(formatCount(this.item.favlistsCount) + ' 收藏')
+            .copyOption(CopyOptions.LocalDevice)
             .fontSize(13)
             .fontColor(ZhihuColors.textSecondary)
         }
         Blank()
         if (this.item.answerType === 'PAID') {
           Text('盐选')
+            .copyOption(CopyOptions.LocalDevice)
             .fontSize(10)
             .fontColor(ZhihuColors.textInverse)
             .backgroundColor(ZhihuColors.primary)

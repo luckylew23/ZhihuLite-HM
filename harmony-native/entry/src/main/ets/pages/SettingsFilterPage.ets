@@ -34,6 +34,7 @@ struct SettingsFilterPage {
   topBar() {
     Row() {
       Text('‹')
+        .copyOption(CopyOptions.LocalDevice)
         .fontSize(26)
         .fontColor(ZhihuColors.primary)
         .width(40)
@@ -41,6 +42,7 @@ struct SettingsFilterPage {
           router.back();
         })
       Text('过滤与推荐')
+        .copyOption(CopyOptions.LocalDevice)
         .fontSize(18)
         .fontWeight(FontWeight.Bold)
         .fontColor(ZhihuColors.text)
@@ -56,6 +58,7 @@ struct SettingsFilterPage {
   @Builder
   sectionLabel(title: string) {
     Text(title)
+      .copyOption(CopyOptions.LocalDevice)
       .fontSize(13)
       .fontColor(ZhihuColors.textSecondary)
       .width('100%')
@@ -65,6 +68,7 @@ struct SettingsFilterPage {
   @Builder
   iconBadge(glyph: string) {
     Text(glyph)
+      .copyOption(CopyOptions.LocalDevice)
       .fontSize(16)
       .fontColor(ZhihuColors.primary)
       .width(36)
@@ -81,10 +85,12 @@ struct SettingsFilterPage {
       this.iconBadge(glyph)
       Column({ space: 2 }) {
         Text(label)
+          .copyOption(CopyOptions.LocalDevice)
           .fontSize(15)
           .fontColor(ZhihuColors.text)
         if (desc !== null) {
           Text(desc)
+            .copyOption(CopyOptions.LocalDevice)
             .fontSize(12)
             .fontColor(ZhihuColors.textTertiary)
             .maxLines(1)
@@ -108,10 +114,12 @@ struct SettingsFilterPage {
     Row({ space: 12 }) {
       this.iconBadge('删')
       Text('清除本地去重记录')
+        .copyOption(CopyOptions.LocalDevice)
         .fontSize(15)
         .fontColor(ZhihuColors.text)
         .layoutWeight(1)
       Text('清除')
+        .copyOption(CopyOptions.LocalDevice)
         .fontSize(15)
         .fontColor(ZhihuColors.danger)
         .onClick(() => {
@@ -131,11 +139,13 @@ struct SettingsFilterPage {
           // 介绍卡
           Column({ space: 8 }) {
             Text('推荐流设置分为两类')
+              .copyOption(CopyOptions.LocalDevice)
               .fontSize(16)
               .fontWeight(FontWeight.Bold)
               .fontColor(ZhihuColors.text)
               .width('100%')
             Text('服务端请求参数会影响知乎返回的推荐内容；本地后处理只在应用收到内容后执行，包含内容过滤、去重与启动缓存。')
+              .copyOption(CopyOptions.LocalDevice)
               .fontSize(13)
               .fontColor(ZhihuColors.textSecondary)
               .width('100%')

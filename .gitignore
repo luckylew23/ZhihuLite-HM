@@ -53,6 +53,16 @@ harmony/**/node_modules/
 harmony/codecache/
 # JS bundle + 资源由 scripts/build-ohos-bundle.js 生成，属构建产物
 harmony/entry/src/main/resources/rawfile/
+# HarmonyOS NEXT 原生工程（harmony-native）构建产物
+harmony-native/.hvigor/
+harmony-native/oh_modules/
+harmony-native/**/oh_modules/
+harmony-native/entry/build/
+harmony-native/build/
+harmony-native/.cxx/
+harmony-native/codecache/
+harmony-native/.clangd/
+harmony-native/.clang-format
 ohos-bundle/
 *.hap
 *.hsp
@@ -61,3 +71,6 @@ ohos-bundle/
 # 签名：仓库只保留脚本与公开证书，私钥(p12)/profile(p7b) 本地保存
 harmony/signing/*.p7b
 harmony/signing/verify-*
+
+# 本地备份目录
+.hmos-backup/

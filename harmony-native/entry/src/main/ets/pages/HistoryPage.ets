@@ -191,12 +191,14 @@ export struct HistoryPage {
     Row({ space: 10 }) {
       if (this.selecting) {
         Text(this.isSelected(this.makeKey(item)) ? '●' : '○')
+          .copyOption(CopyOptions.LocalDevice)
           .fontSize(16)
           .fontColor(this.isSelected(this.makeKey(item))
             ? ZhihuColors.primary : ZhihuColors.textTertiary)
       }
       Column({ space: 6 }) {
         Text(item.data.header.title)
+          .copyOption(CopyOptions.LocalDevice)
           .fontSize(15)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.text)
@@ -205,6 +207,7 @@ export struct HistoryPage {
           .width('100%')
         if (item.data.content.summary.length > 0) {
           Text(item.data.content.summary)
+            .copyOption(CopyOptions.LocalDevice)
             .fontSize(13)
             .fontColor(ZhihuColors.textSecondary)
             .maxLines(2)
@@ -214,11 +217,13 @@ export struct HistoryPage {
         Row() {
           Text(item.data.matrix.length > 0 && item.data.matrix[0].data
             ? item.data.matrix[0].data.text : '')
+            .copyOption(CopyOptions.LocalDevice)
             .fontSize(12)
             .fontColor(ZhihuColors.textTertiary)
             .layoutWeight(1)
           Text(item.data.extra.read_time > 0
             ? formatDate(item.data.extra.read_time) : '')
+            .copyOption(CopyOptions.LocalDevice)
             .fontSize(12)
             .fontColor(ZhihuColors.textTertiary)
         }
@@ -250,11 +255,13 @@ export struct HistoryPage {
       if (this.loadingMore) {
         Row({ space: 8 }) {
           LoadingProgress().width(18).height(18).color(ZhihuColors.textTertiary)
-          Text('加载中…').fontSize(13).fontColor(ZhihuColors.textTertiary)
+          Text('加载中…')
+            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
         }
         .justifyContent(FlexAlign.Center).width('100%').padding(12)
       } else if (this.isEnd && this.items.length > 0) {
         Text('— 没有更多了 —')
+          .copyOption(CopyOptions.LocalDevice)
           .fontSize(13).fontColor(ZhihuColors.textTertiary)
           .width('100%').textAlign(TextAlign.Center).padding(12)
       }
@@ -273,7 +280,8 @@ export struct HistoryPage {
       if (!this.loggedIn) {
         Column({ space: 16 }) {
           Blank()
-          Text('登录后才能查看浏览历史').fontSize(14).fontColor(ZhihuColors.textSecondary)
+          Text('登录后才能查看浏览历史')
+            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
           Button('登录知乎')
             .width(220).height(44).backgroundColor(ZhihuColors.primary)
             .onClick(() => {
@@ -285,12 +293,14 @@ export struct HistoryPage {
       } else if (this.loading) {
         Column({ space: 8 }) {
           LoadingProgress().width(48).height(48).color(ZhihuColors.primary)
-          Text('加载中…').fontSize(13).fontColor(ZhihuColors.textTertiary)
+          Text('加载中…')
+            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
         }
         .width('100%').layoutWeight(1).justifyContent(FlexAlign.Center)
       } else if (this.error.length > 0 && this.items.length === 0) {
         Column({ space: 16 }) {
-          Text(this.error).fontSize(14).fontColor(ZhihuColors.textSecondary)
+          Text(this.error)
+            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
           Button('重试')
             .fontSize(14).backgroundColor(ZhihuColors.primary)
             .onClick(() => {
@@ -300,7 +310,8 @@ export struct HistoryPage {
         .width('100%').layoutWeight(1).justifyContent(FlexAlign.Center)
       } else if (this.items.length === 0) {
         Column() {
-          Text('这里空空如也').fontSize(14).fontColor(ZhihuColors.textTertiary)
+          Text('这里空空如也')
+            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
         }
         .width('100%').layoutWeight(1).justifyContent(FlexAlign.Center)
       } else {

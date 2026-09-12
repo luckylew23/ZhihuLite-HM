@@ -63,6 +63,7 @@ struct ArticleDetailPage {
         Scroll() {
           Column({ space: 12 }) {
             Text(this.article.title)
+              .copyOption(CopyOptions.LocalDevice)
               .fontSize(21)
               .fontWeight(FontWeight.Bold)
               .fontColor(ZhihuColors.text)
@@ -76,8 +77,10 @@ struct ArticleDetailPage {
                 .backgroundColor(ZhihuColors.backgroundTertiary)
               Column({ space: 2 }) {
                 Text(this.article.author.name)
+                  .copyOption(CopyOptions.LocalDevice)
                   .fontSize(14).fontWeight(FontWeight.Medium).fontColor(ZhihuColors.text)
                 Text(formatDate(this.article.created))
+                  .copyOption(CopyOptions.LocalDevice)
                   .fontSize(12).fontColor(ZhihuColors.textTertiary)
               }
               .alignItems(HorizontalAlign.Start)
@@ -87,6 +90,7 @@ struct ArticleDetailPage {
             .alignItems(VerticalAlign.Center)
 
             Text(this.bodyText)
+              .copyOption(CopyOptions.LocalDevice)
               .fontSize(16)
               .fontColor(ZhihuColors.text)
               .lineHeight(26)
@@ -103,14 +107,18 @@ struct ArticleDetailPage {
 
         Row({ space: 4 }) {
           Row({ space: 4 }) {
-            Text('▲').fontSize(14).fontColor(ZhihuColors.textSecondary)
-            Text(formatCount(this.article.voteup_count ?? 0)).fontSize(14).fontColor(ZhihuColors.textSecondary)
+            Text('▲')
+              .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
+            Text(formatCount(this.article.voteup_count ?? 0))
+              .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
           }
           .layoutWeight(1).justifyContent(FlexAlign.Center).padding({ top: 12, bottom: 12 })
 
           Row({ space: 4 }) {
-            Text('💬').fontSize(14).fontColor(ZhihuColors.textSecondary)
-            Text(formatCount(this.article.comment_count)).fontSize(14).fontColor(ZhihuColors.textSecondary)
+            Text('💬')
+              .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
+            Text(formatCount(this.article.comment_count))
+              .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
           }
           .layoutWeight(1).justifyContent(FlexAlign.Center).padding({ top: 12, bottom: 12 })
           .onClick(() => {

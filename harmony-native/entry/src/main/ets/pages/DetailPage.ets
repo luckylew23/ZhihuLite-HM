@@ -64,6 +64,7 @@ struct DetailPage {
     Column() {
       Row() {
         Text('‹')
+          .copyOption(CopyOptions.LocalDevice)
           .fontSize(24)
           .fontColor(ZhihuColors.text)
           .padding({ left: 4, right: 8 })
@@ -71,6 +72,7 @@ struct DetailPage {
             router.back();
           })
         Text('详情')
+          .copyOption(CopyOptions.LocalDevice)
           .fontSize(16)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.text)
@@ -85,6 +87,7 @@ struct DetailPage {
         Column({ space: 12 }) {
           if (this.title.length > 0) {
             Text(this.title)
+              .copyOption(CopyOptions.LocalDevice)
               .fontSize(20)
               .fontWeight(FontWeight.Bold)
               .fontColor(ZhihuColors.text)
@@ -93,6 +96,7 @@ struct DetailPage {
           }
           if (this.excerpt.length > 0) {
             Text(this.excerpt)
+              .copyOption(CopyOptions.LocalDevice)
               .fontSize(15)
               .fontColor(ZhihuColors.textSecondary)
               .width('100%')
@@ -110,6 +114,7 @@ struct DetailPage {
             })
 
           Text('完整详情（回答/文章正文、评论、赞同）将在下一版本接入')
+            .copyOption(CopyOptions.LocalDevice)
             .fontSize(12)
             .fontColor(ZhihuColors.textTertiary)
             .width('100%')

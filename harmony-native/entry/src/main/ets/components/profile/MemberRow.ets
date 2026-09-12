@@ -31,6 +31,7 @@ export struct MemberRow {
       }
       Column({ space: 2 }) {
         Text(this.name)
+          .copyOption(CopyOptions.LocalDevice)
           .fontSize(15)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.text)
@@ -38,6 +39,7 @@ export struct MemberRow {
           .textOverflow({ overflow: TextOverflow.Ellipsis })
         if (this.headline.length > 0) {
           Text(this.headline)
+            .copyOption(CopyOptions.LocalDevice)
             .fontSize(12)
             .fontColor(ZhihuColors.textSecondary)
             .maxLines(1)

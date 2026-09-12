@@ -98,6 +98,7 @@ struct Index {
   topTab(key: string, index: number) {
     Column({ space: 5 }) {
       Text(this.keyToLabel(key))
+        .copyOption(CopyOptions.LocalDevice)
         .fontSize(this.innerIndex === index ? 17 : 15)
         .fontWeight(this.innerIndex === index ? FontWeight.Bold : FontWeight.Normal)
         .fontColor(
@@ -134,6 +135,7 @@ struct Index {
       )
       Blank()
       Text('🔍')
+        .copyOption(CopyOptions.LocalDevice)
         .fontSize(20)
         .fontColor(ZhihuColors.text)
         .padding(8)
@@ -176,6 +178,7 @@ struct Index {
   }) {
     Column() {
       Text(icon)
+        .copyOption(CopyOptions.LocalDevice)
         .fontSize(24)
         .fontColor(
           this.outerIndex === target
@@ -216,6 +219,7 @@ struct Index {
       })
       Column() {
         Text('+')
+          .copyOption(CopyOptions.LocalDevice)
           .fontSize(28)
           .fontWeight(FontWeight.Bold)
           .fontColor(ZhihuColors.textInverse)

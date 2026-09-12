@@ -57,6 +57,7 @@ struct PublishPage {
   optionRow(item: PublishOption) {
     Row({ space: 14 }) {
       Text(item.glyph)
+        .copyOption(CopyOptions.LocalDevice)
         .fontSize(26)
         .width(56)
         .height(56)
@@ -65,16 +66,19 @@ struct PublishPage {
         .borderRadius(14)
       Column({ space: 3 }) {
         Text(item.title)
+          .copyOption(CopyOptions.LocalDevice)
           .fontSize(17)
           .fontWeight(FontWeight.Bold)
           .fontColor(ZhihuColors.text)
         Text(item.subtitle)
+          .copyOption(CopyOptions.LocalDevice)
           .fontSize(13)
           .fontColor(ZhihuColors.textSecondary)
       }
       .alignItems(HorizontalAlign.Start)
       .layoutWeight(1)
       Text('›')
+        .copyOption(CopyOptions.LocalDevice)
         .fontSize(20)
         .fontColor(ZhihuColors.textTertiary)
     }
@@ -105,6 +109,7 @@ struct PublishPage {
       // 顶部导航：返回 + 标题
       Row() {
         Text('‹')
+          .copyOption(CopyOptions.LocalDevice)
           .fontSize(30)
           .fontColor(ZhihuColors.text)
           .padding({ left: 6, right: 10 })
@@ -112,6 +117,7 @@ struct PublishPage {
             router.back();
           })
         Text('发布内容')
+          .copyOption(CopyOptions.LocalDevice)
           .fontSize(17)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.text)
@@ -126,10 +132,12 @@ struct PublishPage {
       // 顶部
       Column({ space: 4 }) {
         Text('发布内容')
+          .copyOption(CopyOptions.LocalDevice)
           .fontSize(28)
           .fontWeight(FontWeight.Bold)
           .fontColor(ZhihuColors.text)
         Text('让世界看到你的思考')
+          .copyOption(CopyOptions.LocalDevice)
           .fontSize(14)
           .fontColor(ZhihuColors.textSecondary)
       }

@@ -114,6 +114,7 @@ struct PublishPinPage {
   topBar() {
     Row() {
       Text('✕')
+        .copyOption(CopyOptions.LocalDevice)
         .fontSize(24)
         .fontColor(ZhihuColors.text)
         .width(44)
@@ -122,6 +123,7 @@ struct PublishPinPage {
         })
       Blank()
       Text('发想法')
+        .copyOption(CopyOptions.LocalDevice)
         .fontSize(17)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.text)
@@ -131,6 +133,7 @@ struct PublishPinPage {
           LoadingProgress().width(20).height(20).color(ZhihuColors.primary)
         } else {
           Text('发布')
+            .copyOption(CopyOptions.LocalDevice)
             .fontSize(15)
             .fontWeight(FontWeight.Medium)
             .fontColor(ZhihuColors.textInverse)
@@ -157,6 +160,7 @@ struct PublishPinPage {
     Column({ space: 16 }) {
       Blank()
       Text('发布想法前请先登录知乎账号')
+        .copyOption(CopyOptions.LocalDevice)
         .fontSize(14)
         .fontColor(ZhihuColors.textSecondary)
       Button('去登录')
@@ -187,7 +191,8 @@ struct PublishPinPage {
               .objectFit(ImageFit.Cover)
               .backgroundColor(ZhihuColors.backgroundTertiary)
             Stack() {
-              Text('✕').fontSize(11).fontColor(ZhihuColors.textInverse)
+              Text('✕')
+                .copyOption(CopyOptions.LocalDevice).fontSize(11).fontColor(ZhihuColors.textInverse)
             }
             .width(20)
             .height(20)
@@ -208,8 +213,10 @@ struct PublishPinPage {
   @Builder
   addImageButton() {
     Row({ space: 8 }) {
-      Text('🖼').fontSize(16).fontColor(ZhihuColors.primary)
+      Text('🖼')
+        .copyOption(CopyOptions.LocalDevice).fontSize(16).fontColor(ZhihuColors.primary)
       Text('添加图片 (' + this.images.length + '/' + MAX_IMAGES + ')')
+        .copyOption(CopyOptions.LocalDevice)
         .fontSize(15)
         .fontColor(ZhihuColors.primary)
     }
@@ -252,6 +259,7 @@ struct PublishPinPage {
 
         if (this.error.length > 0) {
           Text(this.error)
+            .copyOption(CopyOptions.LocalDevice)
             .fontSize(13)
             .fontColor(ZhihuColors.danger)
             .width('100%')

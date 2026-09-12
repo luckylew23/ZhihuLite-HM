@@ -23,6 +23,7 @@ struct LoginPage {
     Column() {
       Row() {
         Text('取消')
+          .copyOption(CopyOptions.LocalDevice)
           .fontSize(15)
           .fontColor(ZhihuColors.primary)
           .onClick(() => {
@@ -30,11 +31,13 @@ struct LoginPage {
           })
         Blank()
         Text('知乎登录')
+          .copyOption(CopyOptions.LocalDevice)
           .fontSize(16)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.text)
         Blank()
         Text('   ')
+          .copyOption(CopyOptions.LocalDevice)
           .fontSize(15)
       }
       .width('100%')
@@ -70,6 +73,7 @@ struct LoginPage {
         if (this.logined) {
           Column({ space: 16 }) {
             Text('登录成功')
+              .copyOption(CopyOptions.LocalDevice)
               .fontSize(16)
               .fontColor(ZhihuColors.text)
             Button('返回')

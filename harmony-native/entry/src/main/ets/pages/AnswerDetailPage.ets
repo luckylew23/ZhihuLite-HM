@@ -119,6 +119,7 @@ struct AnswerDetailPage {
             // 所属问题
             if (this.answer.question !== undefined && this.answer.question.title.length > 0) {
               Text(this.answer.question.title)
+                .copyOption(CopyOptions.LocalDevice)
                 .fontSize(19)
                 .fontWeight(FontWeight.Bold)
                 .fontColor(ZhihuColors.text)
@@ -134,9 +135,11 @@ struct AnswerDetailPage {
                 .backgroundColor(ZhihuColors.backgroundTertiary)
               Column({ space: 2 }) {
                 Text(this.answer.author.name)
+                  .copyOption(CopyOptions.LocalDevice)
                   .fontSize(15).fontWeight(FontWeight.Medium).fontColor(ZhihuColors.text)
                 if (this.answer.author.headline && this.answer.author.headline.length > 0) {
                   Text(this.answer.author.headline)
+                    .copyOption(CopyOptions.LocalDevice)
                     .fontSize(12).fontColor(ZhihuColors.textTertiary)
                     .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
                 }
@@ -149,6 +152,7 @@ struct AnswerDetailPage {
 
             // 正文（纯文本降级）
             Text(this.bodyText)
+              .copyOption(CopyOptions.LocalDevice)
               .fontSize(16)
               .fontColor(ZhihuColors.text)
               .lineHeight(26)
@@ -157,6 +161,7 @@ struct AnswerDetailPage {
 
             if (this.metaText().length > 0) {
               Text(this.metaText())
+                .copyOption(CopyOptions.LocalDevice)
                 .fontSize(12)
                 .fontColor(ZhihuColors.textTertiary)
                 .width('100%')
@@ -174,9 +179,11 @@ struct AnswerDetailPage {
         Row({ space: 4 }) {
           Row({ space: 4 }) {
             Text(this.voting === 1 ? '▲' : '△')
+              .copyOption(CopyOptions.LocalDevice)
               .fontSize(14)
               .fontColor(this.voting === 1 ? ZhihuColors.primary : ZhihuColors.textSecondary)
             Text(formatCount(this.voteCount))
+              .copyOption(CopyOptions.LocalDevice)
               .fontSize(14)
               .fontColor(this.voting === 1 ? ZhihuColors.primary : ZhihuColors.textSecondary)
           }
@@ -189,9 +196,11 @@ struct AnswerDetailPage {
 
           Row({ space: 4 }) {
             Text(this.voting === -1 ? '▼' : '▽')
+              .copyOption(CopyOptions.LocalDevice)
               .fontSize(14)
               .fontColor(this.voting === -1 ? ZhihuColors.danger : ZhihuColors.textSecondary)
             Text('反对')
+              .copyOption(CopyOptions.LocalDevice)
               .fontSize(14)
               .fontColor(this.voting === -1 ? ZhihuColors.danger : ZhihuColors.textSecondary)
           }
@@ -203,8 +212,10 @@ struct AnswerDetailPage {
           })
 
           Row({ space: 4 }) {
-            Text('💬').fontSize(14).fontColor(ZhihuColors.textSecondary)
-            Text(formatCount(this.answer.comment_count)).fontSize(14).fontColor(ZhihuColors.textSecondary)
+            Text('💬')
+              .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
+            Text(formatCount(this.answer.comment_count))
+              .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
           }
           .layoutWeight(1)
           .justifyContent(FlexAlign.Center)
@@ -214,8 +225,10 @@ struct AnswerDetailPage {
           })
 
           Row({ space: 4 }) {
-            Text('★').fontSize(14).fontColor(ZhihuColors.textSecondary)
-            Text('收藏').fontSize(14).fontColor(ZhihuColors.textSecondary)
+            Text('★')
+              .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
+            Text('收藏')
+              .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
           }
           .layoutWeight(1)
           .justifyContent(FlexAlign.Center)

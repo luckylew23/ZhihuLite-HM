@@ -88,6 +88,7 @@ export struct ProfilePage {
   @Builder
   iconBadge(glyph: string) {
     Text(glyph)
+      .copyOption(CopyOptions.LocalDevice)
       .fontSize(15)
       .fontColor(ZhihuColors.primary)
       .width(36)
@@ -101,10 +102,12 @@ export struct ProfilePage {
   statItem(label: string, value: number, clickable: boolean) {
     Column({ space: 4 }) {
       Text(String(value))
+        .copyOption(CopyOptions.LocalDevice)
         .fontSize(19)
         .fontWeight(FontWeight.Bold)
         .fontColor(ZhihuColors.text)
       Text(label)
+        .copyOption(CopyOptions.LocalDevice)
         .fontSize(12)
         .fontColor(ZhihuColors.textSecondary)
     }
@@ -121,15 +124,18 @@ export struct ProfilePage {
     Row({ space: 14 }) {
       this.iconBadge(item.glyph)
       Text(item.label)
+        .copyOption(CopyOptions.LocalDevice)
         .fontSize(16)
         .fontColor(ZhihuColors.text)
         .layoutWeight(1)
       if (item.badge.length > 0) {
         Text(item.badge)
+          .copyOption(CopyOptions.LocalDevice)
           .fontSize(13)
           .fontColor(ZhihuColors.textTertiary)
       }
       Text('›')
+        .copyOption(CopyOptions.LocalDevice)
         .fontSize(20)
         .fontColor(ZhihuColors.textTertiary)
     }
@@ -148,6 +154,7 @@ export struct ProfilePage {
     Row({ space: 14 }) {
       this.iconBadge('昼')
       Text('主题模式')
+        .copyOption(CopyOptions.LocalDevice)
         .fontSize(16)
         .fontColor(ZhihuColors.text)
         .layoutWeight(1)
@@ -168,6 +175,7 @@ export struct ProfilePage {
   @Builder
   themePill(label: string, value: ThemeMode) {
     Text(label)
+      .copyOption(CopyOptions.LocalDevice)
       .fontSize(12)
       .fontColor(this.themeMode === value ? ZhihuColors.textInverse : ZhihuColors.text)
       .fontWeight(this.themeMode === value ? FontWeight.Bold : FontWeight.Normal)
@@ -184,6 +192,7 @@ export struct ProfilePage {
     Column({ space: 16 }) {
       Blank()
       Text('登录后同步你的关注、收藏与创作')
+        .copyOption(CopyOptions.LocalDevice)
         .fontSize(14)
         .fontColor(ZhihuColors.textSecondary)
       Button('登录知乎')
@@ -216,16 +225,19 @@ export struct ProfilePage {
             .backgroundColor(ZhihuColors.backgroundTertiary)
           Column({ space: 4 }) {
             Text(this.me?.name ?? '')
+              .copyOption(CopyOptions.LocalDevice)
               .fontSize(22)
               .fontWeight(FontWeight.Bold)
               .fontColor(ZhihuColors.text)
             Text('点击查看个人主页')
+              .copyOption(CopyOptions.LocalDevice)
               .fontSize(13)
               .fontColor(ZhihuColors.textSecondary)
           }
           .alignItems(HorizontalAlign.Start)
           .layoutWeight(1)
           Text('›')
+            .copyOption(CopyOptions.LocalDevice)
             .fontSize(22)
             .fontColor(ZhihuColors.textTertiary)
         }
@@ -270,13 +282,16 @@ export struct ProfilePage {
           Row({ space: 14 }) {
             this.iconBadge('号')
             Text('切换账号')
+              .copyOption(CopyOptions.LocalDevice)
               .fontSize(16)
               .fontColor(ZhihuColors.text)
               .layoutWeight(1)
             Text('1 个账号')
+              .copyOption(CopyOptions.LocalDevice)
               .fontSize(13)
               .fontColor(ZhihuColors.textTertiary)
             Text('›')
+              .copyOption(CopyOptions.LocalDevice)
               .fontSize(20)
               .fontColor(ZhihuColors.textTertiary)
           }
@@ -295,6 +310,7 @@ export struct ProfilePage {
 
         // 退出账号
         Text('退出账号')
+          .copyOption(CopyOptions.LocalDevice)
           .fontSize(16)
           .fontColor(ZhihuColors.danger)
           .width('100%')

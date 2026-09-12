@@ -106,12 +106,14 @@ export struct CollectionDetailPage {
   headerBlock() {
     Column({ space: 6 }) {
       Text(this.title)
+        .copyOption(CopyOptions.LocalDevice)
         .fontSize(18)
         .fontWeight(FontWeight.Bold)
         .fontColor(ZhihuColors.text)
         .width('100%')
       if (this.description.length > 0) {
         Text(this.description)
+          .copyOption(CopyOptions.LocalDevice)
           .fontSize(13)
           .fontColor(ZhihuColors.textSecondary)
           .width('100%')
@@ -128,7 +130,8 @@ export struct CollectionDetailPage {
       if (this.loadingMore) {
         Row({ space: 8 }) {
           LoadingProgress().width(18).height(18).color(ZhihuColors.textTertiary)
-          Text('加载中…').fontSize(13).fontColor(ZhihuColors.textTertiary)
+          Text('加载中…')
+            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
         }
         .justifyContent(FlexAlign.Center).width('100%').padding(12)
       }
@@ -141,12 +144,14 @@ export struct CollectionDetailPage {
       if (this.loading) {
         Column({ space: 8 }) {
           LoadingProgress().width(48).height(48).color(ZhihuColors.primary)
-          Text('加载中…').fontSize(13).fontColor(ZhihuColors.textTertiary)
+          Text('加载中…')
+            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
         }
         .width('100%').layoutWeight(1).justifyContent(FlexAlign.Center)
       } else if (this.error.length > 0 && this.items.length === 0) {
         Column({ space: 16 }) {
-          Text(this.error).fontSize(14).fontColor(ZhihuColors.textSecondary)
+          Text(this.error)
+            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
           Button('重试')
             .fontSize(14).backgroundColor(ZhihuColors.primary)
             .onClick(() => {
@@ -158,7 +163,8 @@ export struct CollectionDetailPage {
         this.headerBlock()
         if (this.items.length === 0) {
           Column() {
-            Text('这个收藏夹空空如也').fontSize(14).fontColor(ZhihuColors.textTertiary)
+            Text('这个收藏夹空空如也')
+              .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
           }
           .width('100%').layoutWeight(1).justifyContent(FlexAlign.Center)
         } else {

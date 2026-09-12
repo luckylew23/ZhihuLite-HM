@@ -30,6 +30,7 @@ export struct HotCard {
     Row({ space: 12 }) {
       // 排名
       Text(String(this.item.rank))
+        .copyOption(CopyOptions.LocalDevice)
         .fontSize(18)
         .fontWeight(FontWeight.Bold)
         .fontColor(rankColor(this.item.rank))
@@ -41,6 +42,7 @@ export struct HotCard {
         Row({ space: 6 }) {
           if (this.item.labelArea && this.item.labelArea.text) {
             Text(this.item.labelArea.text)
+              .copyOption(CopyOptions.LocalDevice)
               .fontSize(10)
               .fontColor(this.item.labelArea.normal_color ?? ZhihuColors.hotLabel)
               .border({ width: 0.5, color: this.item.labelArea.normal_color ?? ZhihuColors.hotLabel })
@@ -48,6 +50,7 @@ export struct HotCard {
               .padding({ left: 4, right: 4, top: 1, bottom: 1 })
           }
           Text(this.item.title)
+            .copyOption(CopyOptions.LocalDevice)
             .fontSize(15)
             .fontWeight(FontWeight.Medium)
             .fontColor(ZhihuColors.text)
@@ -61,6 +64,7 @@ export struct HotCard {
 
         if (this.item.excerpt.length > 0) {
           Text(this.item.excerpt)
+            .copyOption(CopyOptions.LocalDevice)
             .fontSize(13)
             .fontColor(ZhihuColors.textSecondary)
             .maxLines(2)
@@ -71,10 +75,12 @@ export struct HotCard {
 
         Row({ space: 8 }) {
           if (this.item.hotValue.length > 0) {
-            Text(this.item.hotValue).fontSize(12).fontColor(ZhihuColors.textTertiary)
+            Text(this.item.hotValue)
+              .copyOption(CopyOptions.LocalDevice).fontSize(12).fontColor(ZhihuColors.textTertiary)
           }
           if (this.item.answerCount > 0) {
             Text(String(this.item.answerCount) + ' 回答')
+              .copyOption(CopyOptions.LocalDevice)
               .fontSize(12)
               .fontColor(ZhihuColors.textTertiary)
           }

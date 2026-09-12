@@ -15,6 +15,7 @@ export struct ProfileTopBar {
   build() {
     Row({ space: 8 }) {
       Text('←')
+        .copyOption(CopyOptions.LocalDevice)
         .fontSize(22)
         .fontColor(ZhihuColors.text)
         .padding({ left: 8, right: 8, top: 4, bottom: 4 })
@@ -22,12 +23,14 @@ export struct ProfileTopBar {
           router.back();
         })
       Text(this.title)
+        .copyOption(CopyOptions.LocalDevice)
         .fontSize(17)
         .fontWeight(FontWeight.Bold)
         .fontColor(ZhihuColors.text)
         .layoutWeight(1)
       if (this.rightText.length > 0) {
         Text(this.rightText)
+          .copyOption(CopyOptions.LocalDevice)
           .fontSize(15)
           .fontColor(ZhihuColors.primary)
           .padding({ left: 8, right: 8, top: 4, bottom: 4 })
