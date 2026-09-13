@@ -2,6 +2,7 @@
   "src": [
     "pages/Index",
     "pages/DetailPage",
+  "pages/ImageViewerPage",
     "pages/LoginPage",
     "pages/QuestionDetailPage",
     "pages/AnswerDetailPage",

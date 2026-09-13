@@ -261,9 +261,9 @@ struct QuestionDetailPage {
     if (this.detailText().length > 0) {
       Column({ space: 8 }) {
         if (this.detailImages().length > 0) {
-          Flex({ wrap: FlexWrap.Wrap }) {
-            ForEach(this.detailImages().slice(0, 3), (src: string) => {
-              NetImage({ url: src, w: 110, h: 110, r: 8, mr: 8, mb: 8})
+          Column({ space: 8 }) {
+            ForEach(this.detailImages(), (src: string) => {
+              NetImage({ url: src, w: 0, h: 220, r: 8, fit: ImageFit.Contain, mb: 4, tapView: true })
             }, (src: string) => src)
           }
           .width('100%')
@@ -271,7 +271,7 @@ struct QuestionDetailPage {
 
         Text(this.detailText())
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(16)
+          .fontSize(18)
           .fontColor(ZhihuColors.textSecondary)
           .lineHeight(21)
           .width('100%')

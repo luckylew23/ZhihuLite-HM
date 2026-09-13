@@ -40,14 +40,15 @@
       {
         "name": "ohos.permission.GET_NETWORK_INFO"
       },
-      {
-        "name": "ohos.permission.WRITE_IMAGEVIDEO",
-        "reason": "$string:permission_reason_save_image",
-        "usedScene": {
-          "abilities": ["EntryAbility"],
-          "when": "inuse"
-        }
-      }
+      // WRITE_IMAGEVIDEO 临时注释：hdc 静默安装 user_grant 权限失败
+      // {
+      //   "name": "ohos.permission.WRITE_IMAGEVIDEO",
+      //   "reason": "$string:permission_reason_save_image",
+      //   "usedScene": {
+      //     "abilities": ["EntryAbility"],
+      //     "when": "inuse"
+      //   }
+      // }
     ]
   }
 }

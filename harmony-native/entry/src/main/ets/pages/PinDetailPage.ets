@@ -13,7 +13,7 @@ import { formatDateTime } from '../utils/date';
 import { getZhihuErrorMessage } from '../utils/zhihuError';
 import { DetailNavBar } from '../components/detail/DetailNavBar';
 import { StatusView } from '../components/detail/StatusView';
-import { extractImageUrls, formatCount, readStringParam, stripHtml } from '../components/detail/detailUtils';
+import { formatCount, HtmlBlock, parseHtmlBlocks, readStringParam } from '../components/detail/detailUtils';
 
 @Entry
 @Component
@@ -22,8 +22,7 @@ struct PinDetailPage {
   @State loading: boolean = true;
   @State error: string = '';
   @State pin: ZhihuPinDetail | null = null;
-  @State images: string[] = [];
-  private bodyText: string = '';
+  @State bodyBlocks: HtmlBlock[] = [];
 
   aboutToAppear(): void {
     const p = router.getParams() as Record<string, object>;
@@ -38,8 +37,7 @@ struct PinDetailPage {
       const pin: ZhihuPinDetail = await getPin(this.pinId);
       this.pin = pin;
       const html: string = pin.content_html ?? pin.content ?? '';
-      this.bodyText = stripHtml(html);
-      this.images = extractImageUrls(html);
+      this.bodyBlocks = parseHtmlBlocks(html);
     } catch (e) {
       this.error = getZhihuErrorMessage(e as object);
     } finally {
@@ -84,21 +82,19 @@ struct PinDetailPage {
             .width('100%')
             .alignItems(VerticalAlign.Center)
 
-            if (this.bodyText.length > 0) {
-              Text(this.bodyText)
-          .copyOption(CopyOptions.LocalDevice)
-                .fontSize(18)
-                .fontColor(ZhihuColors.text)
-                .lineHeight(26)
-                .width('100%')
-                .textAlign(TextAlign.Start)
-            }
-
-            if (this.images.length > 0) {
-              ForEach(this.images, (url: string) => {
-                NetImage({ url: url, w: 0, h: 240, r: 8, fit: ImageFit.Contain, mt: 4})
-              }, (url: string, index: number) => String(index) + '-' + url)
-            }
+            ForEach(this.bodyBlocks, (b: HtmlBlock) => {
+              if (b.type === 'text') {
+                Text(b.text)
+                  .copyOption(CopyOptions.LocalDevice)
+                  .fontSize(20)
+                  .fontColor(ZhihuColors.text)
+                  .lineHeight(30)
+                  .width('100%')
+                  .textAlign(TextAlign.Start)
+              } else {
+                NetImage({ url: b.url, w: 0, h: 280, r: 8, fit: ImageFit.Contain, mt: 4, tapView: true })
+              }
+            }, (b: HtmlBlock, i: number) => i.toString() + b.url + b.text.substring(0, 8))
           }
           .width('100%')
           .padding(16)

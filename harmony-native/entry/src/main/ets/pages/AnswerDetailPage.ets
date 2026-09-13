@@ -13,7 +13,8 @@ import { formatDate } from '../utils/date';
 import { getZhihuErrorMessage } from '../utils/zhihuError';
 import { DetailNavBar } from '../components/detail/DetailNavBar';
 import { StatusView } from '../components/detail/StatusView';
-import { formatCount, guardLogin, readStringParam, stripHtml } from '../components/detail/detailUtils';
+import { formatCount, guardLogin, HtmlBlock, parseHtmlBlocks, readStringParam } from '../components/detail/detailUtils';
+import { NetImage } from '../components/NetImage';
 
 @Entry
 @Component
@@ -27,7 +28,7 @@ struct AnswerDetailPage {
   @State collected: boolean = false;
   @State collectionId: string = '';
   @StorageLink('collectPicked') @Watch('onCollectPicked') collectPicked: string = '';
-  private bodyText: string = '';
+  @State bodyBlocks: HtmlBlock[] = [];
 
   onCollectPicked(): void {
     if (this.collectPicked === this.answerId) {
@@ -60,7 +61,7 @@ struct AnswerDetailPage {
       this.answer = a;
       this.voting = a.relationship?.voting ?? 0;
       this.voteCount = a.voteup_count ?? 0;
-      this.bodyText = stripHtml(a.content);
+      this.bodyBlocks = parseHtmlBlocks(a.content);
     } catch (e) {
       this.error = getZhihuErrorMessage(e as object);
     } finally {
@@ -219,14 +220,20 @@ struct AnswerDetailPage {
             .width('100%')
             .alignItems(VerticalAlign.Center)
 
-            // 正文（纯文本降级）
-            Text(this.bodyText)
-          .copyOption(CopyOptions.LocalDevice)
-              .fontSize(18)
-              .fontColor(ZhihuColors.text)
-              .lineHeight(26)
-              .width('100%')
-              .textAlign(TextAlign.Start)
+            // 正文（HTML → 文本/图片块）
+            ForEach(this.bodyBlocks, (b: HtmlBlock) => {
+              if (b.type === 'text') {
+                Text(b.text)
+                  .copyOption(CopyOptions.LocalDevice)
+                  .fontSize(20)
+                  .fontColor(ZhihuColors.text)
+                  .lineHeight(30)
+                  .width('100%')
+                  .textAlign(TextAlign.Start)
+              } else {
+                NetImage({ url: b.url, w: 0, h: 260, r: 8, fit: ImageFit.Contain, mt: 6, tapView: true })
+              }
+            }, (b: HtmlBlock, i: number) => i.toString() + b.url + b.text.substring(0, 8))
 
             if (this.metaText().length > 0) {
               Text(this.metaText())

@@ -13,7 +13,8 @@ import { formatDate } from '../utils/date';
 import { getZhihuErrorMessage } from '../utils/zhihuError';
 import { DetailNavBar } from '../components/detail/DetailNavBar';
 import { StatusView } from '../components/detail/StatusView';
-import { formatCount, readStringParam, stripHtml } from '../components/detail/detailUtils';
+import { NetImage } from '../components/NetImage';
+import { formatCount, HtmlBlock, parseHtmlBlocks, readStringParam } from '../components/detail/detailUtils';
 
 @Entry
 @Component
@@ -22,7 +23,7 @@ struct ArticleDetailPage {
   @State loading: boolean = true;
   @State error: string = '';
   @State article: ZhihuArticle | null = null;
-  private bodyText: string = '';
+  @State bodyBlocks: HtmlBlock[] = [];
 
   aboutToAppear(): void {
     const p = router.getParams() as Record<string, object>;
@@ -36,7 +37,7 @@ struct ArticleDetailPage {
     try {
       const a: ZhihuArticle = await getArticle(this.articleId);
       this.article = a;
-      this.bodyText = stripHtml(a.content);
+      this.bodyBlocks = parseHtmlBlocks(a.content);
     } catch (e) {
       this.error = getZhihuErrorMessage(e as object);
     } finally {
@@ -86,13 +87,19 @@ struct ArticleDetailPage {
             .width('100%')
             .alignItems(VerticalAlign.Center)
 
-            Text(this.bodyText)
-          .copyOption(CopyOptions.LocalDevice)
-              .fontSize(18)
-              .fontColor(ZhihuColors.text)
-              .lineHeight(26)
-              .width('100%')
-              .textAlign(TextAlign.Start)
+            ForEach(this.bodyBlocks, (b: HtmlBlock) => {
+              if (b.type === 'text') {
+                Text(b.text)
+                  .copyOption(CopyOptions.LocalDevice)
+                  .fontSize(20)
+                  .fontColor(ZhihuColors.text)
+                  .lineHeight(30)
+                  .width('100%')
+                  .textAlign(TextAlign.Start)
+              } else {
+                NetImage({ url: b.url, w: 0, h: 260, r: 8, fit: ImageFit.Contain, mt: 6, tapView: true })
+              }
+            }, (b: HtmlBlock, i: number) => i.toString() + b.url + b.text.substring(0, 8))
           }
           .width('100%')
           .padding(16)

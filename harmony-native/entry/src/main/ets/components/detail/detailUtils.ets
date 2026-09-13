@@ -38,6 +38,58 @@ export function stripHtml(html: string): string {
   return text.trim();
 }
 
+/** 正文富文本块：text=文本段；image=图片段（可长按下载）。 */
+export interface HtmlBlock {
+  type: 'text' | 'image';
+  text: string;
+  url: string;
+}
+
+/** 从 <img ...> 标签里按优先级取真实 URL（知乎懒加载：data-actualsrc > data-original > data-src > src） */
+function extractImgSrc(tag: string): string {
+  const attrNames: string[] = ['data-actualsrc', 'data-original', 'data-src', 'src'];
+  for (let i = 0; i < attrNames.length; i++) {
+    const re: RegExp = new RegExp(attrNames[i] + '="([^"]+)"', 'i');
+    const m: RegExpExecArray | null = re.exec(tag);
+    if (m !== null && m[1].length > 0) {
+      return m[1];
+    }
+  }
+  return '';
+}
+
+/**
+ * 解析 HTML 正文 → 文本/图片交替块（正文内嵌图片显示 + 可长按下载）。
+ * 按 <img> 切分：片段走 stripHtml（剥标签+实体解码），图片标签提取 src。
+ */
+export function parseHtmlBlocks(html: string): HtmlBlock[] {
+  const blocks: HtmlBlock[] = [];
+  if (html === null || html === undefined || typeof html !== 'string') {
+    return blocks;
+  }
+  const regex: RegExp = /<img[^>]*>/gi;
+  let last: number = 0;
+  let m: RegExpExecArray | null = regex.exec(html);
+  while (m !== null) {
+    const seg: string = html.substring(last, m.index);
+    const t: string = stripHtml(seg);
+    if (t.length > 0) {
+      blocks.push({ type: 'text', text: t, url: '' });
+    }
+    const url: string = extractImgSrc(m[0]);
+    if (url.length > 0 && url.indexOf('data:') !== 0) {
+      blocks.push({ type: 'image', text: '', url: url });
+    }
+    last = m.index + m[0].length;
+    m = regex.exec(html);
+  }
+  const tail: string = stripHtml(html.substring(last));
+  if (tail.length > 0) {
+    blocks.push({ type: 'text', text: tail, url: '' });
+  }
+  return blocks;
+}
+
 /** 从 HTML 中抽出所有图片地址（去重，按出现顺序）。 */
 export function extractImageUrls(html: string): string[] {
   const out: string[] = [];

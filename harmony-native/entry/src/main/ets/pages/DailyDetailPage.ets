@@ -5,15 +5,16 @@
  */
 
 import { router } from '@kit.ArkUI';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 import {
   DailyDetailResponse,
   getDailyDetail,
-  htmlToPlainText,
 } from '../api/daily';
 import { ZhihuColors } from '../utils/theme';
 import { DetailNavBar } from '../components/detail/DetailNavBar';
 import { StatusView } from '../components/detail/StatusView';
-import { readStringParam } from '../components/detail/detailUtils';
+import { HtmlBlock, parseHtmlBlocks, readStringParam } from '../components/detail/detailUtils';
+import { NetImage } from '../components/NetImage';
 
 @Entry
 @Component
@@ -22,7 +23,7 @@ struct DailyDetailPage {
   @State loading: boolean = true;
   @State error: string = '';
   @State detail: DailyDetailResponse | null = null;
-  private bodyText: string = '';
+  @State bodyBlocks: HtmlBlock[] = [];
   private fallbackTitle: string = '';
 
   aboutToAppear(): void {
@@ -38,12 +39,38 @@ struct DailyDetailPage {
     try {
       const d: DailyDetailResponse = await getDailyDetail(this.storyId);
       this.detail = d;
-      this.bodyText = htmlToPlainText(d.body);
+      // 头图已用 images[0]，正文里的 [图片] 占位用 images[1..] 依次替换
+      const bodyImgs: string[] = (d.images !== undefined && d.images.length > 1) ? d.images.slice(1) : [];
+      this.bodyBlocks = this.fillPlaceholders(parseHtmlBlocks(d.body), bodyImgs);
     } catch (e) {
       this.error = '日报内容加载失败，请稍后重试';
     } finally {
       this.loading = false;
     }
+  }
+
+  /** 把正文文本里的 [图片] 字面占位，按顺序替换为正文图片块（对应 images[1..]） */
+  private fillPlaceholders(blocks: HtmlBlock[], imgs: string[]): HtmlBlock[] {
+    const out: HtmlBlock[] = [];
+    let pi = 0;
+    for (let i = 0; i < blocks.length; i++) {
+      const b: HtmlBlock = blocks[i];
+      if (b.type === 'text') {
+        const parts: string[] = b.text.split('[图片]');
+        for (let j = 0; j < parts.length; j++) {
+          if (parts[j].length > 0) {
+            out.push({ type: 'text', text: parts[j], url: '' });
+          }
+          if (j < parts.length - 1 && pi < imgs.length) {
+            out.push({ type: 'image', text: '', url: imgs[pi] });
+            pi++;
+          }
+        }
+      } else {
+        out.push(b);
+      }
+    }
+    return out;
   }
 
   private coverUrl(): string {
@@ -91,13 +118,19 @@ struct DailyDetailPage {
                   .fontColor(ZhihuColors.textSecondary)
                   .width('100%')
               }
-              if (this.bodyText.length > 0) {
+              if (this.bodyBlocks.length > 0) {
                 Divider().strokeWidth(0.5).color(ZhihuColors.divider).margin({ top: 4, bottom: 4 })
-                Text(this.bodyText)
-                  .fontSize(17)
-                  .lineHeight(24)
-                  .fontColor(ZhihuColors.text)
-                  .width('100%')
+                ForEach(this.bodyBlocks, (b: HtmlBlock) => {
+                  if (b.type === 'text') {
+                    Text(b.text)
+                      .fontSize(19)
+                      .lineHeight(28)
+                      .fontColor(ZhihuColors.text)
+                      .width('100%')
+                  } else {
+                    NetImage({ url: b.url, w: 0, h: 260, r: 8, fit: ImageFit.Contain, mt: 4, tapView: true })
+                  }
+                }, (b: HtmlBlock, i: number) => i.toString() + b.url + b.text.substring(0, 8))
               } else {
                 Text('正文暂无法展示')
                   .fontSize(16)
