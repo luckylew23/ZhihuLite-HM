@@ -11,6 +11,7 @@ import {
   getMyCollections,
   deleteCollection,
 } from '../api/collection';
+import { ApiError } from '../api/httpClient';
 import { authStore } from '../store/authStore';
 import { ZhihuColors } from '../utils/theme';
 import { ProfileTopBar } from '../components/profile/ProfileTopBar';
@@ -65,7 +66,13 @@ export struct CollectionsListPage {
       this.isEnd = resp.paging.is_end;
       this.pageOffset = this.pageOffset + 20;
     } catch (e) {
-      this.error = '收藏夹加载失败';
+      // 显示真实原因（HTTP 状态码 + 服务端消息），便于定位
+      let detail: string = String(e);
+      if (e instanceof ApiError) {
+        detail = 'HTTP ' + String(e.status) + ' ' + e.message;
+      }
+      console.error('[ZhihuLite] collections failed: ' + detail);
+      this.error = '收藏夹加载失败：' + detail;
     } finally {
       this.inFlight = false;
     }
@@ -192,7 +199,10 @@ export struct CollectionsListPage {
           Button('重试')
             .fontSize(15).backgroundColor(ZhihuColors.primary)
             .onClick(() => {
-              this.loadFirst();
+              this.loggedIn = authStore.isLoggedIn;
+              if (this.loggedIn) {
+                this.loadFirst();
+              }
             })
         }
         .width('100%').layoutWeight(1).justifyContent(FlexAlign.Center)

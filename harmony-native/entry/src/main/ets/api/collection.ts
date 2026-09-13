@@ -111,9 +111,13 @@ export const getMyCollections = async (
   offset: number = 0,
 ): Promise<CollectionListResponse> => {
   const token: string = await myUrlToken();
-  const userId: string = token.length > 0 ? token : 'me';
+  // 不回落 'me'：/people/me/collections 在知乎新版 API 上会被拒（403），
+  // 拿不到真实 url_token 时直接抛可读错误，避免静默失败。
+  if (token.length === 0) {
+    throw new Error('无法获取当前用户标识（请重新登录后再试）');
+  }
   const res = await zhihuClient.get<CollectionListResponse>(
-    API_V4 + '/people/' + userId + '/collections?limit=' + String(limit) +
+    API_V4 + '/people/' + token + '/collections?limit=' + String(limit) +
       '&offset=' + String(offset) + '&include=' + COLLECTION_INCLUDE,
   );
   return res.data;
