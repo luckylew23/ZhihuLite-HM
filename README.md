@@ -5,7 +5,7 @@
 > 上游 [zhihu--](https://github.com/luckylew23/zhihu--)（v0.6.0，React Native / Expo）的完整原生移植：
 > 复用上游纯 TypeScript 业务逻辑，UI 用 ArkTS 原生重写，界面与 Android 版一致。
 
-[![版本](https://img.shields.io/badge/版本-v0.3.9-blue)](#版本历史) [![平台](https://img.shields.io/badge/平台-HarmonyOS%20NEXT-black)](#) [![架构](https://img.shields.io/badge/架构-原生ArkTS-green)](#架构概览)
+[![版本](https://img.shields.io/badge/版本-v0.3.10-blue)](#版本历史) [![平台](https://img.shields.io/badge/平台-HarmonyOS%20NEXT-black)](#) [![架构](https://img.shields.io/badge/架构-原生ArkTS-green)](#架构概览)
 
 ---
 
@@ -55,7 +55,7 @@ cd ~/workbuddy/zhihu--HMOS/harmony-native
 ```bash
 HDC=/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc
 $HDC list targets                                   # 确认设备在线
-$HDC -t <serial> install -r ZhihuLite-HM-v0.3.9-signed.hap
+$HDC -t <serial> install -r ZhihuLite-HM-v0.3.10-signed.hap
 ```
 
 已交付 HAP 均保留在 `~/workbuddy/zhihu--HMOS/`，命名 `ZhihuLite-HM-v<版本>-signed.hap`。
@@ -115,6 +115,7 @@ zhihu--HMOS/
 | v0.3.7 | 全量 HTTP 日志，定位搜索解析崩溃 |
 | v0.3.8 | 搜索修复：结果解析 null 全防护 + 搜索关键词配置 |
 | v0.3.9 | 全回归修复：收藏夹解析防护 + pin.content 类型防护 + HTML 实体解码 + 热榜/日报两天离线缓存（进入即缓存、离线可看）+ DFX 设计（不闪退/深浅主题/点击≤3s）|
+| v0.3.10 | 最近浏览闪退修复（extra/header/content/matrix 空引用全防护 + 逐条解析）+ 默认加载最近两天浏览记录 + 底栏发布按钮去圆圈改纯 + 号 |
 
 ## 已知限制
 

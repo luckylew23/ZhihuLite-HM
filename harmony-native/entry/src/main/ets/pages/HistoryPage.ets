@@ -16,6 +16,10 @@ import { authStore } from '../store/authStore';
 import { ZhihuColors } from '../utils/theme';
 import { formatDate } from '../utils/date';
 import { ProfileTopBar } from '../components/profile/ProfileTopBar';
+import { ReadHistoryExtra } from '../api/history';
+
+/** 最近两天（秒）——默认加载范围；read_time 为秒级时间戳 */
+const RECENT_TWO_DAYS_S: number = 2 * 24 * 3600;
 
 @Entry
 @Component
@@ -26,6 +30,7 @@ export struct HistoryPage {
   @State loadingMore: boolean = false;
   @State isEnd: boolean = false;
   @State loggedIn: boolean = false;
+  @State filteredEmpty: boolean = false;
   @State selecting: boolean = false;
   @State selectedKeys: string[] = [];
 
@@ -65,19 +70,113 @@ export struct HistoryPage {
     this.inFlight = true;
     try {
       const resp = await getReadHistory(20, this.pageOffset);
-      this.items = reset ? resp.data : this.items.concat(resp.data);
+      const list: ReadHistoryDataItem[] = [];
+      // 逐条防护：null 条目/结构残缺只跳过该条，不拖垮整页
+      for (const raw of resp.data) {
+        if (raw === undefined || raw === null) {
+          continue;
+        }
+        try {
+          const d = raw.data;
+          if (d === undefined || d === null) {
+            continue;
+          }
+          list.push(raw);
+        } catch (e) {
+          console.error('[ZhihuLite] history item skip: ' + String(e));
+        }
+      }
+      // 默认加载最近两天（reset 首屏过滤）；翻页（loadMore）继续追加更早记录
+      if (reset) {
+        const recent: ReadHistoryDataItem[] = [];
+        for (const it of list) {
+          if (this.isWithinTwoDays(it)) {
+            recent.push(it);
+          }
+        }
+        this.items = recent;
+        this.filteredEmpty = list.length > 0 && recent.length === 0;
+      } else {
+        this.items = this.items.concat(list);
+      }
       this.isEnd = resp.paging.is_end;
       this.pageOffset = this.pageOffset + 20;
     } catch (e) {
+      console.error('[ZhihuLite] history load failed: ' + String(e));
       this.error = '浏览历史加载失败';
     } finally {
       this.inFlight = false;
     }
   }
 
+  /** read_time（秒）是否落在最近两天内 */
+  private isWithinTwoDays(item: ReadHistoryDataItem): boolean {
+    const extra = this.safeExtra(item);
+    if (extra === null || extra.read_time <= 0) {
+      return false;
+    }
+    const ageS: number = Date.now() / 1000 - extra.read_time;
+    return ageS >= 0 && ageS <= RECENT_TWO_DAYS_S;
+  }
+
+  private safeExtra(item: ReadHistoryDataItem): ReadHistoryExtra | null {
+    if (item === null || item === undefined) {
+      return null;
+    }
+    const d = item.data;
+    if (d === null || d === undefined || d.extra === null || d.extra === undefined) {
+      return null;
+    }
+    return d.extra;
+  }
+
+  private safeTitle(item: ReadHistoryDataItem): string {
+    if (item === null || item === undefined) {
+      return '';
+    }
+    const d = item.data;
+    if (d === null || d === undefined || d.header === null || d.header === undefined) {
+      return '';
+    }
+    return d.header.title || '';
+  }
+
+  private safeSummary(item: ReadHistoryDataItem): string {
+    if (item === null || item === undefined) {
+      return '';
+    }
+    const d = item.data;
+    if (d === null || d === undefined || d.content === null || d.content === undefined) {
+      return '';
+    }
+    return d.content.summary || '';
+  }
+
+  private safeMatrixText(item: ReadHistoryDataItem): string {
+    if (item === null || item === undefined) {
+      return '';
+    }
+    const d = item.data;
+    if (d === null || d === undefined || d.matrix === null || d.matrix === undefined ||
+      d.matrix.length === 0) {
+      return '';
+    }
+    const m0 = d.matrix[0];
+    if (m0 === null || m0 === undefined || m0.data === null || m0.data === undefined) {
+      return '';
+    }
+    return m0.data.text || '';
+  }
+
+  private safeReadTime(item: ReadHistoryDataItem): number {
+    const extra = this.safeExtra(item);
+    return extra !== null ? extra.read_time : 0;
+  }
+
   private makeKey(item: ReadHistoryDataItem): string {
-    const extra = item.data.extra;
-    return extra.content_type + '-' + extra.content_token;
+    const extra = this.safeExtra(item);
+    return (extra !== null ? extra.content_type : 'unknown') + '-' +
+      (extra !== null ? extra.content_token : '');
   }
 
   private isSelected(key: string): boolean {
@@ -109,7 +208,11 @@ export struct HistoryPage {
       this.toggleSelect(key);
       return;
     }
-    const extra = item.data.extra;
+    const extra = this.safeExtra(item);
+    if (extra === null) {
+      promptAction.showToast({ message: '记录不完整' });
+      return;
+    }
     const type = extra.content_type;
     const token = extra.content_token;
     if (type === 'profile') {
@@ -196,15 +299,15 @@ export struct HistoryPage {
             ? ZhihuColors.primary : ZhihuColors.textTertiary)
       }
       Column({ space: 6 }) {
-        Text(item.data.header.title)
+        Text(this.safeTitle(item))
           .fontSize(17)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.text)
           .maxLines(2)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .width('100%')
-        if (item.data.content.summary.length > 0) {
-          Text(item.data.content.summary)
+        if (this.safeSummary(item).length > 0) {
+          Text(this.safeSummary(item))
             .fontSize(15)
             .fontColor(ZhihuColors.textSecondary)
             .maxLines(2)
@@ -212,13 +315,12 @@ export struct HistoryPage {
             .width('100%')
         }
         Row() {
-          Text(item.data.matrix.length > 0 && item.data.matrix[0].data
-            ? item.data.matrix[0].data.text : '')
+          Text(this.safeMatrixText(item))
             .fontSize(14)
             .fontColor(ZhihuColors.textTertiary)
             .layoutWeight(1)
-          Text(item.data.extra.read_time > 0
-            ? formatDate(item.data.extra.read_time) : '')
+          Text(this.safeReadTime(item) > 0
+            ? formatDate(this.safeReadTime(item)) : '')
             .fontSize(14)
             .fontColor(ZhihuColors.textTertiary)
         }
@@ -299,8 +401,10 @@ export struct HistoryPage {
         }
         .width('100%').layoutWeight(1).justifyContent(FlexAlign.Center)
       } else if (this.items.length === 0) {
-        Column() {
-          Text('这里空空如也')
+        Column({ space: 8 }) {
+          Text(this.filteredEmpty ? '最近两天暂无浏览记录' : '这里空空如也')
+            .fontSize(15)
+            .fontColor(ZhihuColors.textSecondary)
         }
         .width('100%').layoutWeight(1).justifyContent(FlexAlign.Center)
       } else {
@@ -309,8 +413,11 @@ export struct HistoryPage {
             ListItem() {
               this.rowItem(item, idx)
             }
-          }, (item: ReadHistoryDataItem, idx: number) =>
-            'history-' + item.data.extra.content_token + '-' + String(idx))
+          }, (item: ReadHistoryDataItem, idx: number) => {
+            const extra = this.safeExtra(item);
+            const tok = extra !== null ? extra.content_token : '';
+            return 'history-' + tok + '-' + String(idx);
+          })
           ListItem() {
             this.footer()
           }
