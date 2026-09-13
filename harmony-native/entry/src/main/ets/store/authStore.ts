@@ -4,6 +4,7 @@
  */
 
 import { preferences } from '@kit.ArkData';
+import { initCacheStore } from '../utils/cacheStore';
 import { common } from '@kit.AbilityKit';
 // AppStorage 为全局 API（V1），SDK 6.0.2 起不再从 @kit.ArkUI 导出，无需 import
 
@@ -21,6 +22,7 @@ function bumpLoginVersion(): void {
 
 export function setAppContext(ctx: common.Context): void {
   appContext = ctx;
+  initCacheStore(ctx);
   authStore.loadFromDisk();
 }
 

@@ -13,6 +13,7 @@ import {
   formatDailyDate,
 } from '../api/daily';
 import { ZhihuColors } from '../utils/theme';
+import { cacheWrite, cacheRead, CACHE_TWO_DAYS_MS, DailyCachePayload } from '../utils/cacheStore';
 
 @Component
 export struct DailyPage {
@@ -38,12 +39,18 @@ export struct DailyPage {
       this.date = resp.date ?? '';
       this.stories = resp.stories ?? [];
       this.error = this.stories.length === 0 ? '本期日报暂无内容' : '';
+      this.saveDailyCache();
     } catch (e) {
-      let detail = '网络异常';
-      if (e instanceof Error && e.message) {
-        detail = e.message;
+      // 离线/失败：优先读两天内缓存
+      if (this.loadDailyCache()) {
+        this.error = '';
+      } else {
+        let detail = '网络异常';
+        if (e instanceof Error && e.message) {
+          detail = e.message;
+        }
+        this.error = '日报加载失败：' + detail;
       }
-      this.error = '日报加载失败：' + detail;
     } finally {
       this.loading = false;
       this.inFlight = false;
@@ -56,6 +63,7 @@ export struct DailyPage {
       const resp = await getDailyLatest();
       this.date = resp.date ?? '';
       this.stories = resp.stories ?? [];
+      this.saveDailyCache();
       this.error = '';
     } catch (e) {
       // 刷新失败保留旧内容
@@ -93,6 +101,31 @@ export struct DailyPage {
       this.loadingMore = false;
       this.inFlight = false;
     }
+  }
+
+  /** 日报成功后写两天缓存 */
+  private saveDailyCache(): void {
+    const stories = this.stories.slice();
+    const payload: DailyCachePayload = { savedAt: Date.now(), date: this.date, stories: stories };
+    cacheWrite('daily_cache_v2', payload);
+  }
+
+  /** 日报离线：读两天内缓存，成功返回 true */
+  private loadDailyCache(): boolean {
+    const cached = cacheRead<DailyCachePayload>('daily_cache_v2', CACHE_TWO_DAYS_MS);
+    if (cached === null || cached.stories === undefined || cached.stories.length === 0) {
+      return false;
+    }
+    const list: DailyStory[] = [];
+    cached.stories.forEach((raw: object) => {
+      const st = raw as DailyStory;
+      if (st !== null && st !== undefined) {
+        list.push(st);
+      }
+    });
+    this.date = cached.date ?? '';
+    this.stories = list;
+    return true;
   }
 
   private openStory(story: DailyStory): void {

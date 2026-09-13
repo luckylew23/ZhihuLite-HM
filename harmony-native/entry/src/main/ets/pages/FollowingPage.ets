@@ -219,6 +219,15 @@ export struct FollowingPage {
                     .textAlign(TextAlign.Center)
                 }
                 .width(56)
+                .onClick(() => {
+                  router.pushUrl({
+                    url: 'pages/PeoplePage',
+                    params: {
+                      urlToken: r.actor.url_token ?? String(r.actor.id ?? ''),
+                      name: r.actor.name ?? '',
+                    },
+                  });
+                })
               }
             },
             (r: RecentMomentItem) => (r.actor.id || '') + '-' + (r.brief ?? ''),

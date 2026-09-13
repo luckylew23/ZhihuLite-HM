@@ -58,6 +58,13 @@
 - 主题模式（auto / light / dark，默认 auto 深色）、栏目可见性、默认首页栏目、内容过滤
 - 外观 / 筛选页持久化
 
+### 2.9 离线缓存（热榜 / 日报）
+- **进入即缓存**：热榜、日报加载成功后立即把当天内容写入本地文件缓存（`{filesDir}/zhihu_cache/hot_cache_v2.json`、`daily_cache_v2.json`）
+- **缓存有效期两天**：`CACHE_TWO_DAYS_MS = 2*24*60*60*1000`，超龄自动失效
+- **离线可看**：网络请求失败（断网/接口异常）时自动回退读取两天内缓存，仍可正常浏览热榜与日报内容
+- 实现：`utils/cacheStore.ts`（fs 同步 API：accessSync 探活目录 + mkdirSync 创建 + openSync/writeSync/closeSync 写入 + statSync/readTextSync 读取），缓存失败静默不影响主流程
+- 注意：`fileIo.stat().mtime` 单位为**秒**，与 `Date.now()` 毫秒需换算（v0.3.9 修复，否则缓存永远判过期）
+
 ### 2.8 搜索关键词（应用可发现性）
 - 包内 `metadata.keywords`：知乎,zhihu,知乎Lite,ZhihuLite,zhihulite,轻量,知乎第三方,知乎鸿蒙版,知乎客户端,鸿蒙知乎,知乎轻量版,zhihu-lite,知乎minimal
 - 应用描述 `description_application`（关于页可见，含关键词文案）
@@ -164,10 +171,28 @@ harmony-native/entry/src/main/ets/
 - `preferences`（`@kit.ArkData`）持久化：`auth_cookie` / `user_name` / `theme_mode` / `visible_tabs` / `default_tab` / 过滤项
 - 单账号模型（v1.0 简化）；卸载重装清登录态（Cookie 在应用沙箱）
 
-### 4.4 性能设计
-- copyOption 最小化（见 4.1）——ArkUI 文本选择能力注册开销大，是"点击半天不响应"的根因
-- 登录重建机制（loginVersion + key）在"状态正确"与"重建开销"间取权衡
-- 分页触底加载、图片懒加载（List 机制）
+### 4.4 DFX 设计（可靠性 / 主题适配 / 性能）
+
+#### 4.4.1 可靠性 —— 功能正常、不闪退（验收项 1）
+- 全量回归基线：推荐 / 关注 / 热榜 / 日报 / 问题详情 / 回答详情 / 文章 / 想法 / 收藏夹（分类→列表→详情）/ 搜索 / 我的 —— 每次发版前按此清单真机回归
+- **解析全防护**：所有列表解析（收藏 items、搜索 object/highlight/question、feed 各类型）逐条 try/catch + null 跳过，单条坏数据不拖垮整页（v0.3.8 搜索 / v0.3.9 收藏夹）
+- **类型防护**：`stripHtml` 增加 `typeof html !== 'string'` 前置判断（上游 pin.content 可能为对象，v0.3.9 修复"undefined is not callable"）
+- 崩溃监控：hilog 业务前缀 `[ZhihuLite]`，请求链路 `ZhihuHttp`（req METHOD url status=.. len=.. err=..），回归脚本 grep AppCrash/FATAL 零命中
+
+#### 4.4.2 主题适配 —— 深色背景浅色文字、浅色背景深色文字（验收项 2）
+- 双套调色板 `utils/theme.ts`：`LIGHT_PALETTE`（背景 #f6f6f6、文字 #1a1a1a）/ `DARK_PALETTE`（背景 #121212、文字 #ffffff），textSecondary/textTertiary/surface/border/divider 等全量配套
+- 模式：auto（跟随系统）/ light / dark，`settingsStore.theme_mode` 持久化，我的→设置→外观切换，`applyTheme()` 就地注入 `ZhihuColors` 保持页面零改动
+- 硬编码颜色审计：仅登录页错误红 `#ff4d4f` 等语义色（深浅主题皆可用）保留，半透明遮罩 `#xx000000` 属通用蒙层
+
+#### 4.4.3 性能 —— 点击响应 ≤ 3s，超限优化（验收项 3）
+- **点击响应硬指标 ≤ 3s**（点击→内容出现，冷启动约 7-10s 不计入交互响应）
+- 实测（v0.3.9 真机）：热榜 tab 点击→内容渲染 <2.8s；日报（命中缓存）<2.3s
+- 已实施优化：
+  - copyOption 全局最小化（421→6 处）——ArkUI 文本选择能力注册开销大，是"点击半天不响应"的根因
+  - 登录重建机制（loginVersion + key）控制重建开销
+  - 分页触底加载、图片懒加载（List 机制）
+  - 热榜/日报离线缓存命中后秒出内容（见 2.9）
+- 优化手段兜底：定位长任务→拆分/异步化；列表只渲染可视项；避免 build 内做网络/文件 IO
 
 ### 4.5 安全与签名
 - 华为签名链（DevEco 自动签名，物料 `~/.ohos/config/default_harmony-native_*.p12/.p7b`）——真机安装必需
@@ -196,6 +221,7 @@ harmony-native/entry/src/main/ets/
 - 页面栈残留会误导测试 → 先 `aa force-stop` 冷启动
 - **v0.3.6 全面验证通过**：四 tab 有内容 / 热榜→原生详情 / 收藏夹 1303+7 分类 / 底栏/名称/图标正常
 - **v0.3.8**：搜索请求 200+192KB 数据、解析 null 崩溃修复（真机日志确认 `TypeError: Cannot read property 'title' of null` 消失）
+- **v0.3.9**：全回归（推荐/文章详情/热榜/日报/关注/最近更新作者/我的收藏夹 1303+7 分类/收藏详情/收藏条目详情）+ 深浅主题核查（双套色板、切换入口）+ 点击响应实测（热榜 <2.8s、日报 <2.3s）+ 离线缓存验证（断网模拟 404 时热榜完整显示缓存内容，`hot cache read hit n=30`）+ 无 AppCrash/FATAL
 
 ### 5.4 已知降级项（确认仍为降级，不计缺陷）
 1. 日报正文 HTML 剥标签纯文本

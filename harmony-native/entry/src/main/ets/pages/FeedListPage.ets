@@ -19,6 +19,7 @@ import {
 } from '../api/feedParser';
 import { authStore } from '../store/authStore';
 import { ZhihuColors } from '../utils/theme';
+import { cacheWrite, cacheRead, CACHE_TWO_DAYS_MS, HotCachePayload } from '../utils/cacheStore';
 import { FeedCard } from '../components/FeedCard';
 import { HotCard } from '../components/HotCard';
 
@@ -69,16 +70,53 @@ export struct FeedListPage {
     try {
       const resp = await getFeed(this.entryUrl(), authStore.cookies);
       this.applyPage(resp, true);
+      this.saveHotCache();
     } catch (e) {
-      let detail = '网络异常';
-      if (e instanceof Error && e.message) {
-        detail = e.message;
+      // 离线/失败：热榜优先读两天内缓存
+      if (this.isHot() && this.loadHotCache()) {
+        this.error = '';
+      } else {
+        let detail = '网络异常';
+        if (e instanceof Error && e.message) {
+          detail = e.message;
+        }
+        this.error = '加载失败：' + detail;
       }
-      this.error = '加载失败：' + detail;
     } finally {
       this.loading = false;
       this.inFlight = false;
     }
+  }
+
+  /** 热榜成功后写两天缓存 */
+  private saveHotCache(): void {
+    if (!this.isHot()) {
+      return;
+    }
+    const items = this.hotItems.slice();
+    const payload: HotCachePayload = { savedAt: Date.now(), items: items as object[] };
+    cacheWrite('hot_cache_v2', payload);
+  }
+
+  /** 热榜离线：读两天内缓存，成功返回 true */
+  private loadHotCache(): boolean {
+    const cached = cacheRead<HotCachePayload>('hot_cache_v2', CACHE_TWO_DAYS_MS);
+    if (cached === null || cached.items === undefined || cached.items.length === 0) {
+      console.error('[ZhihuLite] hot cache read miss');
+      return false;
+    }
+    console.error('[ZhihuLite] hot cache read hit n=' + String(cached.items.length));
+    const list: HotItem[] = [];
+    cached.items.forEach((raw: object) => {
+      const it = raw as HotItem;
+      if (it !== null && it !== undefined) {
+        list.push(it);
+      }
+    });
+    this.hotItems = list;
+    this.isEnd = true;
+    this.error = '';
+    return true;
   }
 
   async refresh(): Promise<void> {
@@ -87,6 +125,7 @@ export struct FeedListPage {
       const url = this.isHot() ? this.entryUrl() : this.appendActionUp(this.entryUrl());
       const resp = await getFeed(url, authStore.cookies);
       this.applyPage(resp, true);
+      this.saveHotCache();
       this.error = '';
     } catch (e) {
       // 刷新失败保留旧列表

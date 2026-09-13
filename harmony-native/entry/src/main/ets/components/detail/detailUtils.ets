@@ -15,6 +15,9 @@ export function stripHtml(html: string): string {
   if (html === null || html === undefined) {
     return '';
   }
+  if (typeof html !== 'string') {
+    return '';
+  }
   let text: string = html;
   text = text.replace(/<br\s*\/?>/gi, '\n');
   text = text.replace(/<\/(p|div|section|article|h[1-6]|li|ul|ol|blockquote|figure)>/gi, '\n');
@@ -25,6 +28,7 @@ export function stripHtml(html: string): string {
   text = text.replace(/&lt;/g, '<');
   text = text.replace(/&gt;/g, '>');
   text = text.replace(/&quot;/g, '"');
+  text = text.replace(/&#34;/gi, '"');
   text = text.replace(/&#39;/g, '\'');
   text = text.replace(/&#x27;/g, '\'');
   text = text.replace(/&hellip;/g, '…');

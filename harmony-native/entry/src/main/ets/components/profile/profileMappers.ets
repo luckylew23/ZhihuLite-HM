@@ -20,6 +20,9 @@ export function stripHtml(html?: string): string {
   if (!html) {
     return '';
   }
+  if (typeof html !== 'string') {
+    return '';
+  }
   return html
     .replace(/<[^>]+>/g, '')
     .replace(/&nbsp;/g, ' ')
@@ -27,6 +30,7 @@ export function stripHtml(html?: string): string {
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
+    .replace(/&#34;/gi, '"')
     .replace(/&#39;/g, "'");
 }
 

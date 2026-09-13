@@ -77,18 +77,39 @@ export struct CollectionDetailPage {
       const resp = await getCollectionDetail(this.collectionId, 20, this.pageOffset);
       const list: FeedItem[] = [];
       for (const raw of resp.data) {
-        const rec = raw as Record<string, object>;
-        // 上游 item.content 为回答/文章/想法对象；个别接口直接返回 content 本身
-        const contentObj = rec['content'] ? rec['content'] : raw;
-        const rel = contentObj as ZhihuMemberRelation;
-        if (rel && rel.id !== undefined) {
-          list.push(relationToFeedItem(rel));
+        // 逐条防护：null 条目/解析异常只跳过该条，不拖垮整页
+        if (raw === undefined || raw === null) {
+          continue;
+        }
+        let skipType: string = '?';
+        try {
+          const rec = raw as Record<string, object>;
+          // 上游 item.content 为回答/文章/想法对象；个别接口直接返回 content 本身
+          const contentObj = rec['content'] ? rec['content'] : raw;
+          if (contentObj === undefined || contentObj === null) {
+            continue;
+          }
+          const relObj = contentObj as Record<string, object>;
+          skipType = String(relObj['type'] ?? '?');
+          const rel = contentObj as ZhihuMemberRelation;
+          if (rel && rel.id !== undefined) {
+            const item = relationToFeedItem(rel);
+            if (item !== undefined && item !== null) {
+              list.push(item);
+            }
+          }
+        } catch (e) {
+          console.error('[ZhihuLite] collection item skip type=' + skipType + ' err=' + String(e));
         }
       }
       this.items = reset ? list : this.items.concat(list);
       this.isEnd = resp.paging.is_end;
       this.pageOffset = this.pageOffset + 20;
+      if (reset && list.length === 0 && this.error.length === 0) {
+        console.error('[ZhihuLite] collection items parsed empty, rawLen=' + String(resp.data.length));
+      }
     } catch (e) {
+      console.error('[ZhihuLite] collection detail failed: ' + String(e));
       this.error = '收藏内容加载失败';
     } finally {
       this.inFlight = false;
