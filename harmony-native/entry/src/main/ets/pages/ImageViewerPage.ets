@@ -92,32 +92,31 @@ struct ImageViewerPage {
 
       // 右上角操作层：内层 Stack 撑满并 TopEnd 对齐，按钮固定右上角
       Stack({ alignContent: Alignment.TopEnd }) {
-        Row({ space: 10 }) {
-          // 复制链接（圆形半透明按钮）
+        Row({ space: 8 }) {
+          // 复制链接（小圆图标，半透明）
           Text('⧉')
-            .width(40)
-            .height(40)
-            .borderRadius(20)
-            .backgroundColor('rgba(0,0,0,0.45)')
-            .fontSize(18)
+            .width(32)
+            .height(32)
+            .borderRadius(16)
+            .backgroundColor('rgba(0,0,0,0.35)')
+            .fontSize(15)
             .fontColor(Color.White)
             .textAlign(TextAlign.Center)
             .onClick(() => {
               this.copyLink();
             })
-          // 系统 SaveButton：点击瞬间系统授权写相册，无需 WRITE_IMAGEVIDEO
+          // 系统 SaveButton：纯图标圆形，无文字块，贴右上角不挡图
           SaveButton({
             icon: SaveIconStyle.FULL_FILLED,
-            text: SaveDescription.SAVE_IMAGE,
             buttonType: ButtonType.Circle,
           })
-            .width(40)
-            .height(40)
+            .width(32)
+            .height(32)
             .onClick(() => {
               this.saveToGallery();
             })
         }
-        .margin({ top: 16, right: 16 })
+        .margin({ top: 8, right: 12 })
       }
       .width('100%')
       .height('100%')
