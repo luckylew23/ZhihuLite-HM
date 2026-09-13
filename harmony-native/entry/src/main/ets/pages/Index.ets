@@ -174,13 +174,20 @@ struct Index {
     })
   }
 
-  /** 外层底部单个图标项（首页 / 个人中心），选中 #0084ff，未选 #ccc */
+  /** 外层底部单个图标项（首页 / 个人中心），选中 #0084ff，未选 #ccc；图标下带文字标签（对齐 Android 版） */
   @Builder
-  bottomItem(icon: string, target: number, onAlreadyActive: () => void = () => {
+  bottomItem(icon: string, label: string, target: number, onAlreadyActive: () => void = () => {
   }) {
-    Column() {
+    Column({ space: 2 }) {
       Text(icon)
-        .fontSize(24)
+        .fontSize(22)
+        .fontColor(
+          this.outerIndex === target
+            ? ZhihuColors.tabIconSelected
+            : ZhihuColors.tabIconDefault,
+        )
+      Text(label)
+        .fontSize(10)
         .fontColor(
           this.outerIndex === target
             ? ZhihuColors.tabIconSelected
@@ -215,12 +222,12 @@ struct Index {
   @Builder
   bottomBar() {
     Row() {
-      this.bottomItem('🏠', 0, () => {
+      this.bottomItem('⌂', '首页', 0, () => {
         this.goHome();
       })
-      Column() {
+      Column({ space: 2 }) {
         Text('+')
-          .fontSize(28)
+          .fontSize(24)
           .fontWeight(FontWeight.Bold)
           .fontColor(ZhihuColors.textInverse)
           .width(44)
@@ -228,6 +235,9 @@ struct Index {
           .textAlign(TextAlign.Center)
           .backgroundColor(ZhihuColors.tabIconSelected)
           .borderRadius(22)
+        Text('发布')
+          .fontSize(10)
+          .fontColor(ZhihuColors.tabIconDefault)
       }
       .layoutWeight(1)
       .height('100%')
@@ -236,7 +246,7 @@ struct Index {
         // v1.3.0：发布入口改为四宫格入口页（写回答/写文章/发想法/提问题）
         router.pushUrl({ url: 'pages/PublishPage' });
       })
-      this.bottomItem('👤', 1)
+      this.bottomItem('👤', '我的', 1)
     }
     .width('100%')
     .height(64)
