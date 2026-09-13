@@ -5,8 +5,9 @@
  * 降级：HTML 正文剥标签后用 Text 渲染，不做 WebView。
  */
 
-import { router } from '@kit.ArkUI';
+import { router, promptAction } from '@kit.ArkUI';
 import { getAnswer, voteAnswer, AnswerDetail } from '../api/answer';
+import { getAnswerCollectionStatus, removeFromCollection } from '../api/collection';
 import { ZhihuColors } from '../utils/theme';
 import { formatDate } from '../utils/date';
 import { getZhihuErrorMessage } from '../utils/zhihuError';
@@ -23,7 +24,17 @@ struct AnswerDetailPage {
   @State answer: AnswerDetail | null = null;
   @State voting: number = 0;
   @State voteCount: number = 0;
+  @State collected: boolean = false;
+  @State collectionId: string = '';
+  @StorageLink('collectPicked') @Watch('onCollectPicked') collectPicked: string = '';
   private bodyText: string = '';
+
+  onCollectPicked(): void {
+    if (this.collectPicked === this.answerId) {
+      this.collected = true;
+      this.collectPicked = '';
+    }
+  }
 
   aboutToAppear(): void {
     const p = router.getParams() as Record<string, object>;
@@ -43,6 +54,7 @@ struct AnswerDetailPage {
   private async load(): Promise<void> {
     this.loading = true;
     this.error = '';
+    this.refreshCollectionStatus();
     try {
       const a: AnswerDetail = await getAnswer(this.answerId);
       this.answer = a;
@@ -97,10 +109,50 @@ struct AnswerDetailPage {
     });
   }
 
-  private onCollect(): void {
+  /** 查询该回答是否已被收藏 */
+  private async refreshCollectionStatus(): Promise<void> {
+    if (this.answerId.length === 0) {
+      return;
+    }
+    try {
+      const st = await getAnswerCollectionStatus(this.answerId, 1);
+      if (st.collected === true) {
+        this.collected = true;
+        const list = st.data ?? [];
+        if (list.length > 0) {
+          const first = list[0] as Record<string, object>;
+          this.collectionId = String(first['id'] ?? '');
+        }
+      }
+    } catch (e) {
+      // 状态查询失败不阻塞页面
+    }
+  }
+
+  private async onCollect(): Promise<void> {
     if (!guardLogin()) {
       return;
     }
+    if (this.collected) {
+      // 已收藏 → 取消收藏（对齐上游 toggleCollect）
+      if (this.collectionId.length === 0) {
+        await this.refreshCollectionStatus();
+        if (this.collectionId.length === 0) {
+          promptAction.showToast({ message: '无法获取收藏夹信息' });
+          return;
+        }
+      }
+      try {
+        await removeFromCollection(this.collectionId, this.answerId);
+        this.collected = false;
+        this.collectionId = '';
+        promptAction.showToast({ message: '已取消收藏' });
+      } catch (e) {
+        promptAction.showToast({ message: '取消收藏失败' });
+      }
+      return;
+    }
+    // 未收藏 → 选择收藏夹
     router.pushUrl({
       url: 'pages/CollectionPickerPage',
       params: { resourceType: 'answer', resourceId: this.answerId },
@@ -238,8 +290,12 @@ struct AnswerDetailPage {
           })
 
           Row({ space: 4 }) {
-            Text('★')
-            Text('收藏')
+            Text(this.collected ? '★' : '☆')
+              .fontSize(17)
+              .fontColor(this.collected ? ZhihuColors.warning : ZhihuColors.textSecondary)
+            Text(this.collected ? '取消收藏' : '移至收藏')
+              .fontSize(16)
+              .fontColor(this.collected ? ZhihuColors.warning : ZhihuColors.textSecondary)
           }
           .layoutWeight(1)
           .justifyContent(FlexAlign.Center)

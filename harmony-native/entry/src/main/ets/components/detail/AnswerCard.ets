@@ -5,8 +5,9 @@
  * 富文本正文按 spec 降级：只渲染剥标签后的纯文本摘要，不做 WebView。
  */
 
-import { router } from '@kit.ArkUI';
+import { router, promptAction } from '@kit.ArkUI';
 import { AnswerDetail, voteAnswer } from '../../api/answer';
+import { getAnswerCollectionStatus, removeFromCollection } from '../../api/collection';
 import { ZhihuColors } from '../../utils/theme';
 import { formatCount, guardLogin, stripHtml } from './detailUtils';
 
@@ -23,13 +24,41 @@ export struct AnswerCard {
   } as AnswerDetail;
   @State voted: number = 0;
   @State voteCount: number = 0;
+  @State collected: boolean = false;
+  @State collectionId: string = '';
+  @StorageLink('collectPicked') @Watch('onCollectPicked') collectPicked: string = '';
   private summary: string = '';
+
+  onCollectPicked(): void {
+    if (this.collectPicked === String(this.item.id)) {
+      this.collected = true;
+      this.collectPicked = '';
+    }
+  }
 
   aboutToAppear(): void {
     this.voted = this.item.relationship?.voting ?? 0;
     this.voteCount = this.item.voteup_count ?? 0;
     const fromExcerpt: string = stripHtml(this.item.excerpt);
     this.summary = fromExcerpt.length > 0 ? fromExcerpt : stripHtml(this.item.content);
+    this.refreshCollectionStatus();
+  }
+
+  /** 查询该回答是否已被收藏（对齐上游 collectedStatusMap） */
+  private async refreshCollectionStatus(): Promise<void> {
+    try {
+      const st = await getAnswerCollectionStatus(String(this.item.id), 1);
+      if (st.collected === true) {
+        this.collected = true;
+        const list = st.data ?? [];
+        if (list.length > 0) {
+          const first = list[0] as Record<string, object>;
+          this.collectionId = String(first['id'] ?? '');
+        }
+      }
+    } catch (e) {
+      // 状态查询失败不阻塞页面，保持未收藏展示
+    }
   }
 
   private openAnswer(): void {
@@ -62,10 +91,30 @@ export struct AnswerCard {
     });
   }
 
-  private onCollect(): void {
+  private async onCollect(): Promise<void> {
     if (!guardLogin()) {
       return;
     }
+    if (this.collected) {
+      // 已收藏 → 直接取消收藏（对齐上游 toggleCollect）
+      if (this.collectionId.length === 0) {
+        await this.refreshCollectionStatus();
+        if (this.collectionId.length === 0) {
+          promptAction.showToast({ message: '无法获取收藏夹信息' });
+          return;
+        }
+      }
+      try {
+        await removeFromCollection(this.collectionId, this.item.id);
+        this.collected = false;
+        this.collectionId = '';
+        promptAction.showToast({ message: '已取消收藏' });
+      } catch (e) {
+        promptAction.showToast({ message: '取消收藏失败' });
+      }
+      return;
+    }
+    // 未收藏 → 选择收藏夹
     router.pushUrl({
       url: 'pages/CollectionPickerPage',
       params: { resourceType: 'answer', resourceId: String(this.item.id) },
@@ -143,8 +192,12 @@ export struct AnswerCard {
         })
 
         Row({ space: 4 }) {
-          Text('★')
-          Text('收藏')
+          Text(this.collected ? '★' : '☆')
+            .fontSize(16)
+            .fontColor(this.collected ? ZhihuColors.warning : ZhihuColors.textTertiary)
+          Text(this.collected ? '取消收藏' : '移至收藏')
+            .fontSize(15)
+            .fontColor(this.collected ? ZhihuColors.warning : ZhihuColors.textSecondary)
         }
         .padding({ left: 8, right: 8, top: 4, bottom: 4 })
         .onClick(() => {

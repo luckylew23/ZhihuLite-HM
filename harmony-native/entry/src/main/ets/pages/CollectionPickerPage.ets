@@ -113,6 +113,10 @@ struct CollectionPickerPage {
           await addToCollection(row.id, this.resourceId);
         }
       }
+      // 收藏成功 → 通知详情页刷新收藏状态（AnswerCard 通过 @StorageLink 感知）
+      if (row.isFavorited === false && !this.isArticle()) {
+        AppStorage.setOrCreate('collectPicked', String(this.resourceId));
+      }
       // 本地翻转
       const next: CollectionSel[] = [];
       for (const c of this.collections) {
