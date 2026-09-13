@@ -30,7 +30,6 @@ export struct HotCard {
     Row({ space: 12 }) {
       // 排名
       Text(String(this.item.rank))
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(18)
         .fontWeight(FontWeight.Bold)
         .fontColor(rankColor(this.item.rank))
@@ -42,7 +41,6 @@ export struct HotCard {
         Row({ space: 6 }) {
           if (this.item.labelArea && this.item.labelArea.text) {
             Text(this.item.labelArea.text)
-              .copyOption(CopyOptions.LocalDevice)
               .fontSize(10)
               .fontColor(this.item.labelArea.normal_color ?? ZhihuColors.hotLabel)
               .border({ width: 0.5, color: this.item.labelArea.normal_color ?? ZhihuColors.hotLabel })
@@ -76,11 +74,10 @@ export struct HotCard {
         Row({ space: 8 }) {
           if (this.item.hotValue.length > 0) {
             Text(this.item.hotValue)
-              .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
+              .fontSize(13).fontColor(ZhihuColors.textTertiary)
           }
           if (this.item.answerCount > 0) {
             Text(String(this.item.answerCount) + ' 回答')
-              .copyOption(CopyOptions.LocalDevice)
               .fontSize(13)
               .fontColor(ZhihuColors.textTertiary)
           }

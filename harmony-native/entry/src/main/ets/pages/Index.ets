@@ -33,6 +33,9 @@ struct Index {
   @State visibleKeys: string[] = [];
   // 内层 Tabs 控制器：保证顶栏点击/底栏首页回默认栏均能强制切换内容
   private tabsCtrl: TabsController = new TabsController();
+  // 登录态版本号：登录/登出翻转时 +1 → 下方 Tabs/ProfilePage 的 key 变化 → 强制重建，
+  // 各列表页重新 aboutToAppear 用最新 cookie 加载（登录后状态刷新）
+  @StorageProp('loginVersion') loginVersion: number = 0;
 
   /** 顶栏允许出现的栏目（固定顺序；publish/profile 不在其中） */
   private topTabOrder: string[] = ['following', 'recommend', 'hot', 'daily'];
@@ -167,6 +170,7 @@ struct Index {
     .barHeight(0)
     .barWidth(0)
     .layoutWeight(1)
+    .key('home-' + String(this.loginVersion))
     .onChange((i: number) => {
       this.innerIndex = i;
     })
@@ -246,13 +250,26 @@ struct Index {
 
   build() {
     Column() {
-      if (this.outerIndex === 0) {
-        this.topNavBar()
-        this.homeTabs()
-      } else {
+      // 首页组与个人中心常驻（Visibility 切换），避免条件渲染反复销毁/重建
+      // 整个 Tabs 树（4 个列表页重发请求）——这是“切换慢/点击卡”的根因之一。
+      Stack() {
+        Column() {
+          this.topNavBar()
+          this.homeTabs()
+        }
+        .width('100%')
+        .height('100%')
+        .visibility(this.outerIndex === 0 ? Visibility.Visible : Visibility.None)
+
         ProfilePage()
-          .layoutWeight(1)
+          .width('100%')
+          .height('100%')
+          .key('profile-' + String(this.loginVersion))
+          .visibility(this.outerIndex === 1 ? Visibility.Visible : Visibility.None)
       }
+      .width('100%')
+      .layoutWeight(1)
+
       this.bottomBar()
     }
     .width('100%')

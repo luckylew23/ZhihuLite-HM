@@ -3,14 +3,14 @@
   "version-code": 2,
   "uuid": "a7f3d2c1-8b90-4e5f-b2a1-3c4d5e6f7081",
   "validity": {
-    "not-before": 1788884180,
-    "not-after": 2104330580
+    "not-before": 1789145951,
+    "not-after": 2104592351
   },
   "type": "debug",
   "bundle-info": {
     "developer-id": "ZhihuMinusMinus",
     "development-certificate": "MIICKTCCAdCgAwIBAgIEOJ1WYDAKBggqhkjOPQQDAjBsMQswCQYDVQQGEwJDTjEYMBYGA1UECgwPWmhpaHVNaW51c01pbnVzMRgwFgYDVQQLDA9aaGlodU1pbnVzTWludXMxKTAnBgNVBAMMIEFwcGxpY2F0aW9uIFNpZ25hdHVyZSBTZXJ2aWNlIENBMB4XDTI2MDkwOTE2MTYxMFoXDTM2MDkwNjE2MTYxMFowYTELMAkGA1UEBhMCQ04xGDAWBgNVBAoMD1poaWh1TWludXNNaW51czEYMBYGA1UECwwPWmhpaHVNaW51c01pbnVzMR4wHAYDVQQDDBVaaGlodU1pbnVzTWludXMgRGVidWcwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAATW1JfzB5QPunA_w3ShTX8YiGqOX8T7RV6ZjFsCGNY51pFFbPkdZnvPh1cGlcClx7GrF3Zw3sjPxsycYiSf4xMDo2swaTAdBgNVHQ4EFgQUrUooD_yphZhx3s-jxg1TbDp9eN4wCQYDVR0TBAIwADAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwMwGAYMKwYBBAGPWwKCeAEDBAgwBgIBAQoBADAKBggqhkjOPQQDAgNHADBEAiBcAnjKb-WteY2M5K9pU-VBCegPbn0n10g4KXRL6mmzLQIgSpI4lS0QbFWiZImSUFNq2lUJ5S9FCzeSIlI7TLnR5M0=",
-    "bundle-name": "com.huamu013.ZhihuMinusMinus",
+    "bundle-name": "com.zhihulite.hmos",
     "apl": "normal",
     "app-feature": "hos_normal_app"
   },

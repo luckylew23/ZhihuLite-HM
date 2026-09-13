@@ -5,12 +5,19 @@
 
 import { preferences } from '@kit.ArkData';
 import { common } from '@kit.AbilityKit';
+import { AppStorage } from '@kit.ArkUI';
 
 const PREF_NAME: string = 'zhihu_native';
 const COOKIE_KEY: string = 'auth_cookie';
 const USER_NAME_KEY: string = 'user_name';
 
 let appContext: common.Context | null = null;
+
+/** 登录态版本号：登录/登出翻转时 +1，主框架据此强制重建各列表页（登录后状态刷新）。 */
+function bumpLoginVersion(): void {
+  const v = AppStorage.get<number>('loginVersion') ?? 0;
+  AppStorage.setOrCreate('loginVersion', v + 1);
+}
 
 export function setAppContext(ctx: common.Context): void {
   appContext = ctx;
@@ -75,8 +82,12 @@ class AuthStore {
   }
 
   setCookies(cookie: string): void {
+    const wasLoggedIn = hasAuthenticationCookie(this.cookie);
     this.cookie = cookie;
     this.persist();
+    if (wasLoggedIn !== hasAuthenticationCookie(this.cookie)) {
+      bumpLoginVersion();
+    }
   }
 
   setUserName(name: string): void {
@@ -92,9 +103,13 @@ class AuthStore {
   }
 
   clear(): void {
+    const wasLoggedIn = this.isLoggedIn;
     this.cookie = '';
     this.displayName = '';
     this.persist();
+    if (wasLoggedIn) {
+      bumpLoginVersion();
+    }
   }
 
   private persist(): void {

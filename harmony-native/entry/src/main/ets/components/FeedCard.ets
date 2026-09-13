@@ -41,14 +41,12 @@ export struct FeedCard {
           .backgroundColor(ZhihuColors.backgroundTertiary)
         Column({ space: 2 }) {
           Text(this.item.author.name)
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(15)
             .fontColor(ZhihuColors.text)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
           if (this.item.actionText && this.item.actionText.length > 0) {
             Text(this.item.actionText)
-              .copyOption(CopyOptions.LocalDevice)
               .fontSize(13)
               .fontColor(ZhihuColors.textTertiary)
               .maxLines(1)
@@ -59,7 +57,6 @@ export struct FeedCard {
 
         if (this.item.isLabeled) {
           Text('广告')
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(10)
             .fontColor(ZhihuColors.textTertiary)
             .padding({ left: 6, right: 6, top: 2, bottom: 2 })
@@ -110,26 +107,24 @@ export struct FeedCard {
       Row({ space: 16 }) {
         Row({ space: 4 }) {
           Text('▲')
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
+            .fontSize(13).fontColor(ZhihuColors.textTertiary)
           Text(formatCount(this.item.voteCount))
-            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
+            .fontSize(14).fontColor(ZhihuColors.textSecondary)
         }
         Row({ space: 4 }) {
           Text('评论')
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
+            .fontSize(13).fontColor(ZhihuColors.textTertiary)
           Text(formatCount(this.item.commentCount))
-            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
+            .fontSize(14).fontColor(ZhihuColors.textSecondary)
         }
         if (this.item.favlistsCount && this.item.favlistsCount > 0) {
           Text(formatCount(this.item.favlistsCount) + ' 收藏')
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(14)
             .fontColor(ZhihuColors.textSecondary)
         }
         Blank()
         if (this.item.answerType === 'PAID') {
           Text('盐选')
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(10)
             .fontColor(ZhihuColors.textInverse)
             .backgroundColor(ZhihuColors.primary)
