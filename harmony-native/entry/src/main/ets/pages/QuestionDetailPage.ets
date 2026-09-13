@@ -7,6 +7,7 @@
  */
 
 import { router } from '@kit.ArkUI';
+import { NetImage } from '../components/NetImage';
 import { Want, common } from '@kit.AbilityKit';
 import {
   getQuestion,
@@ -262,13 +263,7 @@ struct QuestionDetailPage {
         if (this.detailImages().length > 0) {
           Flex({ wrap: FlexWrap.Wrap }) {
             ForEach(this.detailImages().slice(0, 3), (src: string) => {
-              Image(src)
-                .width(110)
-                .height(110)
-                .borderRadius(8)
-                .objectFit(ImageFit.Cover)
-                .margin({ right: 8, bottom: 8 })
-                .backgroundColor(ZhihuColors.backgroundTertiary)
+              NetImage({ url: src, w: 110, h: 110, r: 8, mr: 8, mb: 8})
             }, (src: string) => src)
           }
           .width('100%')

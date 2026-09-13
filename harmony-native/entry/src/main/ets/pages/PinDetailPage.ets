@@ -6,6 +6,7 @@
  */
 
 import { router } from '@kit.ArkUI';
+import { NetImage } from '../components/NetImage';
 import { getPin, ZhihuPinDetail } from '../api/pin';
 import { ZhihuColors } from '../utils/theme';
 import { formatDateTime } from '../utils/date';
@@ -95,12 +96,7 @@ struct PinDetailPage {
 
             if (this.images.length > 0) {
               ForEach(this.images, (url: string) => {
-                Image(url)
-                  .width('100%')
-                  .borderRadius(8)
-                  .objectFit(ImageFit.Contain)
-                  .backgroundColor(ZhihuColors.backgroundTertiary)
-                  .margin({ top: 4 })
+                NetImage({ url: url, w: 0, h: 240, r: 8, fit: ImageFit.Contain, mt: 4})
               }, (url: string, index: number) => String(index) + '-' + url)
             }
           }

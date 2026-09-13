@@ -1,3 +1,4 @@
+import { NetImage } from './NetImage';
 /**
  * components/FeedCard —— 普通 Feed 卡片（回答/文章/想法/问题）。
  */
@@ -91,14 +92,9 @@ export struct FeedCard {
           .lineHeight(21)
       }
 
-      // 配图
+      // 配图（长按可下载原图）
       if (this.item.image && this.item.image.length > 0) {
-        Image(this.item.image)
-          .width('100%')
-          .height(180)
-          .borderRadius(8)
-          .objectFit(ImageFit.Cover)
-          .backgroundColor(ZhihuColors.backgroundTertiary)
+        NetImage({ url: this.item.image, w: 0, h: 180, r: 8 })
       }
 
       // 统计行

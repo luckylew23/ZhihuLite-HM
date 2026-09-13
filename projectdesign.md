@@ -12,7 +12,7 @@
 |---|---|
 | 应用显示名 | 知乎Lite |
 | Bundle Name | `com.zhihulite.hmos`（与原版 `com.huamu013.ZhihuMinusMinus` 隔离，不冲突） |
-| 当前版本 | v0.3.12（versionCode 147） |
+| 当前版本 | v0.3.13（versionCode 148） |
 | 上游基线 | `~/workbuddy/zhihu--/`（HEAD bf28d4a，v0.6.0） |
 | 工程目录 | `~/workbuddy/zhihu--HMOS/harmony-native/` |
 | 远程仓库 | `git@github.com:luckylew23/ZhihuLite-HM.git` |
@@ -117,6 +117,13 @@ zhihu--HMOS/
 - **离线可看**：网络请求失败（断网/接口异常）时自动回退读取两天内缓存，仍可正常浏览热榜与日报内容
 - 实现：`utils/cacheStore.ts`（fs 同步 API：accessSync 探活目录 + mkdirSync 创建 + openSync/writeSync/closeSync 写入 + statSync/readTextSync 读取），缓存失败静默不影响主流程
 - 注意：`fileIo.stat().mtime` 单位为**秒**，与 `Date.now()` 毫秒需换算（v0.3.9 修复，否则缓存永远判过期）
+
+### 2.11 图片显示与长按下载原图
+- **内容图片统一组件 `NetImage`**：推荐/热榜/日报/想法/问题详情等主要图片（v0.3.13 起）
+- **长按下载原图（无水印）**：`utils/imageUrl.ts` 转换（去 `source=` 水印参数 + 去 `_400x400` 尺寸段 + 去 `/80/` 压缩段）→ `utils/imageDownload.ts` 二进制下载 → `photoAccessHelper.createAsset` 写入系统相册
+- 权限：`ohos.permission.WRITE_IMAGEVIDEO`（首次弹窗授权，`reason` 文案已配置）
+- 反馈：下载中/成功/失败均 toast；日志 TAG ZhihuLite
+- 已知边界：`uitest longClick` 无法注入 ArkUI 长按手势，长按交互需真机人工验证
 
 ### 2.8 搜索关键词（应用可发现性）
 - 包内 `metadata.keywords`：知乎,zhihu,知乎Lite,ZhihuLite,zhihulite,轻量,知乎第三方,知乎鸿蒙版,知乎客户端,鸿蒙知乎,知乎轻量版,zhihu-lite,知乎minimal
@@ -290,6 +297,7 @@ harmony-native/entry/src/main/ets/
 - **v0.3.10**：最近浏览回归（进入不闪退、显示今日记录、点击进文章详情正常）+ 底栏发布按钮视觉调整（去圆圈）+ 无 AppCrash/FATAL
 - **v0.3.11**：搜索页回归（搜索框深浅主题正常、placeholder 灰字、搜索按钮蓝色；默认时间三月内）+ 筛选面板逻辑走查 + 真机验证受限说明（HDC 文本注入仅进输入法候选区、无法提交，搜索链路需人工键入验证）
 - **v0.3.12**：收藏按钮回归（详情页底部"☆ 移至收藏"未收藏态 → 选择收藏夹收藏 → 返回变"★ 取消收藏"橙色 → 再点取消恢复未收藏态，全链路真机通过）+ 资源 ID 防串扰（收藏回传标志带 resourceId，避免跨页面误刷新）
+- **v0.3.13**：NetImage 图片组件回归（首页推荐带图卡片正常渲染、无崩溃）+ 长按下载链路构建验证通过 + 自动化局限（uitest 无法注入长按手势，需人工验证下载）
 
 ### 5.4 已知降级项（确认仍为降级，不计缺陷）
 1. 日报正文 HTML 剥标签纯文本
@@ -378,3 +386,4 @@ $HDC -t <serial> shell aa start -a EntryAbility -b com.zhihulite.hmos
 | v0.3.10 | 最近浏览闪退修复（extra/header/content/matrix 空引用全防护 + 逐条解析）+ 默认加载最近两天浏览记录 + 底栏发布按钮去圆圈改纯 + 号 |
 | v0.3.11 | 搜索页：默认时间范围改为三月内 + 筛选面板（内容类型/排序/时间三行 chips 可选）+ 筛选按钮可点开 + 修复深色主题下搜索框字体颜色（TextInput 未设 fontColor）+ 时间 pill 硬编码浅蓝改主题色 |
 | v0.3.12 | 收藏按钮修复：详情页/回答卡片收藏状态（未收藏 ☆ 移至收藏 → 已收藏 ★ 取消收藏 橙色）+ 进入自动查询收藏状态 + 收藏后返回实时刷新 + 收藏回传带资源 ID 防串扰 |
+| v0.3.13 | 图片长按下载原图（无水印）：统一 NetImage 组件（推荐/热榜/日报/想法/问题详情）+ 原图 URL 转换（去水印参数/尺寸段/压缩段）+ photoAccessHelper 保存相册 + 相册权限 |

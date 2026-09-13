@@ -39,6 +39,14 @@
       },
       {
         "name": "ohos.permission.GET_NETWORK_INFO"
+      },
+      {
+        "name": "ohos.permission.WRITE_IMAGEVIDEO",
+        "reason": "$string:permission_reason_save_image",
+        "usedScene": {
+          "abilities": ["EntryAbility"],
+          "when": "inuse"
+        }
       }
     ]
   }

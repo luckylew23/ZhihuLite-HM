@@ -3,6 +3,7 @@
  */
 
 import { HotItem } from '../api/feedParser';
+import { NetImage } from './NetImage';
 import { ZhihuColors } from '../utils/theme';
 
 function rankColor(rank: number): string {
@@ -87,12 +88,7 @@ export struct HotCard {
 
       // 配图
       if (this.item.image && this.item.image.length > 0) {
-        Image(this.item.image)
-          .width(96)
-          .height(72)
-          .borderRadius(6)
-          .objectFit(ImageFit.Cover)
-          .backgroundColor(ZhihuColors.backgroundTertiary)
+        NetImage({ url: this.item.image, w: 96, h: 72, r: 6 })
       }
     }
     .width('100%')

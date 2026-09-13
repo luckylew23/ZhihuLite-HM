@@ -5,7 +5,7 @@
 > 上游 [zhihu--](https://github.com/luckylew23/zhihu--)（v0.6.0，React Native / Expo）的完整原生移植：
 > 复用上游纯 TypeScript 业务逻辑，UI 用 ArkTS 原生重写，界面与 Android 版一致。
 
-[![版本](https://img.shields.io/badge/版本-v0.3.12-blue)](#版本历史) [![平台](https://img.shields.io/badge/平台-HarmonyOS%20NEXT-black)](#) [![架构](https://img.shields.io/badge/架构-原生ArkTS-green)](#架构概览)
+[![版本](https://img.shields.io/badge/版本-v0.3.13-blue)](#版本历史) [![平台](https://img.shields.io/badge/平台-HarmonyOS%20NEXT-black)](#) [![架构](https://img.shields.io/badge/架构-原生ArkTS-green)](#架构概览)
 
 ---
 

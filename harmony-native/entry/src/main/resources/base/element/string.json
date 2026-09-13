@@ -15,6 +15,10 @@
     {
       "name": "EntryAbility_label",
       "value": "知乎Lite"
+    },
+    {
+      "name": "permission_reason_save_image",
+      "value": "用于将长按的图片保存到相册"
     }
   ]
 }

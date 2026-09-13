@@ -6,6 +6,7 @@
  */
 
 import { router } from '@kit.ArkUI';
+import { NetImage } from '../components/NetImage';
 import {
   DailyStory,
   getDailyLatest,
@@ -140,19 +141,9 @@ export struct DailyPage {
     Row({ space: 12 }) {
       // 缩略图（无图时占位色块）
       if (item.images && item.images.length > 0 && item.images[0].length > 0) {
-        Image(item.images[0])
-          .width(88)
-          .height(88)
-          .borderRadius(10)
-          .objectFit(ImageFit.Cover)
-          .backgroundColor(ZhihuColors.backgroundTertiary)
+        NetImage({ url: item.images[0], w: 88, h: 88, r: 10 })
       } else if (item.image && item.image.length > 0) {
-        Image(item.image)
-          .width(88)
-          .height(88)
-          .borderRadius(10)
-          .objectFit(ImageFit.Cover)
-          .backgroundColor(ZhihuColors.backgroundTertiary)
+        NetImage({ url: item.image, w: 88, h: 88, r: 10 })
       } else {
         Row()
           .width(88)
