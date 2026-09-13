@@ -3,8 +3,8 @@
     "bundleName": "com.zhihulite.hmos",
     "bundleType": "app",
     "vendor": "ZhihuLite-HM",
-    "versionCode": 145,
-    "versionName": "0.3.10",
+    "versionCode": 146,
+    "versionName": "0.3.11",
     "icon": "$media:app_icon",
     "label": "$string:app_name",
     "description": "$string:description_application"

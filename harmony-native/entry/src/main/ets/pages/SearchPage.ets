@@ -84,7 +84,10 @@ struct SearchPage {
   @State suggestions: SuggestHit[] = [];
   @State showSuggest: boolean = false;
 
-  @State timeFilter: string = '';
+  @State timeFilter: string = 'three_months';
+  @State showFilterPanel: boolean = false;
+  @State contentType: string = '';
+  @State sortType: string = '';
 
   @State feedResults: FeedItem[] = [];
   @State peopleResults: PeopleHit[] = [];
@@ -117,7 +120,20 @@ struct SearchPage {
       opt.time_interval =
         this.timeFilter as 'a_day' | 'a_week' | 'a_month' | 'three_months';
     }
+    if (this.contentType.length > 0) {
+      opt.vertical = this.contentType as 'answer' | 'article' | 'zvideo';
+    }
+    if (this.sortType.length > 0) {
+      opt.sort = this.sortType as 'created_time' | 'upvoted_count';
+    }
     return opt;
+  }
+
+  /** 生效的筛选项数（badge 用） */
+  private activeFilterCount(): number {
+    return (this.timeFilter !== 'three_months' ? 1 : 0) +
+      (this.contentType.length > 0 ? 1 : 0) +
+      (this.sortType.length > 0 ? 1 : 0);
   }
 
   // ---------------- 建议 ----------------
@@ -184,10 +200,35 @@ struct SearchPage {
   }
 
   async resetFilter(): Promise<void> {
-    if (this.timeFilter.length === 0) {
+    const changed: boolean = this.contentType.length > 0 || this.sortType.length > 0 ||
+      this.timeFilter !== 'three_months';
+    this.contentType = '';
+    this.sortType = '';
+    this.timeFilter = 'three_months';
+    this.showFilterPanel = false;
+    if (!changed || !this.searching || this.submitted.length === 0) {
       return;
     }
-    await this.applyTimeFilter('');
+    this.pageOffset = 0;
+    await this.runSearch(0, true);
+  }
+
+  private async applyContentType(v: string): Promise<void> {
+    this.contentType = v;
+    await this.reSearchOnFilter();
+  }
+
+  private async applySortType(v: string): Promise<void> {
+    this.sortType = v;
+    await this.reSearchOnFilter();
+  }
+
+  private async reSearchOnFilter(): Promise<void> {
+    if (!this.searching || this.submitted.length === 0) {
+      return;
+    }
+    this.pageOffset = 0;
+    await this.runSearch(0, true);
   }
 
   async runSearch(offset: number, replace: boolean): Promise<void> {
@@ -374,6 +415,8 @@ struct SearchPage {
           .height(36)
           .backgroundColor(Color.Transparent)
           .fontSize(16)
+          .fontColor(ZhihuColors.text)
+          .caretColor(ZhihuColors.primary)
           .placeholderColor(ZhihuColors.textTertiary)
           .onChange((v: string) => {
             this.onInputChange(v);
@@ -448,13 +491,15 @@ struct SearchPage {
   @Builder
   filterBar() {
     Row({ space: 10 }) {
-      // 筛选 pill（带激活数 badge）
+      // 筛选 pill（带激活数 badge，点击展开筛选面板）
       Row({ space: 6 }) {
         Text('≡')
         Text('筛选')
-        if (this.timeFilter.length > 0) {
+        if (this.activeFilterCount() > 0) {
           Stack() {
-            Text('1')
+            Text(String(this.activeFilterCount()))
+              .fontSize(10)
+              .fontColor(ZhihuColors.textInverse)
           }
           .width(16)
           .height(16)
@@ -465,7 +510,11 @@ struct SearchPage {
       .height(34)
       .padding({ left: 12, right: 12 })
       .borderRadius(17)
-      .backgroundColor(ZhihuColors.backgroundTertiary)
+      .backgroundColor(this.showFilterPanel ? ZhihuColors.primaryTransparent :
+        ZhihuColors.backgroundTertiary)
+      .onClick(() => {
+        this.showFilterPanel = !this.showFilterPanel;
+      })
       // 时间下拉 pill
       Row({ space: 4 }) {
         Text('时间：' + timeLabel(this.timeFilter))
@@ -476,7 +525,7 @@ struct SearchPage {
       .height(34)
       .padding({ left: 12, right: 12 })
       .borderRadius(17)
-      .backgroundColor('#e3f0ff')
+      .backgroundColor(ZhihuColors.primaryTransparent)
       .bindMenu(this.timeMenuItems())
       Blank()
       Text('重置')
@@ -502,6 +551,114 @@ struct SearchPage {
       });
     }
     return items;
+  }
+
+  /** 筛选面板：内容类型 / 排序 / 时间 三行 chips（点选项即应用并保留面板） */
+  @Builder
+  filterPanel() {
+    Column({ space: 12 }) {
+      // 内容类型
+      Column({ space: 6 }) {
+        Text('内容类型')
+          .fontSize(13)
+          .fontColor(ZhihuColors.textTertiary)
+          .width('100%')
+        Row({ space: 8 }) {
+          this.chip('全部', this.contentType.length === 0, () => {
+            this.applyContentType('');
+          })
+          this.chip('回答', this.contentType === 'answer', () => {
+            this.applyContentType('answer');
+          })
+          this.chip('文章', this.contentType === 'article', () => {
+            this.applyContentType('article');
+          })
+          this.chip('视频', this.contentType === 'zvideo', () => {
+            this.applyContentType('zvideo');
+          })
+        }
+        .width('100%')
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.Start)
+
+      // 排序
+      Column({ space: 6 }) {
+        Text('排序')
+          .fontSize(13)
+          .fontColor(ZhihuColors.textTertiary)
+          .width('100%')
+        Row({ space: 8 }) {
+          this.chip('默认', this.sortType.length === 0, () => {
+            this.applySortType('');
+          })
+          this.chip('最新', this.sortType === 'created_time', () => {
+            this.applySortType('created_time');
+          })
+          this.chip('最多赞同', this.sortType === 'upvoted_count', () => {
+            this.applySortType('upvoted_count');
+          })
+        }
+        .width('100%')
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.Start)
+
+      // 时间（与顶部时间下拉联动）
+      Column({ space: 6 }) {
+        Text('时间范围')
+          .fontSize(13)
+          .fontColor(ZhihuColors.textTertiary)
+          .width('100%')
+        Row({ space: 8 }) {
+          this.timeChip('不限', '', () => {
+            this.applyTimeFilter('');
+          })
+          this.timeChip('一天内', 'a_day', () => {
+            this.applyTimeFilter('a_day');
+          })
+          this.timeChip('一周内', 'a_week', () => {
+            this.applyTimeFilter('a_week');
+          })
+          this.timeChip('一月内', 'a_month', () => {
+            this.applyTimeFilter('a_month');
+          })
+          this.timeChip('三月内', 'three_months', () => {
+            this.applyTimeFilter('three_months');
+          })
+        }
+        .width('100%')
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.Start)
+    }
+    .width('100%')
+    .padding({ left: 14, right: 14, top: 12, bottom: 12 })
+    .backgroundColor(ZhihuColors.backgroundSecondary)
+    .border({ width: { bottom: 0.5 }, color: ZhihuColors.border })
+  }
+
+  @Builder
+  chip(label: string, selected: boolean, onClick: () => void) {
+    Text(label)
+      .fontSize(14)
+      .fontColor(selected ? ZhihuColors.textInverse : ZhihuColors.text)
+      .padding({ left: 12, right: 12, top: 5, bottom: 5 })
+      .borderRadius(14)
+      .backgroundColor(selected ? ZhihuColors.primary : ZhihuColors.backgroundTertiary)
+      .onClick(onClick)
+  }
+
+  @Builder
+  timeChip(label: string, value: string, onClick: () => void) {
+    Text(label)
+      .fontSize(14)
+      .fontColor(this.timeFilter === value ? ZhihuColors.textInverse : ZhihuColors.text)
+      .padding({ left: 12, right: 12, top: 5, bottom: 5 })
+      .borderRadius(14)
+      .backgroundColor(this.timeFilter === value ? ZhihuColors.primary :
+        ZhihuColors.backgroundTertiary)
+      .onClick(onClick)
   }
 
   @Builder
@@ -714,6 +871,9 @@ struct SearchPage {
       if (this.searching) {
         this.tabBar()
         this.filterBar()
+        if (this.showFilterPanel) {
+          this.filterPanel()
+        }
         this.statRow()
       }
 
