@@ -294,7 +294,8 @@ class ZhihuHttpClient {
     return {
       status: resp.status,
       headers: resp.headers,
-      data: this.parseJson<T>(resp.body),
+      // 2xx 空 body（DELETE/204 等）不当作错误
+      data: resp.body.length > 0 ? this.parseJson<T>(resp.body) : (null as T),
     };
   }
 

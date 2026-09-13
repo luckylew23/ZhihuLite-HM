@@ -81,6 +81,14 @@ function imageOf(target: RawFeedTarget): string | null {
   if (target.content_img && target.content_img.length > 0) {
     return target.content_img[0] ?? null;
   }
+  // 热榜/部分形态：children[0].thumbnail
+  if (Array.isArray(target.children) && target.children.length > 0) {
+    const c0 = target.children[0] as Record<string, unknown>;
+    const th = c0['thumbnail'] as string | undefined;
+    if (th !== undefined && th.length > 0) {
+      return th;
+    }
+  }
   return null;
 }
 

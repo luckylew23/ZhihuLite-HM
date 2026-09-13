@@ -33,15 +33,19 @@ struct DetailPage {
     if (this.url && this.url.length > 0) {
       return this.url;
     }
+    const qid = this.questionId.length > 0 ? this.questionId : this.contentId;
     if (this.contentType === 'question') {
-      const qid = this.questionId.length > 0 ? this.questionId : this.contentId;
       return 'https://www.zhihu.com/question/' + qid;
     }
-    if (this.contentType === 'article') {
+    // 调用方（SearchPage/FeedListPage）传复数类型，统一兼容
+    if (this.contentType === 'article' || this.contentType === 'articles') {
       return 'https://zhuanlan.zhihu.com/p/' + this.contentId;
     }
-    if (this.contentType === 'pin') {
+    if (this.contentType === 'pin' || this.contentType === 'pins') {
       return 'https://www.zhihu.com/pin/' + this.contentId;
+    }
+    if (this.contentType === 'video' || this.contentType === 'videos') {
+      return 'https://www.zhihu.com/zvideo/' + this.contentId;
     }
     return 'https://www.zhihu.com/answer/' + this.contentId;
   }

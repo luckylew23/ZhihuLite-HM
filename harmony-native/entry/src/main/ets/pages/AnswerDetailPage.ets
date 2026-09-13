@@ -31,6 +31,15 @@ struct AnswerDetailPage {
     this.load();
   }
 
+  // 从写操作/评论返回时刷新（首次由 aboutToAppear 加载）
+  onPageShow(): void {
+    if (this.shownOnce) {
+      this.load();
+    }
+    this.shownOnce = true;
+  }
+  private shownOnce: boolean = false;
+
   private async load(): Promise<void> {
     this.loading = true;
     this.error = '';

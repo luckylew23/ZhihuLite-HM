@@ -58,6 +58,15 @@ struct QuestionDetailPage {
     this.loadAnswers(true);
   }
 
+  // 从写回答/评论/点赞返回时刷新（首次由 aboutToAppear 加载，避免双请求）
+  onPageShow(): void {
+    if (this.shownOnce) {
+      this.loadQuestion();
+    }
+    this.shownOnce = true;
+  }
+  private shownOnce: boolean = false;
+
   private async loadQuestion(): Promise<void> {
     this.loadingQ = true;
     this.qError = '';

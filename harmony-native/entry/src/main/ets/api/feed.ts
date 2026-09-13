@@ -169,6 +169,7 @@ export interface RawFeedTarget {
   preview_text?: string;
   thumbnail?: string;
   content_img?: string[];
+  children?: Array<Record<string, unknown>>;
   image_url?: string;
   linkbox?: {
     url?: string;

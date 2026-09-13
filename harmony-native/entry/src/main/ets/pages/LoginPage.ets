@@ -17,6 +17,7 @@ const SIGNIN_URL: string = 'https://www.zhihu.com/signin';
 struct LoginPage {
   controller: webview.WebviewController = new webview.WebviewController();
   @State loading: boolean = true;
+  @State webError: string = '';
   @State logined: boolean = false;
 
   build() {
@@ -59,11 +60,31 @@ struct LoginPage {
             this.loading = false;
             this.tryGrabCookies();
           })
-          .onErrorReceive((event) => {
+          .onErrorReceive(() => {
             this.loading = false;
+            this.webError = '登录页加载失败，请检查网络后重试';
           })
 
-        if (this.loading && !this.logined) {
+        if (this.webError.length > 0 && !this.logined) {
+          Column({ space: 16 }) {
+            Text(this.webError)
+              .fontSize(15)
+              .fontColor('#ff4d4f')
+            Button('重试')
+              .width(160)
+              .height(40)
+              .backgroundColor(ZhihuColors.primary)
+              .onClick(() => {
+                this.webError = '';
+                this.loading = true;
+                try {
+                  this.controller.refresh();
+                } catch (e) {
+                  // ignore
+                }
+              })
+          }
+        } else if (this.loading && !this.logined) {
           LoadingProgress().width(48).height(48).color(ZhihuColors.primary)
         }
 
