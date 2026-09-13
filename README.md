@@ -46,4 +46,4 @@
 
 ## 致谢
 
-- [zhihu--](https://github.com/luckylew23/zhihu--)：上游 React Native 知乎客户端（MIT）
+本项目初始版本参考复刻：[zhihu--](https://github.com/luckylew23/zhihu--)（上游 React Native 知乎客户端，MIT）
