@@ -289,13 +289,27 @@ class ZhihuHttpClient {
     }
 
     if (resp.status >= 400) {
-      throw this.buildError(resp.status, resp.body);
+      const err = this.buildError(resp.status, resp.body);
+      hilog.error(DOMAIN, TAG, 'req %{public}s %{public}s status=%{public}d err=%{public}s body=%{public}s',
+        method, url, resp.status, err.message, resp.body.substring(0, 160));
+      throw err;
     }
+    // 业务错误（200 + {"error":{...}}）由 parseJson 抛 ApiError，这里记录便于定位
+    let data: T;
+    try {
+      data = resp.body.length > 0 ? this.parseJson<T>(resp.body) : (null as T);
+    } catch (e) {
+      hilog.error(DOMAIN, TAG, 'req %{public}s %{public}s status=%{public}d bizError=%{public}s',
+        method, url, resp.status, String(e));
+      throw e;
+    }
+    hilog.info(DOMAIN, TAG, 'req %{public}s %{public}s status=%{public}d len=%{public}d',
+      method, url, resp.status, resp.body.length);
     return {
       status: resp.status,
       headers: resp.headers,
       // 2xx 空 body（DELETE/204 等）不当作错误
-      data: resp.body.length > 0 ? this.parseJson<T>(resp.body) : (null as T),
+      data: data,
     };
   }
 

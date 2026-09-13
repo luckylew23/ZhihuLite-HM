@@ -1,117 +1,126 @@
-# zhihu--HMOS
+# ZhihuLite-HM（知乎Lite）
 
-> HarmonyOS NEXT 版知乎第三方客户端（[zhihu--](https://github.com/luckylew23/zhihu--)）的鸿蒙壳工程。
+> **轻量级知乎第三方客户端 · HarmonyOS NEXT 原生版**
 >
-> **当前路线：ArkWeb WebView 壳**（与 [Tydora-HMOS](../Tydora-HMOS) 同一条已验证路线）。
-> 早期尝试的 RNOH 原生移植路线已废弃，原因见下方「为什么不是 RNOH」。
+> 上游 [zhihu--](https://github.com/luckylew23/zhihu--)（v0.6.0，React Native / Expo）的完整原生移植：
+> 复用上游纯 TypeScript 业务逻辑，UI 用 ArkTS 原生重写，界面与 Android 版一致。
 
-## 架构
+[![版本](https://img.shields.io/badge/版本-v0.3.8-blue)](#版本历史) [![平台](https://img.shields.io/badge/平台-HarmonyOS%20NEXT-black)](#) [![架构](https://img.shields.io/badge/架构-原生ArkTS-green)](#架构概览)
 
-zhihu-- 是 React Native (Expo) 应用，无法直接编译到 OpenHarmony。本工程分三步把它带到鸿蒙：
+---
 
-```
-zhihu-- (Expo / react-native-web)
-   │  expo export --platform web          ← scripts/build-web.sh
-   ▼
-dist-web/ （多文件静态站点）
-   │  scripts/inline-single-file.mjs      ← JS/CSS/字体/图片全部内联，module→IIFE
-   ▼
-harmony/entry/src/main/resources/rawfile/index.html   ← 单文件，自包含
-   │  ArkWeb: Web({ src: $rawfile('index.html') })
-   ▼
-hvigorw assembleHap（纯 ArkTS 编译 + 资源打包，秒级）
-   │  harmony/signing/sign.sh             ← 本地自签
-   ▼
-zhihu---default-signed.hap
-```
+## 简介
 
-- **ArkTS 壳（`harmony/`）**：`EntryAbility` 拉起 `pages/index`，页面只有一个 `Web` 组件
-- **单文件内联**：`$rawfile` 的文档源是 `resource://rawfile/...`，该 scheme 下 ES module 子资源
-  （`<script type="module">` / `<link rel="modulepreload">`）会被 CORS 拒绝，分包资源也会跨 scheme 取不到。
-  所以构建脚本把所有 JS / CSS / 字体 / 图片内联进一个 `index.html`，并把 module 脚本降级为普通 IIFE 脚本，
-  完成后做自检（零本地子资源引用、零 `type="module"`），不通过直接失败。
+知乎Lite 是知乎的第三方鸿蒙客户端，主打**轻量、快速、功能完整**：
 
-### 为什么不是 RNOH
+- **完整功能**：关注 / 推荐 / 热榜 / 日报 / 搜索 / 收藏 / 互动 / 创作（写回答、写文章、发想法、提问）
+- **原生体验**：纯 ArkTS 重写，无 WebView 壳，点击响应快
+- **界面一致**：对照 Android 版原样复制的深色主题与交互
+- **独立身份**：应用名"知乎Lite"、独立包名 `com.zhihulite.hmos`，与原版互不冲突，可共存安装
 
-RNOH（React Native OpenHarmony）方案在本项目上有两个硬伤：
+## 特性速览
 
-1. **构建耗时**：RNOH 的 har 内含 boost / folly / glog / libevent / fast_float 的全量 C++ 源码，
-   且 `libs/` 为空（没有预编译 `.so`），`assembleHap` 会触发一次完整的 CMake 原生构建（数十分钟级）。
-2. **版本错配**：zhihu-- 的 JS 侧是 `react-native@0.83.2`，而 ohpm 上可获取的 RNOH 为 `0.84.3`
-   （无 0.83.x），`@react-native-oh/react-native-harmony@0.84.3` 的 peer 是精确的 `react-native@0.84.1`。
+| 模块 | 能力 |
+|---|---|
+| 首页栏目 | 关注 / 推荐 / 热榜 / 日报，可配置展示，默认推荐 |
+| 内容详情 | 问题、回答、文章、想法、视频、专栏、话题（原生详情页） |
+| 互动创作 | 点赞 / 收藏 / 关注 / 评论 / 写回答 / 写文章 / 发想法 / 提问 |
+| 搜索 | 综合 / 用户双 tab，登录后使用 |
+| 个人中心 | 我的收藏（内容+分类）、历史、通知、私信、赞同、他人主页 |
+| 设置 | 主题（自动/浅色/深色）、栏目、默认首页、内容过滤 |
+| 可发现性 | 包内搜索关键词（知乎/zhihu/lite/轻量/知乎第三方/知乎鸿蒙版等） |
 
-此外 RNOH 0.82+ 的 har 已不再随包发布 hvigor 构建插件（只有 ArkTS 运行时导出），
-旧写法 `import { appTasks } from '@rnoh/react-native-openharmony'` 必然 MODULE_NOT_FOUND。
+## 快速开始
 
-RNOH 相关的历史资料仍保留在 `OHOS_*.md` 与 `platform/ohos/`，但已不参与构建。
+### 环境要求
 
-## 环境要求
+- macOS + DevEco Studio（含 OpenHarmony SDK 6.0.2 / API 20）
+- 真机需开启开发者模式；命令行构建无需 IDE GUI
 
-- Node.js ≥ 20.19（Metro 要求；脚本默认用 WorkBuddy 托管的 22.22.2）
-- DevEco Studio（含 OpenHarmony SDK，API 20 / `6.0.0(20)`）
-- DevEco 自带 JDK（jbr）
-
-## 构建
+### 构建
 
 ```bash
-# 一键：Web 导出 → 单文件内联 → assembleHap → 本地自签
-bash scripts/build-ohos.sh            # 默认 release；传 debug 出 debug 包
-
-# 分步
-bash scripts/build-web.sh             # 只做 Web 产物 + rawfile
-SKIP_WEB=1 bash scripts/build-ohos.sh # 复用已有 rawfile，只重打 hap
-bash scripts/build-hap.sh release     # 只打包 + 签名
+cd ~/workbuddy/zhihu--HMOS/harmony-native
+/Applications/DevEco-Studio.app/Contents/tools/node/bin/node \
+  /Applications/DevEco-Studio.app/Contents/tools/hvigor/bin/hvigorw.js \
+  assembleHap --mode module -p product=default --no-daemon
 ```
 
-产物：
+产物：`entry/build/default/outputs/default/entry-default-signed.hap`（华为签名，真机可装）。
 
-- 未签名 `harmony/entry/build/default/outputs/default/entry-default-unsigned.hap`
-- 已签名 `harmony/entry/build/default/outputs/default/zhihu--default-signed.hap`
-
-环境变量：
-
-| 变量 | 默认 | 说明 |
-|---|---|---|
-| `ZHIHU_SRC` | `../zhihu--` | 上游 Expo 工程目录（要能跑 `expo export --platform web`） |
-| `NODE_BIN` | WorkBuddy 托管 22.22.2 | node 所在目录 |
-| `DEVECO_HOME` | `/Applications/DevEco-Studio.app/Contents` | DevEco 安装位置 |
-
-## 安装
+### 安装
 
 ```bash
-hdc install harmony/entry/build/default/outputs/default/zhihu--default-signed.hap
+HDC=/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc
+$HDC list targets                                   # 确认设备在线
+$HDC -t <serial> install -r ZhihuLite-HM-v0.3.8-signed.hap
 ```
 
-自签调试包需要设备开启开发者模式。
+已交付 HAP 均保留在 `~/workbuddy/zhihu--HMOS/`，命名 `ZhihuLite-HM-v<版本>-signed.hap`。
+
+## 架构概览
+
+```
+用户 ──▶ ZhihuLite-HM（ArkTS 原生 UI，36 页面）
+              │
+              ├── api/  27 个知乎 API 模块
+              │     └── httpClient（Cookie Jar + x-zse-96 签名 + 401 自动刷新 + 请求日志）
+              │     └── zse96/（签名算法，与上游逐行对齐）
+              ├── store/  authStore / settingsStore（preferences 持久化）
+              └── 知乎服务端（www / api / zhuanlan / oauth 四域名）
+```
+
+详细 C4 架构（系统上下文 / 容器 / 组件 / 代码）见 [projectdesign.md](projectdesign.md)。
+
+## 项目结构
+
+```
+zhihu--HMOS/
+├── harmony-native/        ★ 原生工程（当前主线）
+│   ├── entry/src/main/ets/{pages,components,api,store,model,utils}
+│   ├── PORTING_SPEC.md    移植规范（所有移植工作的事实来源）
+│   ├── AUDIT_REPORT.md    缺陷审计报告（H/M/L 分级 + 降级项）
+│   └── projectdesign.md   特性/C4/设计/测试/要求
+├── harmony/               旧 WebView 壳（已否决，归档保留）
+├── scripts/               构建 / 签名 / SDK 补丁脚本
+├── HarmonyOS 版可行性分析.md
+└── ZhihuLite-HM-v*.hap    各版本交付产物
+```
+
+## 文档索引
+
+| 文档 | 内容 |
+|---|---|
+| [projectdesign.md](projectdesign.md) | 特性、C4 架构、设计、测试验证、要求（唯一事实来源） |
+| [AUDIT_REPORT.md](harmony-native/AUDIT_REPORT.md) | 缺陷清单（H1-H4/M1-M10/L 系列）+ 已知降级项 |
+| [PORTING_SPEC.md](harmony-native/PORTING_SPEC.md) | 移植规范、ArkTS 硬坑、页面约定 |
+| [scripts/sdk-build-patch.md](scripts/sdk-build-patch.md) | 命令行构建打通与 SDK 补丁方案 |
+| `~/vault/Notebook/Duobao/zhihu--HarmonyOS原生移植记录-v0.2.md` | 逐版本移植/修复/验证记录与经验 |
+
+## 版本历史
+
+| 版本 | 里程碑 |
+|---|---|
+| v0.1 | 自签包 1.1M，首版可跑（仅浏览） |
+| v0.2 | 华为签名 2.5M，命令行构建打通，交互初修 |
+| v0.3 | copyOption 全局减负 421→6，点击响应大幅提升 |
+| v0.3.1 | 收藏夹修复（不再回落 me 路径）+ 错误详情可见 |
+| v0.3.2 | 全局字号 +1 |
+| v0.3.3 | 底栏字符化（⌂ / + / 👤） |
+| v0.3.4 | 应用名"知乎Lite"+ 新图标（蓝底白知字 LITE） |
+| v0.3.5 | 搜索登录提示（search_v3 强制登录） |
+| v0.3.6 | 合集版：全量审计项修复 + 真机全面验证通过 |
+| v0.3.7 | 全量 HTTP 日志，定位搜索解析崩溃 |
+| v0.3.8 | 搜索修复：结果解析 null 全防护 + 搜索关键词配置 |
 
 ## 已知限制
 
-- **CORS**：文档源是 `resource://rawfile`，页面内的跨域 XHR/fetch 会带该 Origin。
-  上游直连知乎接口的部分请求可能被 CORS 拒绝，需要走请求代理或改用原生桥转发。
-- **原生能力**：纯 Web 壳拿不到 `expo-secure-store` / `expo-sqlite` / `expo-haptics` 等原生模块，
-  需要时通过 `javaScriptProxy` 挂 ArkTS 桥（参考 Tydora-HMOS 的 `bridge/TauriBridge.ets`）。
-- 单文件 HTML 体积较大（含内联的 katex 字体等），首次加载略慢。
+- 富文本/LaTeX 正文为纯文本渲染（剥 HTML 标签）
+- 私信为 HTTP 轮询降级（无 WebSocket）
+- 发布图片上传 OSS 未实现
+- 日报正文纯文本、设置部分静态
+- 应用市场搜索关键词主配置需在 AGC 发布后台补充
 
-## 签名说明
+## 致谢
 
-`harmony/signing/sign.sh` 完全离线自签，不需要华为开发者帐号：
-
-```
-Root CA → 二级 CA(App/Profile) → App 证书 → Profile 证书 → p7b → sign-app → verify-app
-```
-
-出于安全考虑，**仓库不包含签名私钥**（`*.p12` / `*.p7b` 已被 `.gitignore` 排除），
-仅保留证书链、`sign.sh` 和 `make-profile.py`。首次运行会自动生成整套物料（口令 `123456`）。
-
-上架 AppGallery 需要换成华为开发者账号申请的正式证书与 Profile。
-
-## 仓库组织
-
-| 仓库 / 分支 | 职责 |
-|---|---|
-| 上游 zhihu-- `main` | 官方多平台发布 |
-| luckylew23/zhihu-- `main` | 纯净镜像，只放能合回上游的改动 |
-| luckylew23/zhihu-- `hmos` | 前端侧鸿蒙改动，不合 main、不发 PR |
-| **本仓库 `main`** | ArkTS 壳工程 + 构建脚本 + 独立 Release，自有版本号 |
-
-版本号位于 `harmony/AppScope/app.json5`（`versionName` / `versionCode`）。
+- [zhihu--](https://github.com/luckylew23/zhihu--)：上游 React Native 知乎客户端（MIT）

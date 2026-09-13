@@ -2,7 +2,11 @@
   "string": [
     {
       "name": "app_name",
-      "value": "知乎--"
+      "value": "知乎Lite"
+    },
+    {
+      "name": "description_application",
+      "value": "知乎Lite（ZhihuLite）——轻量级知乎第三方客户端，专为 HarmonyOS 鸿蒙打造。支持推荐、关注、热榜、日报、搜索、收藏、互动等核心功能，界面简洁响应快。关键词：知乎、zhihu、知乎Lite、轻量、知乎第三方、知乎鸿蒙版、知乎客户端、鸿蒙知乎、知乎轻量版。"
     }
   ]
 }

@@ -246,8 +246,8 @@ export interface ZhihuSearchHighlight {
 
 export interface ZhihuSearchResultItem {
   type: 'search_result';
-  highlight: ZhihuSearchHighlight;
-  object: ZhihuMemberRelation;
+  highlight?: ZhihuSearchHighlight | null;
+  object?: object | null;
   index: number;
 }
 

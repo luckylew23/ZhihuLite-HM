@@ -25,6 +25,15 @@ interface PeopleHit {
   avatar: string;
 }
 
+/** 安全读取 Record 字段（null/undefined 防护），返回 string 默认值 */
+function field(obj: Record<string, object> | null | undefined, key: string, def: string): string {
+  if (obj === undefined || obj === null) {
+    return def;
+  }
+  const v = obj[key];
+  return v !== undefined && v !== null ? String(v) : def;
+}
+
 const TABS: string[] = ['综合', '用户'];
 
 /** time_interval 下拉选项：value 直接对应 SearchContentOptions.time_interval */
@@ -220,6 +229,7 @@ struct SearchPage {
       this.isEnd = resp.paging.is_end;
       this.pageOffset = offset + 20;
     } catch (e) {
+      console.error('[ZhihuLite] search failed: ' + String(e));
       if (replace) {
         const msg: string = String(e);
         if (!this.loggedIn || msg.indexOf('ZERR_NOT_LOGIN') >= 0 || msg.indexOf('101') >= 0) {
@@ -236,58 +246,77 @@ struct SearchPage {
   }
 
   private parsePeople(item: ZhihuSearchResultItem): PeopleHit {
-    const obj = item.object as object as Record<string, object>;
-    const name: string = plainHighlight(item.highlight.title ?? '') || String(obj['name'] ?? '知乎用户');
-    const headline: string = plainHighlight(item.highlight.description ?? '') || String(obj['headline'] ?? '');
+    const rawObj = item.object;
+    const obj: Record<string, object> | null = rawObj !== undefined && rawObj !== null
+      ? (rawObj as Record<string, object>) : null;
+    const hl = item.highlight;
+    const hlSafe: Record<string, object> | null = hl !== undefined && hl !== null
+      ? (hl as Record<string, object>) : null;
+    const name: string =
+      plainHighlight(field(hlSafe, 'title', '')) || field(obj, 'name', '知乎用户');
+    const headline: string =
+      plainHighlight(field(hlSafe, 'description', '')) || field(obj, 'headline', '');
     return {
-      id: String(obj['id'] ?? ''),
+      id: field(obj, 'id', ''),
       name: name,
       headline: headline,
-      avatar: String(obj['avatar_url'] ?? ''),
+      avatar: field(obj, 'avatar_url', ''),
     };
   }
 
   private parseFeed(item: ZhihuSearchResultItem): FeedItem | null {
-    const obj = item.object as object as Record<string, object>;
-    const objType: string = String(obj['type'] ?? '');
+    const rawObj = item.object;
+    const obj: Record<string, object> | null = rawObj !== undefined && rawObj !== null
+      ? (rawObj as Record<string, object>) : null;
+    const objType: string = field(obj, 'type', '');
     if (objType === 'people') {
       return null;
     }
-    // question 子对象
-    const question = obj['question'] as Record<string, object> | undefined;
+    const hl = item.highlight;
+    const hlSafe: Record<string, object> | null = hl !== undefined && hl !== null
+      ? (hl as Record<string, object>) : null;
+    // question 子对象（可能为 null，如 article/pin 结果）
+    const rawQ = obj === null ? undefined : obj['question'];
+    const question: Record<string, object> | null = rawQ !== undefined && rawQ !== null
+      ? (rawQ as Record<string, object>) : null;
     const title: string =
-      plainHighlight(item.highlight.title ?? '') ||
-      String(question !== undefined ? question['name'] ?? '' : '') ||
-      String(obj['title'] ?? '无标题');
+      plainHighlight(field(hlSafe, 'title', '')) ||
+      field(question, 'name', '') ||
+      field(obj, 'title', '无标题');
     const excerpt: string =
-      plainHighlight(item.highlight.description ?? '') || String(obj['excerpt'] ?? '');
+      plainHighlight(field(hlSafe, 'description', '')) || field(obj, 'excerpt', '');
 
     // 作者
-    const authorRec = obj['author'] as Record<string, object> | undefined;
+    const rawAuthor = obj === null ? undefined : obj['author'];
+    const authorRec: Record<string, object> | null = rawAuthor !== undefined && rawAuthor !== null
+      ? (rawAuthor as Record<string, object>) : null;
     const author: FeedAuthor = {
-      id: authorRec === undefined ? '' : String(authorRec['id'] ?? ''),
-      name: authorRec === undefined ? '匿名用户' : String(authorRec['name'] ?? '匿名用户'),
-      avatar: authorRec === undefined ? '' : String(authorRec['avatar_url'] ?? ''),
+      id: field(authorRec, 'id', ''),
+      name: field(authorRec, 'name', '匿名用户'),
+      avatar: field(authorRec, 'avatar_url', ''),
     };
 
     // 配图
     let image: string | null = null;
-    const thumb = obj['thumbnail_info'] as Record<string, object> | undefined;
-    if (thumb !== undefined) {
-      const thumbs = thumb['thumbnails'] as object[] | undefined;
+    const rawThumb = obj === null ? undefined : obj['thumbnail_info'];
+    if (rawThumb !== undefined && rawThumb !== null) {
+      const thumb = rawThumb as Record<string, object>;
+      const thumbs = thumb['thumbnails'];
       if (Array.isArray(thumbs) && thumbs.length > 0) {
         const t0 = thumbs[0] as Record<string, object>;
-        image = String(t0['url'] ?? '');
+        image = field(t0, 'url', '');
       }
     }
 
-    const authorIdStr: string = String(obj['id'] ?? (question !== undefined ? question['id'] ?? '' : ''));
+    const authorIdStr: string = field(obj, 'id', field(question, 'id', ''));
     const typeStr: string = objType + 's';
-    const voteCount: number = Number(obj['voteup_count'] ?? 0);
-    const commentCount: number = Number(obj['comment_count'] ?? 0);
+    const voteCount: number = Number(field(obj, 'voteup_count', '0'));
+    const commentCount: number = Number(field(obj, 'comment_count', '0'));
 
-    const rel = obj['relationship'] as Record<string, object> | undefined;
-    const voted: number = rel === undefined ? 0 : Number(rel['voting'] ?? 0);
+    const rawRel = obj === null ? undefined : obj['relationship'];
+    const rel: Record<string, object> | null = rawRel !== undefined && rawRel !== null
+      ? (rawRel as Record<string, object>) : null;
+    const voted: number = rel === null ? 0 : Number(field(rel, 'voting', '0'));
 
     const feedItem: FeedItem = {
       id: authorIdStr,
@@ -300,7 +329,7 @@ struct SearchPage {
       commentCount: commentCount,
       voted: voted,
     };
-    if (question !== undefined) {
+    if (question !== null) {
       feedItem.questionId = String(question['id'] ?? '');
     }
     return feedItem;

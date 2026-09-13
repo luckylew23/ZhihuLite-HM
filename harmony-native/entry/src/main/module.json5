@@ -6,6 +6,12 @@
     "mainElement": "EntryAbility",
     "deviceTypes": ["default"],
     "deliveryWithInstall": true,
+    "metadata": [
+      {
+        "name": "keywords",
+        "value": "知乎,zhihu,知乎Lite,ZhihuLite,zhihulite,轻量,知乎第三方,知乎鸿蒙版,知乎客户端,鸿蒙知乎,知乎轻量版,zhihu-lite,知乎minimal"
+      }
+    ],
     "installationFree": false,
     "pages": "$profile:main_pages",
     "abilities": [
