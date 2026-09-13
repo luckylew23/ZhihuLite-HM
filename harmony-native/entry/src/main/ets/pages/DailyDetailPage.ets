@@ -41,7 +41,15 @@ struct DailyDetailPage {
       this.detail = d;
       // 头图已用 images[0]，正文里的 [图片] 占位用 images[1..] 依次替换
       const bodyImgs: string[] = (d.images !== undefined && d.images.length > 1) ? d.images.slice(1) : [];
-      this.bodyBlocks = this.fillPlaceholders(parseHtmlBlocks(d.body), bodyImgs);
+      let blocks: HtmlBlock[] = this.fillPlaceholders(parseHtmlBlocks(d.body), bodyImgs);
+      // 正文第一个图片块即答主头像，标记为小圆形头像渲染
+      for (let k = 0; k < blocks.length; k++) {
+        if (blocks[k].type === 'image') {
+          blocks[k] = { type: 'image', text: '__avatar__', url: blocks[k].url };
+          break;
+        }
+      }
+      this.bodyBlocks = blocks;
     } catch (e) {
       this.error = '日报内容加载失败，请稍后重试';
     } finally {
@@ -49,7 +57,8 @@ struct DailyDetailPage {
     }
   }
 
-  /** 把正文文本里的 [图片] 字面占位，按顺序替换为正文图片块（对应 images[1..]） */
+  /** 把正文文本里的 [图片] 字面占位，按顺序替换为正文图片块（对应 images[1..]）。
+   *  第一个 [图片] 实际是答主头像（紧邻作者介绍文字），打 '__avatar__' 标记渲染成小圆形头像。 */
   private fillPlaceholders(blocks: HtmlBlock[], imgs: string[]): HtmlBlock[] {
     const out: HtmlBlock[] = [];
     let pi = 0;
@@ -62,7 +71,8 @@ struct DailyDetailPage {
             out.push({ type: 'text', text: parts[j], url: '' });
           }
           if (j < parts.length - 1 && pi < imgs.length) {
-            out.push({ type: 'image', text: '', url: imgs[pi] });
+            const tag: string = pi === 0 ? '__avatar__' : '';
+            out.push({ type: 'image', text: tag, url: imgs[pi] });
             pi++;
           }
         }
@@ -127,6 +137,12 @@ struct DailyDetailPage {
                       .lineHeight(28)
                       .fontColor(ZhihuColors.text)
                       .width('100%')
+                  } else if (b.text === '__avatar__') {
+                    // 答主头像：小圆形 48px
+                    Row() {
+                      NetImage({ url: b.url, w: 48, h: 48, r: 24 })
+                    }
+                    .width('100%')
                   } else {
                     NetImage({ url: b.url, w: 0, h: 260, r: 8, fit: ImageFit.Contain, mt: 4, tapView: true })
                   }
