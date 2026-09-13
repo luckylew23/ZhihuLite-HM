@@ -5,7 +5,7 @@
 
 import { preferences } from '@kit.ArkData';
 import { common } from '@kit.AbilityKit';
-import { AppStorage } from '@kit.ArkUI';
+// AppStorage 为全局 API（V1），SDK 6.0.2 起不再从 @kit.ArkUI 导出，无需 import
 
 const PREF_NAME: string = 'zhihu_native';
 const COOKIE_KEY: string = 'auth_cookie';

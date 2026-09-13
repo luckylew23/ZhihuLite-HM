@@ -261,7 +261,9 @@ struct Index {
         .height('100%')
         .visibility(this.outerIndex === 0 ? Visibility.Visible : Visibility.None)
 
-        ProfilePage()
+        Column() {
+          ProfilePage()
+        }
           .width('100%')
           .height('100%')
           .key('profile-' + String(this.loginVersion))
