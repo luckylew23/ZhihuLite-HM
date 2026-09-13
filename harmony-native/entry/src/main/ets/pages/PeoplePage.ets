@@ -328,7 +328,7 @@ export struct PeoplePage {
               .layoutWeight(1)
             if (!this.isMe) {
               Text(this.isFollowing ? '已关注' : '关注')
-                .fontSize(14)
+                .fontSize(15)
                 .fontWeight(FontWeight.Medium)
                 .fontColor(this.isFollowing ? ZhihuColors.textSecondary : ZhihuColors.primary)
                 .height(30)
@@ -342,7 +342,7 @@ export struct PeoplePage {
                   this.handleFollow();
                 })
               Text('私信')
-                .fontSize(14)
+                .fontSize(15)
                 .fontColor(ZhihuColors.textSecondary)
                 .height(30)
                 .padding({ left: 12, right: 12 })
@@ -357,7 +357,7 @@ export struct PeoplePage {
           .width('100%')
           .alignItems(VerticalAlign.Center)
           Text(this.member?.headline ?? '最近发布')
-            .fontSize(14)
+            .fontSize(15)
             .fontColor(ZhihuColors.textSecondary)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -372,7 +372,7 @@ export struct PeoplePage {
 
       if (this.member?.description && this.member.description.length > 0) {
         Text(this.member.description)
-          .fontSize(14)
+          .fontSize(15)
           .fontColor(ZhihuColors.textSecondary)
           .lineHeight(19)
           .maxLines(2)
@@ -401,7 +401,7 @@ export struct PeoplePage {
       ForEach(TABS, (tab: ProfileTab) => {
         Column() {
           Text(tab.label)
-            .fontSize(15)
+            .fontSize(16)
             .fontWeight(this.activeTab === tab.key ? FontWeight.Bold : FontWeight.Normal)
             .fontColor(this.activeTab === tab.key ? ZhihuColors.primary : ZhihuColors.textSecondary)
             .padding({ top: 12, bottom: 12 })
@@ -430,7 +430,7 @@ export struct PeoplePage {
         .padding(12)
       } else if (this.isEnd && this.hasAnyItem()) {
         Text('已看完本次更新')
-          .fontSize(14)
+          .fontSize(15)
           .fontColor(ZhihuColors.textTertiary)
           .width('100%')
           .textAlign(TextAlign.Center)
@@ -444,7 +444,7 @@ export struct PeoplePage {
   activityCard(item: FeedItem) {
     Column({ space: 8 }) {
       Text(this.typeText(item))
-        .fontSize(14)
+        .fontSize(15)
         .fontColor(ZhihuColors.textTertiary)
         .width('100%')
 
@@ -456,7 +456,7 @@ export struct PeoplePage {
           .objectFit(ImageFit.Cover)
           .backgroundColor(ZhihuColors.backgroundTertiary)
         Text(item.author.name)
-          .fontSize(15)
+          .fontSize(16)
           .fontColor(ZhihuColors.text)
           .maxLines(1)
           .layoutWeight(1)
@@ -465,7 +465,7 @@ export struct PeoplePage {
 
       if (item.type !== 'pins' && item.title.length > 0) {
         Text(item.title)
-          .fontSize(17)
+          .fontSize(18)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.text)
           .maxLines(2)
@@ -477,7 +477,7 @@ export struct PeoplePage {
       if (item.excerpt.length > 0) {
         Row({ space: 10 }) {
           Text(item.excerpt)
-            .fontSize(15)
+            .fontSize(16)
             .fontColor(ZhihuColors.textSecondary)
             .lineHeight(20)
             .maxLines(3)
@@ -577,7 +577,7 @@ export struct PeoplePage {
       Column({ space: 12 }) {
         Text(this.listError)
         Button('重试')
-          .fontSize(15)
+          .fontSize(16)
           .backgroundColor(ZhihuColors.primary)
           .onClick(() => {
             this.loadTabFirst();
@@ -609,9 +609,9 @@ export struct PeoplePage {
       } else if (this.error.length > 0 || !this.member) {
         Column({ space: 16 }) {
           Text(this.error.length > 0 ? this.error : '用户不存在')
-            .fontSize(15).fontColor(ZhihuColors.textSecondary)
+            .fontSize(16).fontColor(ZhihuColors.textSecondary)
           Button('重试')
-            .fontSize(15)
+            .fontSize(16)
             .backgroundColor(ZhihuColors.primary)
             .onClick(() => {
               this.loadMember();

@@ -130,7 +130,7 @@ struct AnswerDetailPage {
             // 所属问题
             if (this.answer.question !== undefined && this.answer.question.title.length > 0) {
               Text(this.answer.question.title)
-                .fontSize(19)
+                .fontSize(20)
                 .fontWeight(FontWeight.Bold)
                 .fontColor(ZhihuColors.text)
                 .width('100%')
@@ -145,10 +145,10 @@ struct AnswerDetailPage {
                 .backgroundColor(ZhihuColors.backgroundTertiary)
               Column({ space: 2 }) {
                 Text(this.answer.author.name)
-                  .fontSize(16).fontWeight(FontWeight.Medium).fontColor(ZhihuColors.text)
+                  .fontSize(17).fontWeight(FontWeight.Medium).fontColor(ZhihuColors.text)
                 if (this.answer.author.headline && this.answer.author.headline.length > 0) {
                   Text(this.answer.author.headline)
-                    .fontSize(13).fontColor(ZhihuColors.textTertiary)
+                    .fontSize(14).fontColor(ZhihuColors.textTertiary)
                     .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
                 }
               }
@@ -161,7 +161,7 @@ struct AnswerDetailPage {
             // 正文（纯文本降级）
             Text(this.bodyText)
           .copyOption(CopyOptions.LocalDevice)
-              .fontSize(17)
+              .fontSize(18)
               .fontColor(ZhihuColors.text)
               .lineHeight(26)
               .width('100%')
@@ -169,7 +169,7 @@ struct AnswerDetailPage {
 
             if (this.metaText().length > 0) {
               Text(this.metaText())
-                .fontSize(13)
+                .fontSize(14)
                 .fontColor(ZhihuColors.textTertiary)
                 .width('100%')
             }
@@ -186,10 +186,10 @@ struct AnswerDetailPage {
         Row({ space: 4 }) {
           Row({ space: 4 }) {
             Text(this.voting === 1 ? '▲' : '△')
-              .fontSize(15)
+              .fontSize(16)
               .fontColor(this.voting === 1 ? ZhihuColors.primary : ZhihuColors.textSecondary)
             Text(formatCount(this.voteCount))
-              .fontSize(15)
+              .fontSize(16)
               .fontColor(this.voting === 1 ? ZhihuColors.primary : ZhihuColors.textSecondary)
               .onClick(() => {
                 this.openVoters();
@@ -204,10 +204,10 @@ struct AnswerDetailPage {
 
           Row({ space: 4 }) {
             Text(this.voting === -1 ? '▼' : '▽')
-              .fontSize(15)
+              .fontSize(16)
               .fontColor(this.voting === -1 ? ZhihuColors.danger : ZhihuColors.textSecondary)
             Text('反对')
-              .fontSize(15)
+              .fontSize(16)
               .fontColor(this.voting === -1 ? ZhihuColors.danger : ZhihuColors.textSecondary)
           }
           .layoutWeight(1)

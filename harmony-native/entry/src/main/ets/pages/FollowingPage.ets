@@ -179,7 +179,7 @@ export struct FollowingPage {
     if (this.recentItems.length > 0) {
       Column({ space: 8 }) {
         Text('最近更新')
-          .fontSize(14)
+          .fontSize(15)
           .fontColor(ZhihuColors.textSecondary)
           .width('100%')
           .textAlign(TextAlign.Start)
@@ -198,7 +198,7 @@ export struct FollowingPage {
                       .backgroundColor(ZhihuColors.backgroundTertiary)
                     if (r.unread_count > 0) {
                       Text(r.unread_count > 99 ? '99+' : String(r.unread_count))
-                        .fontSize(9)
+                        .fontSize(10)
                         .fontColor(ZhihuColors.textInverse)
                         .backgroundColor(ZhihuColors.danger)
                         .borderRadius(8)
@@ -211,7 +211,7 @@ export struct FollowingPage {
                   .width(48)
                   .height(48)
                   Text(r.actor.name)
-                    .fontSize(12)
+                    .fontSize(13)
                     .fontColor(ZhihuColors.textSecondary)
                     .maxLines(1)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -241,14 +241,14 @@ export struct FollowingPage {
       // 类型行（「回答了问题」/「发布了想法」灰色小字）——无动作文案时整行不渲染
       if (item.actionText && item.actionText.length > 0) {
         Text(item.actionText)
-          .fontSize(13)
+          .fontSize(14)
           .fontColor(ZhihuColors.textTertiary)
           .width('100%')
           .textAlign(TextAlign.Start)
       }
       // 作者名（粗体）
       Text(item.author.name)
-        .fontSize(15)
+        .fontSize(16)
         .fontWeight(FontWeight.Bold)
         .fontColor(ZhihuColors.text)
         .maxLines(1)
@@ -258,7 +258,7 @@ export struct FollowingPage {
       // 问题标题（粗体可点）
       if (item.title.length > 0) {
         Text(item.title)
-          .fontSize(17)
+          .fontSize(18)
           .fontWeight(FontWeight.Bold)
           .fontColor(ZhihuColors.text)
           .maxLines(2)
@@ -269,7 +269,7 @@ export struct FollowingPage {
       // 正文摘要
       if (item.excerpt.length > 0) {
         Text(item.excerpt)
-          .fontSize(15)
+          .fontSize(16)
           .fontColor(ZhihuColors.textSecondary)
           .maxLines(3)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -290,26 +290,26 @@ export struct FollowingPage {
       Row({ space: 18 }) {
         Row({ space: 4 }) {
           Text('▲')
-            .fontSize(13)
+            .fontSize(14)
             .fontColor(ZhihuColors.textTertiary)
           Text(formatCount(item.voteCount))
-            .fontSize(14)
+            .fontSize(15)
             .fontColor(ZhihuColors.textSecondary)
         }
         Row({ space: 4 }) {
           Text('○')
-            .fontSize(13)
+            .fontSize(14)
             .fontColor(ZhihuColors.textTertiary)
           Text(formatCount(item.commentCount))
-            .fontSize(14)
+            .fontSize(15)
             .fontColor(ZhihuColors.textSecondary)
         }
         Row({ space: 4 }) {
           Text('☆')
-            .fontSize(13)
+            .fontSize(14)
             .fontColor(ZhihuColors.textTertiary)
           Text(formatCount(item.favlistsCount ?? 0))
-            .fontSize(14)
+            .fontSize(15)
             .fontColor(ZhihuColors.textSecondary)
         }
       }
@@ -336,7 +336,7 @@ export struct FollowingPage {
         .padding(12)
       } else if (this.isEnd && this.items.length > 0) {
         Text('— 已看完本次更新 —')
-          .fontSize(14)
+          .fontSize(15)
           .fontColor(ZhihuColors.textTertiary)
           .width('100%')
           .textAlign(TextAlign.Center)
@@ -396,10 +396,10 @@ export struct FollowingPage {
       if (this.error.length > 0 && this.items.length === 0) {
         Column({ space: 16 }) {
           Text(this.error)
-            .fontSize(15)
+            .fontSize(16)
             .fontColor(ZhihuColors.textSecondary)
           Button('重试')
-            .fontSize(15)
+            .fontSize(16)
             .backgroundColor(ZhihuColors.primary)
             .onClick(() => {
               this.loadFirst();

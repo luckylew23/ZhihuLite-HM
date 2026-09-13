@@ -87,20 +87,20 @@ struct DailyDetailPage {
                 .width('100%')
               if (this.detail?.hint && this.detail.hint.length > 0) {
                 Text(this.detail.hint)
-                  .fontSize(14)
+                  .fontSize(15)
                   .fontColor(ZhihuColors.textSecondary)
                   .width('100%')
               }
               if (this.bodyText.length > 0) {
                 Divider().strokeWidth(0.5).color(ZhihuColors.divider).margin({ top: 4, bottom: 4 })
                 Text(this.bodyText)
-                  .fontSize(16)
+                  .fontSize(17)
                   .lineHeight(24)
                   .fontColor(ZhihuColors.text)
                   .width('100%')
               } else {
                 Text('正文暂无法展示')
-                  .fontSize(15)
+                  .fontSize(16)
                   .fontColor(ZhihuColors.textTertiary)
                   .width('100%')
                   .padding({ top: 20 })

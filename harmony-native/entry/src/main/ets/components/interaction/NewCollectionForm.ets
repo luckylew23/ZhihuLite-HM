@@ -23,7 +23,7 @@ export struct NewCollectionForm {
   build() {
     Column({ space: 12 }) {
       Text('标题')
-        .fontSize(16)
+        .fontSize(17)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.text)
         .width('100%')
@@ -33,13 +33,13 @@ export struct NewCollectionForm {
         .backgroundColor(ZhihuColors.backgroundTertiary)
         .borderRadius(12)
         .padding({ left: 14, right: 14 })
-        .fontSize(16)
+        .fontSize(17)
         .onChange((v: string) => {
           this.title = v;
         })
 
       Text('描述（可选）')
-        .fontSize(16)
+        .fontSize(17)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.text)
         .width('100%')
@@ -50,7 +50,7 @@ export struct NewCollectionForm {
         .backgroundColor(ZhihuColors.backgroundTertiary)
         .borderRadius(12)
         .padding(12)
-        .fontSize(16)
+        .fontSize(17)
         .onChange((v: string) => {
           this.description = v;
         })
@@ -76,7 +76,7 @@ export struct NewCollectionForm {
         .height(50)
         .backgroundColor(ZhihuColors.primary)
         .fontColor(ZhihuColors.textInverse)
-        .fontSize(17)
+        .fontSize(18)
         .margin({ top: 12 })
         .enabled(!this.pending)
         .onClick(() => {

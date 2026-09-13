@@ -218,11 +218,11 @@ struct QuestionDetailPage {
       Row({ space: 8 }) {
         Column({ space: 2 }) {
           Text('媒体报道')
-            .fontSize(14)
+            .fontSize(15)
             .fontWeight(FontWeight.Medium)
             .fontColor(ZhihuColors.text)
           Text(this.mediaTitle().length > 0 ? this.mediaTitle() : this.mediaUrl())
-            .fontSize(14)
+            .fontSize(15)
             .fontColor(ZhihuColors.textSecondary)
             .maxLines(2)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -232,7 +232,7 @@ struct QuestionDetailPage {
         .layoutWeight(1)
 
         Text('↗')
-          .fontSize(17)
+          .fontSize(18)
           .fontColor(ZhihuColors.primary)
       }
       .width('100%')
@@ -267,7 +267,7 @@ struct QuestionDetailPage {
 
         Text(this.detailText())
           .copyOption(CopyOptions.LocalDevice)
-          .fontSize(15)
+          .fontSize(16)
           .fontColor(ZhihuColors.textSecondary)
           .lineHeight(21)
           .width('100%')
@@ -277,7 +277,7 @@ struct QuestionDetailPage {
 
         if ((this.question?.detail ?? '').length > 0) {
           Text(this.detailExpanded ? '收起' : '展开全文')
-            .fontSize(14)
+            .fontSize(15)
             .fontWeight(FontWeight.Medium)
             .fontColor(ZhihuColors.primary)
             .onClick(() => {
@@ -293,7 +293,7 @@ struct QuestionDetailPage {
   @Builder
   actionButton(label: string, isActive: boolean, onClick: () => void) {
     Text(label)
-      .fontSize(14)
+      .fontSize(15)
       .fontWeight(FontWeight.Medium)
       .fontColor(ZhihuColors.primary)
       .layoutWeight(1)
@@ -308,7 +308,7 @@ struct QuestionDetailPage {
   sortTab(label: string, mode: string) {
     Column({ space: 4 }) {
       Text(label)
-        .fontSize(15)
+        .fontSize(16)
         .fontColor(this.sortBy === mode ? ZhihuColors.primary : ZhihuColors.textSecondary)
         .fontWeight(this.sortBy === mode ? FontWeight.Bold : FontWeight.Normal)
       if (this.sortBy === mode) {
@@ -339,7 +339,7 @@ struct QuestionDetailPage {
       } else if (this.qError.length > 0) {
         Column({ space: 12 }) {
           Text(this.qError)
-          Button('重试').fontSize(14).backgroundColor(ZhihuColors.primary)
+          Button('重试').fontSize(15).backgroundColor(ZhihuColors.primary)
             .onClick(() => {
               this.loadQuestion();
             })
@@ -360,7 +360,7 @@ struct QuestionDetailPage {
           Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.Start }) {
             ForEach(this.question.topics, (topic: ZhihuTopic) => {
               Text(topic.name)
-                .fontSize(13)
+                .fontSize(14)
                 .fontColor(ZhihuColors.primary)
                 .padding({ left: 12, right: 12, top: 5, bottom: 5 })
                 .borderRadius(14)
@@ -382,7 +382,7 @@ struct QuestionDetailPage {
 
         // 5. 关注·浏览数据行
         Text((this.followerCount) + ' 关注 · ' + (this.question?.visit_count ?? 0) + ' 浏览')
-          .fontSize(14)
+          .fontSize(15)
           .fontColor(ZhihuColors.textTertiary)
           .width('100%')
 
@@ -403,7 +403,7 @@ struct QuestionDetailPage {
         // 7. 回答数 + 排序切换（默认 / 时间）
         Row() {
           Text((this.question?.answer_count ?? 0) + ' 个回答')
-            .fontSize(16)
+            .fontSize(17)
             .fontWeight(FontWeight.Medium)
             .fontColor(ZhihuColors.text)
             .layoutWeight(1)
@@ -433,7 +433,7 @@ struct QuestionDetailPage {
         .padding(12)
       } else if (this.isEnd && this.answers.length > 0) {
         Text('— 没有更多回答了 —')
-          .fontSize(14)
+          .fontSize(15)
           .fontColor(ZhihuColors.textTertiary)
           .width('100%')
           .textAlign(TextAlign.Center)
@@ -482,7 +482,7 @@ struct QuestionDetailPage {
         if (this.answersError.length > 0 && this.answers.length === 0) {
           Column({ space: 16 }) {
             Text(this.answersError)
-            Button('重试').fontSize(15).backgroundColor(ZhihuColors.primary)
+            Button('重试').fontSize(16).backgroundColor(ZhihuColors.primary)
               .onClick(() => {
                 this.loadAnswers(true);
               })
@@ -492,7 +492,7 @@ struct QuestionDetailPage {
         }
         if (!this.answersLoading && this.answersError.length === 0 && this.answers.length === 0 && !this.loadingQ) {
           Text('暂无回答')
-            .fontSize(15)
+            .fontSize(16)
             .fontColor(ZhihuColors.textTertiary)
             .width('100%')
             .padding(60)

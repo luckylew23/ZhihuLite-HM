@@ -129,7 +129,7 @@ export struct DailyPage {
       }
       Column({ space: 6 }) {
         Text(item.title ?? '')
-          .fontSize(16)
+          .fontSize(17)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.text)
           .maxLines(3)
@@ -137,7 +137,7 @@ export struct DailyPage {
           .width('100%')
         if (item.hint && item.hint.length > 0) {
           Text(item.hint)
-            .fontSize(13)
+            .fontSize(14)
             .fontColor(ZhihuColors.textTertiary)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -169,7 +169,7 @@ export struct DailyPage {
         .padding(12)
       } else if (this.stories.length > 0) {
         Text('— 已加载全部日报 —')
-          .fontSize(14)
+          .fontSize(15)
           .fontColor(ZhihuColors.textTertiary)
           .width('100%')
           .textAlign(TextAlign.Center)
@@ -182,7 +182,7 @@ export struct DailyPage {
   dateHeader() {
     Row() {
       Text(this.date.length > 0 ? formatDailyDate(this.date) + ' 日报' : '日报')
-        .fontSize(15)
+        .fontSize(16)
         .fontWeight(FontWeight.Bold)
         .fontColor(ZhihuColors.primary)
     }
@@ -234,10 +234,10 @@ export struct DailyPage {
       if (this.error.length > 0 && this.stories.length === 0) {
         Column({ space: 16 }) {
           Text(this.error)
-            .fontSize(15)
+            .fontSize(16)
             .fontColor(ZhihuColors.textSecondary)
           Button('重试')
-            .fontSize(15)
+            .fontSize(16)
             .backgroundColor(ZhihuColors.primary)
             .onClick(() => {
               this.loadLatest();

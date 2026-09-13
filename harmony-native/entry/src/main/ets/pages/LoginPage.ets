@@ -23,19 +23,19 @@ struct LoginPage {
     Column() {
       Row() {
         Text('取消')
-          .fontSize(16)
+          .fontSize(17)
           .fontColor(ZhihuColors.primary)
           .onClick(() => {
             router.back();
           })
         Blank()
         Text('知乎登录')
-          .fontSize(17)
+          .fontSize(18)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.text)
         Blank()
         Text('   ')
-          .fontSize(16)
+          .fontSize(17)
       }
       .width('100%')
       .height(52)
@@ -70,7 +70,7 @@ struct LoginPage {
         if (this.logined) {
           Column({ space: 16 }) {
             Text('登录成功')
-              .fontSize(17)
+              .fontSize(18)
               .fontColor(ZhihuColors.text)
             Button('返回')
               .width(160)

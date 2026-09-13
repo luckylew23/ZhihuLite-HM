@@ -98,7 +98,7 @@ export struct UserLikesPage {
     Column({ space: 16 }) {
       Blank()
       Text('登录后才能查看我赞过的内容')
-        .fontSize(15)
+        .fontSize(16)
         .fontColor(ZhihuColors.textSecondary)
       Button('登录知乎')
         .width(220)
@@ -128,7 +128,7 @@ export struct UserLikesPage {
   @Builder
   tabItem(key: string) {
     Text(key)
-      .fontSize(16)
+      .fontSize(17)
       .fontWeight(this.activeTab === (key === '文章' ? 'articles' : 'answers')
         ? FontWeight.Bold : FontWeight.Normal)
       .fontColor(this.activeTab === (key === '文章' ? 'articles' : 'answers')
@@ -152,7 +152,7 @@ export struct UserLikesPage {
         .justifyContent(FlexAlign.Center).width('100%').padding(12)
       } else if (this.isEnd && this.items.length > 0) {
         Text('— 没有更多了 —')
-          .fontSize(14).fontColor(ZhihuColors.textTertiary)
+          .fontSize(15).fontColor(ZhihuColors.textTertiary)
           .width('100%').textAlign(TextAlign.Center).padding(12)
       }
     }
@@ -175,7 +175,7 @@ export struct UserLikesPage {
           Column({ space: 16 }) {
             Text(this.error)
             Button('重试')
-              .fontSize(15)
+              .fontSize(16)
               .backgroundColor(ZhihuColors.primary)
               .onClick(() => {
                 this.loadFirst();

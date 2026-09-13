@@ -102,7 +102,7 @@ struct ChatPage {
         })
       Blank()
       Text(this.peerName)
-        .fontSize(18)
+        .fontSize(19)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.text)
         .maxLines(1)
@@ -123,7 +123,7 @@ struct ChatPage {
           Row() {
             Column() {
               Text(this.bubbleText(msg))
-                .fontSize(16)
+                .fontSize(17)
                 .fontColor(this.isMe(msg) ? ZhihuColors.textInverse : ZhihuColors.text)
                 .padding({ left: 14, right: 14, top: 9, bottom: 9 })
                 .backgroundColor(this.isMe(msg) ? ZhihuColors.primary : ZhihuColors.backgroundSecondary)
@@ -159,7 +159,7 @@ struct ChatPage {
         Button('发送')
           .width(64)
           .height(38)
-          .fontSize(15)
+          .fontSize(16)
           .backgroundColor(this.input.trim().length > 0
             ? ZhihuColors.primary
             : ZhihuColors.backgroundTertiary)
@@ -181,12 +181,12 @@ struct ChatPage {
     Column({ space: 16 }) {
       Blank()
       Text('发私信前请先登录知乎账号')
-        .fontSize(15)
+        .fontSize(16)
         .fontColor(ZhihuColors.textSecondary)
       Button('去登录')
         .width(200)
         .height(42)
-        .fontSize(16)
+        .fontSize(17)
         .backgroundColor(ZhihuColors.primary)
         .onClick(() => {
           router.pushUrl({ url: 'pages/LoginPage' });
@@ -215,7 +215,7 @@ struct ChatPage {
         Column({ space: 16 }) {
           Text(this.error)
           Button('重试')
-            .fontSize(15)
+            .fontSize(16)
             .backgroundColor(ZhihuColors.primary)
             .onClick(() => {
               this.loadHistory();
@@ -228,7 +228,7 @@ struct ChatPage {
         this.messageList()
         if (this.error.length > 0) {
           Text(this.error)
-            .fontSize(13)
+            .fontSize(14)
             .fontColor(ZhihuColors.danger)
             .width('100%')
             .padding({ left: 16, bottom: 4 })

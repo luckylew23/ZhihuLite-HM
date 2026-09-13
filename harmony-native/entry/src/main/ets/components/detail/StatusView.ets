@@ -24,11 +24,11 @@ export struct StatusView {
     } else if (this.error.length > 0) {
       Column({ space: 16 }) {
         Text(this.error)
-          .fontSize(15)
+          .fontSize(16)
           .fontColor(ZhihuColors.textSecondary)
           .textAlign(TextAlign.Center)
         Button('重试')
-          .fontSize(15)
+          .fontSize(16)
           .backgroundColor(ZhihuColors.primary)
           .onClick(() => {
             this.onRetry();
@@ -38,7 +38,7 @@ export struct StatusView {
       .padding(40)
     } else if (this.emptyText.length > 0) {
       Text(this.emptyText)
-        .fontSize(15)
+        .fontSize(16)
         .fontColor(ZhihuColors.textTertiary)
         .width('100%')
         .textAlign(TextAlign.Center)

@@ -336,7 +336,7 @@ struct SearchPage {
           .layoutWeight(1)
           .height(36)
           .backgroundColor(Color.Transparent)
-          .fontSize(15)
+          .fontSize(16)
           .placeholderColor(ZhihuColors.textTertiary)
           .onChange((v: string) => {
             this.onInputChange(v);
@@ -367,7 +367,7 @@ struct SearchPage {
       .padding({ left: 12, right: 6 })
       .alignItems(VerticalAlign.Center)
       Text('搜索')
-        .fontSize(16)
+        .fontSize(17)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.primary)
         .padding({ left: 6, right: 6 })
@@ -387,7 +387,7 @@ struct SearchPage {
       ForEach(TABS, (label: string, index: number) => {
         Column() {
           Text(label)
-            .fontSize(17)
+            .fontSize(18)
             .fontColor(this.activeTab === index ? ZhihuColors.primary : ZhihuColors.textSecondary)
             .fontWeight(this.activeTab === index ? FontWeight.Bold : FontWeight.Normal)
           Divider()
@@ -432,7 +432,7 @@ struct SearchPage {
       // 时间下拉 pill
       Row({ space: 4 }) {
         Text('时间：' + timeLabel(this.timeFilter))
-          .fontSize(15)
+          .fontSize(16)
           .fontColor(ZhihuColors.primary)
         Text('▾')
       }
@@ -443,7 +443,7 @@ struct SearchPage {
       .bindMenu(this.timeMenuItems())
       Blank()
       Text('重置')
-        .fontSize(15)
+        .fontSize(16)
         .fontColor(ZhihuColors.textSecondary)
         .onClick(() => {
           this.resetFilter();
@@ -471,13 +471,13 @@ struct SearchPage {
   statRow() {
     Row({ space: 8 }) {
       Text('“' + this.submitted + '”的结果')
-        .fontSize(14)
+        .fontSize(15)
         .fontColor(ZhihuColors.textTertiary)
         .maxLines(1)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
         .layoutWeight(1)
       Text('已加载 ' + this.loadedCount() + ' 条')
-        .fontSize(14)
+        .fontSize(15)
         .fontColor(ZhihuColors.textTertiary)
     }
     .width('100%')
@@ -497,7 +497,7 @@ struct SearchPage {
           Row({ space: 12 }) {
             Text('🔍')
             Text(s.query)
-              .fontSize(16)
+              .fontSize(17)
               .fontColor(ZhihuColors.text)
               .layoutWeight(1)
           }
@@ -527,7 +527,7 @@ struct SearchPage {
       Column({ space: 3 }) {
         Text(p.name)
         Text(p.headline)
-          .fontSize(14)
+          .fontSize(15)
           .fontColor(ZhihuColors.textSecondary)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -547,7 +547,7 @@ struct SearchPage {
     Column({ space: 8 }) {
       if (item.author.avatar.length === 0 || item.author.name === '匿名用户') {
         Text('匿名用户')
-          .fontSize(15)
+          .fontSize(16)
           .fontColor(ZhihuColors.textSecondary)
           .width('100%')
           .textAlign(TextAlign.Center)
@@ -560,7 +560,7 @@ struct SearchPage {
             .objectFit(ImageFit.Cover)
             .backgroundColor(ZhihuColors.backgroundTertiary)
           Text(item.author.name)
-            .fontSize(15)
+            .fontSize(16)
             .fontColor(ZhihuColors.text)
             .maxLines(1)
             .layoutWeight(1)
@@ -570,7 +570,7 @@ struct SearchPage {
 
       if (item.title.length > 0) {
         Text(item.title)
-          .fontSize(17)
+          .fontSize(18)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.text)
           .maxLines(2)
@@ -582,7 +582,7 @@ struct SearchPage {
       if (item.excerpt.length > 0) {
         Row({ space: 10 }) {
           Text(item.excerpt)
-            .fontSize(15)
+            .fontSize(16)
             .fontColor(ZhihuColors.textSecondary)
             .maxLines(3)
             .lineHeight(20)
@@ -686,7 +686,7 @@ struct SearchPage {
       } else if (!this.searching) {
         Column() {
           Text('搜索你想知道的内容')
-            .fontSize(16)
+            .fontSize(17)
             .fontColor(ZhihuColors.textTertiary)
         }
         .width('100%')

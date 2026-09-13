@@ -41,13 +41,13 @@ export struct FeedCard {
           .backgroundColor(ZhihuColors.backgroundTertiary)
         Column({ space: 2 }) {
           Text(this.item.author.name)
-            .fontSize(15)
+            .fontSize(16)
             .fontColor(ZhihuColors.text)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
           if (this.item.actionText && this.item.actionText.length > 0) {
             Text(this.item.actionText)
-              .fontSize(13)
+              .fontSize(14)
               .fontColor(ZhihuColors.textTertiary)
               .maxLines(1)
           }
@@ -57,7 +57,7 @@ export struct FeedCard {
 
         if (this.item.isLabeled) {
           Text('广告')
-            .fontSize(10)
+            .fontSize(11)
             .fontColor(ZhihuColors.textTertiary)
             .padding({ left: 6, right: 6, top: 2, bottom: 2 })
             .borderRadius(4)
@@ -70,7 +70,7 @@ export struct FeedCard {
       // 标题
       if (this.item.title.length > 0) {
         Text(this.item.title)
-          .fontSize(17)
+          .fontSize(18)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.text)
           .maxLines(2)
@@ -82,7 +82,7 @@ export struct FeedCard {
       // 摘要
       if (this.item.excerpt.length > 0) {
         Text(this.item.excerpt)
-          .fontSize(15)
+          .fontSize(16)
           .fontColor(ZhihuColors.textSecondary)
           .maxLines(3)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -105,25 +105,25 @@ export struct FeedCard {
       Row({ space: 16 }) {
         Row({ space: 4 }) {
           Text('▲')
-            .fontSize(13).fontColor(ZhihuColors.textTertiary)
+            .fontSize(14).fontColor(ZhihuColors.textTertiary)
           Text(formatCount(this.item.voteCount))
-            .fontSize(14).fontColor(ZhihuColors.textSecondary)
+            .fontSize(15).fontColor(ZhihuColors.textSecondary)
         }
         Row({ space: 4 }) {
           Text('评论')
-            .fontSize(13).fontColor(ZhihuColors.textTertiary)
+            .fontSize(14).fontColor(ZhihuColors.textTertiary)
           Text(formatCount(this.item.commentCount))
-            .fontSize(14).fontColor(ZhihuColors.textSecondary)
+            .fontSize(15).fontColor(ZhihuColors.textSecondary)
         }
         if (this.item.favlistsCount && this.item.favlistsCount > 0) {
           Text(formatCount(this.item.favlistsCount) + ' 收藏')
-            .fontSize(14)
+            .fontSize(15)
             .fontColor(ZhihuColors.textSecondary)
         }
         Blank()
         if (this.item.answerType === 'PAID') {
           Text('盐选')
-            .fontSize(10)
+            .fontSize(11)
             .fontColor(ZhihuColors.textInverse)
             .backgroundColor(ZhihuColors.primary)
             .borderRadius(4)

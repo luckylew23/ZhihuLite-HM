@@ -191,13 +191,13 @@ export struct HistoryPage {
     Row({ space: 10 }) {
       if (this.selecting) {
         Text(this.isSelected(this.makeKey(item)) ? '●' : '○')
-          .fontSize(17)
+          .fontSize(18)
           .fontColor(this.isSelected(this.makeKey(item))
             ? ZhihuColors.primary : ZhihuColors.textTertiary)
       }
       Column({ space: 6 }) {
         Text(item.data.header.title)
-          .fontSize(16)
+          .fontSize(17)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.text)
           .maxLines(2)
@@ -205,7 +205,7 @@ export struct HistoryPage {
           .width('100%')
         if (item.data.content.summary.length > 0) {
           Text(item.data.content.summary)
-            .fontSize(14)
+            .fontSize(15)
             .fontColor(ZhihuColors.textSecondary)
             .maxLines(2)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -214,12 +214,12 @@ export struct HistoryPage {
         Row() {
           Text(item.data.matrix.length > 0 && item.data.matrix[0].data
             ? item.data.matrix[0].data.text : '')
-            .fontSize(13)
+            .fontSize(14)
             .fontColor(ZhihuColors.textTertiary)
             .layoutWeight(1)
           Text(item.data.extra.read_time > 0
             ? formatDate(item.data.extra.read_time) : '')
-            .fontSize(13)
+            .fontSize(14)
             .fontColor(ZhihuColors.textTertiary)
         }
         .width('100%')
@@ -255,7 +255,7 @@ export struct HistoryPage {
         .justifyContent(FlexAlign.Center).width('100%').padding(12)
       } else if (this.isEnd && this.items.length > 0) {
         Text('— 没有更多了 —')
-          .fontSize(14).fontColor(ZhihuColors.textTertiary)
+          .fontSize(15).fontColor(ZhihuColors.textTertiary)
           .width('100%').textAlign(TextAlign.Center).padding(12)
       }
     }
@@ -292,7 +292,7 @@ export struct HistoryPage {
         Column({ space: 16 }) {
           Text(this.error)
           Button('重试')
-            .fontSize(15).backgroundColor(ZhihuColors.primary)
+            .fontSize(16).backgroundColor(ZhihuColors.primary)
             .onClick(() => {
               this.loadFirst();
             })
@@ -327,7 +327,7 @@ export struct HistoryPage {
           Button('删除选中 (' + String(this.selectedKeys.length) + ')')
             .width('90%')
             .height(44)
-            .fontSize(16)
+            .fontSize(17)
             .fontColor(ZhihuColors.textInverse)
             .backgroundColor(ZhihuColors.danger)
             .margin({ bottom: 16 })

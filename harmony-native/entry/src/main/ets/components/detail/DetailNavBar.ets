@@ -19,7 +19,7 @@ export struct DetailNavBar {
           router.back();
         })
       Text(this.title)
-        .fontSize(18)
+        .fontSize(19)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.text)
         .maxLines(1)

@@ -122,7 +122,7 @@ struct PublishPinPage {
         })
       Blank()
       Text('发想法')
-        .fontSize(18)
+        .fontSize(19)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.text)
       Blank()
@@ -131,7 +131,7 @@ struct PublishPinPage {
           LoadingProgress().width(20).height(20).color(ZhihuColors.primary)
         } else {
           Text('发布')
-            .fontSize(16)
+            .fontSize(17)
             .fontWeight(FontWeight.Medium)
             .fontColor(ZhihuColors.textInverse)
             .height(36)
@@ -157,12 +157,12 @@ struct PublishPinPage {
     Column({ space: 16 }) {
       Blank()
       Text('发布想法前请先登录知乎账号')
-        .fontSize(15)
+        .fontSize(16)
         .fontColor(ZhihuColors.textSecondary)
       Button('去登录')
         .width(200)
         .height(42)
-        .fontSize(16)
+        .fontSize(17)
         .backgroundColor(ZhihuColors.primary)
         .onClick(() => {
           router.pushUrl({ url: 'pages/LoginPage' });
@@ -210,7 +210,7 @@ struct PublishPinPage {
     Row({ space: 8 }) {
       Text('🖼')
       Text('添加图片 (' + this.images.length + '/' + MAX_IMAGES + ')')
-        .fontSize(16)
+        .fontSize(17)
         .fontColor(ZhihuColors.primary)
     }
     .width('100%')
@@ -231,7 +231,7 @@ struct PublishPinPage {
         TextInput({ text: $$this.title, placeholder: '标题（可选）' })
           .width('100%')
           .height(50)
-          .fontSize(18)
+          .fontSize(19)
           .fontWeight(FontWeight.Medium)
           .placeholderColor(ZhihuColors.textTertiary)
           .backgroundColor(Color.Transparent)
@@ -242,7 +242,7 @@ struct PublishPinPage {
         TextArea({ text: $$this.content, placeholder: '这一刻的想法…' })
           .width('100%')
           .height(220)
-          .fontSize(17)
+          .fontSize(18)
           .placeholderColor(ZhihuColors.textTertiary)
           .backgroundColor(Color.Transparent)
 
@@ -252,7 +252,7 @@ struct PublishPinPage {
 
         if (this.error.length > 0) {
           Text(this.error)
-            .fontSize(14)
+            .fontSize(15)
             .fontColor(ZhihuColors.danger)
             .width('100%')
         }

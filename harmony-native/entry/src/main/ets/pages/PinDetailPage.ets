@@ -71,10 +71,10 @@ struct PinDetailPage {
                 .backgroundColor(ZhihuColors.backgroundTertiary)
               Column({ space: 2 }) {
                 Text(this.pin.author.name)
-                  .fontSize(16).fontWeight(FontWeight.Medium).fontColor(ZhihuColors.text)
+                  .fontSize(17).fontWeight(FontWeight.Medium).fontColor(ZhihuColors.text)
                 if (this.pin.created && this.pin.created > 0) {
                   Text(formatDateTime(this.pin.created))
-                    .fontSize(13).fontColor(ZhihuColors.textTertiary)
+                    .fontSize(14).fontColor(ZhihuColors.textTertiary)
                 }
               }
               .alignItems(HorizontalAlign.Start)
@@ -86,7 +86,7 @@ struct PinDetailPage {
             if (this.bodyText.length > 0) {
               Text(this.bodyText)
           .copyOption(CopyOptions.LocalDevice)
-                .fontSize(17)
+                .fontSize(18)
                 .fontColor(ZhihuColors.text)
                 .lineHeight(26)
                 .width('100%')

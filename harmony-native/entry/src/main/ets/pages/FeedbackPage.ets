@@ -54,7 +54,7 @@ struct FeedbackPage {
         })
       Blank()
       Text('反馈与建议')
-        .fontSize(18)
+        .fontSize(19)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.text)
       Blank()
@@ -72,7 +72,7 @@ struct FeedbackPage {
       Scroll() {
         Column({ space: 14 }) {
           Text('遇到问题或有功能建议？填写下面的表单告诉我们。')
-            .fontSize(15)
+            .fontSize(16)
             .fontColor(ZhihuColors.textSecondary)
             .width('100%')
 
@@ -80,27 +80,27 @@ struct FeedbackPage {
             TextInput({ text: $$this.contact, placeholder: '联系方式（邮箱 / 手机号，可选）' })
               .width('100%')
               .height(48)
-              .fontSize(15)
+              .fontSize(16)
               .placeholderColor(ZhihuColors.textTertiary)
               .backgroundColor(ZhihuColors.backgroundSecondary)
 
             TextArea({ text: $$this.content, placeholder: '请描述你遇到的问题或建议…' })
               .width('100%')
               .height(200)
-              .fontSize(15)
+              .fontSize(16)
               .placeholderColor(ZhihuColors.textTertiary)
               .backgroundColor(ZhihuColors.backgroundSecondary)
 
             if (this.error.length > 0) {
               Text(this.error)
-                .fontSize(14)
+                .fontSize(15)
                 .fontColor(ZhihuColors.danger)
                 .width('100%')
             }
 
             if (this.submitted) {
               Text('已收到你的反馈（仅本地记录，未接入真实反馈通道）。')
-                .fontSize(14)
+                .fontSize(15)
                 .fontColor(ZhihuColors.success)
                 .width('100%')
             }
@@ -116,7 +116,7 @@ struct FeedbackPage {
               Button('提交反馈')
                 .width('100%')
                 .height(44)
-                .fontSize(16)
+                .fontSize(17)
                 .backgroundColor(ZhihuColors.primary)
                 .onClick(() => {
                   this.submit();
@@ -129,7 +129,7 @@ struct FeedbackPage {
           .borderRadius(12)
 
           Text('说明：当前版本未接入知乎反馈接口，提交不会发送到服务端。')
-            .fontSize(13)
+            .fontSize(14)
             .fontColor(ZhihuColors.textTertiary)
             .width('100%')
         }

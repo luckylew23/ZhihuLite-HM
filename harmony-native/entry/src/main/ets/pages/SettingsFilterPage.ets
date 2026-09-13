@@ -41,7 +41,7 @@ struct SettingsFilterPage {
           router.back();
         })
       Text('过滤与推荐')
-        .fontSize(18)
+        .fontSize(19)
         .fontWeight(FontWeight.Bold)
         .fontColor(ZhihuColors.text)
       Blank()
@@ -56,7 +56,7 @@ struct SettingsFilterPage {
   @Builder
   sectionLabel(title: string) {
     Text(title)
-      .fontSize(14)
+      .fontSize(15)
       .fontColor(ZhihuColors.textSecondary)
       .width('100%')
       .padding({ left: 16, top: 20, bottom: 8 })
@@ -65,7 +65,7 @@ struct SettingsFilterPage {
   @Builder
   iconBadge(glyph: string) {
     Text(glyph)
-      .fontSize(17)
+      .fontSize(18)
       .fontColor(ZhihuColors.primary)
       .width(36)
       .height(36)
@@ -81,11 +81,11 @@ struct SettingsFilterPage {
       this.iconBadge(glyph)
       Column({ space: 2 }) {
         Text(label)
-          .fontSize(16)
+          .fontSize(17)
           .fontColor(ZhihuColors.text)
         if (desc !== null) {
           Text(desc)
-            .fontSize(13)
+            .fontSize(14)
             .fontColor(ZhihuColors.textTertiary)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -108,11 +108,11 @@ struct SettingsFilterPage {
     Row({ space: 12 }) {
       this.iconBadge('删')
       Text('清除本地去重记录')
-        .fontSize(16)
+        .fontSize(17)
         .fontColor(ZhihuColors.text)
         .layoutWeight(1)
       Text('清除')
-        .fontSize(16)
+        .fontSize(17)
         .fontColor(ZhihuColors.danger)
         .onClick(() => {
           settingsStore.clearDedupRecords();
@@ -131,12 +131,12 @@ struct SettingsFilterPage {
           // 介绍卡
           Column({ space: 8 }) {
             Text('推荐流设置分为两类')
-              .fontSize(17)
+              .fontSize(18)
               .fontWeight(FontWeight.Bold)
               .fontColor(ZhihuColors.text)
               .width('100%')
             Text('服务端请求参数会影响知乎返回的推荐内容；本地后处理只在应用收到内容后执行，包含内容过滤、去重与启动缓存。')
-              .fontSize(14)
+              .fontSize(15)
               .fontColor(ZhihuColors.textSecondary)
               .width('100%')
           }

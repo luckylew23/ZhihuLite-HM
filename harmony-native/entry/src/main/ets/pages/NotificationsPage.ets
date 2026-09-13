@@ -222,7 +222,7 @@ struct NotificationsPage {
         })
       Blank()
       Text('消息通知')
-        .fontSize(18)
+        .fontSize(19)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.text)
       Blank()
@@ -230,7 +230,7 @@ struct NotificationsPage {
         LoadingProgress().width(18).height(18).color(ZhihuColors.primary)
       } else {
         Text('全部已读')
-          .fontSize(15)
+          .fontSize(16)
           .fontColor(ZhihuColors.primary)
           .onClick(() => {
             this.markAllRead();
@@ -248,7 +248,7 @@ struct NotificationsPage {
     Row({ space: 8 }) {
       ForEach(TABS, (tab: NotifyTab) => {
         Text(tab.label)
-          .fontSize(14)
+          .fontSize(15)
           .fontWeight(this.tabValue === tab.value ? FontWeight.Bold : FontWeight.Normal)
           .fontColor(this.tabValue === tab.value ? ZhihuColors.primary : ZhihuColors.textSecondary)
           .padding({ left: 14, right: 14, top: 7, bottom: 7 })
@@ -278,7 +278,7 @@ struct NotificationsPage {
         .padding(12)
       } else if (this.isEnd && this.items.length > 0) {
         Text('— 没有更多了 —')
-          .fontSize(13)
+          .fontSize(14)
           .fontColor(ZhihuColors.textTertiary)
           .width('100%')
           .textAlign(TextAlign.Center)
@@ -301,17 +301,17 @@ struct NotificationsPage {
             Column({ space: 4 }) {
               Row() {
                 Text(item.content?.verb ?? '系统通知')
-                  .fontSize(14)
+                  .fontSize(15)
                   .fontWeight(FontWeight.Bold)
                   .fontColor(this.iconColor(item))
                 Blank()
                 Text(formatRelativeTime(item.create_time ?? 0))
-                  .fontSize(12)
+                  .fontSize(13)
                   .fontColor(ZhihuColors.textTertiary)
               }
               .width('100%')
               Text(this.bodyText(item))
-                .fontSize(14)
+                .fontSize(15)
                 .fontColor(ZhihuColors.text)
                 .maxLines(3)
                 .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -347,12 +347,12 @@ struct NotificationsPage {
     Column({ space: 16 }) {
       Blank()
       Text('查看消息通知前请先登录知乎账号')
-        .fontSize(15)
+        .fontSize(16)
         .fontColor(ZhihuColors.textSecondary)
       Button('去登录')
         .width(200)
         .height(42)
-        .fontSize(16)
+        .fontSize(17)
         .backgroundColor(ZhihuColors.primary)
         .onClick(() => {
           router.pushUrl({ url: 'pages/LoginPage' });
@@ -383,7 +383,7 @@ struct NotificationsPage {
           Column({ space: 16 }) {
             Text(this.error)
             Button('重试')
-              .fontSize(15)
+              .fontSize(16)
               .backgroundColor(ZhihuColors.primary)
               .onClick(() => {
                 this.loadFirst();

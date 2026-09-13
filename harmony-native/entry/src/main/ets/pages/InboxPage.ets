@@ -87,7 +87,7 @@ struct InboxPage {
         })
       Blank()
       Text('我的私信')
-        .fontSize(18)
+        .fontSize(19)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.text)
       Blank()
@@ -112,7 +112,7 @@ struct InboxPage {
         .padding(12)
       } else if (this.isEnd && this.threads.length > 0) {
         Text('— 没有更多了 —')
-          .fontSize(13)
+          .fontSize(14)
           .fontColor(ZhihuColors.textTertiary)
           .width('100%')
           .textAlign(TextAlign.Center)
@@ -136,7 +136,7 @@ struct InboxPage {
                 .backgroundColor(ZhihuColors.backgroundTertiary)
               if (thread.unread_count > 0) {
                 Text(thread.unread_count > 99 ? '99+' : String(thread.unread_count))
-                  .fontSize(10)
+                  .fontSize(11)
                   .fontColor(ZhihuColors.textInverse)
                   .backgroundColor(ZhihuColors.danger)
                   .borderRadius(9)
@@ -147,19 +147,19 @@ struct InboxPage {
             Column({ space: 4 }) {
               Row() {
                 Text(thread.participant.name)
-                  .fontSize(17)
+                  .fontSize(18)
                   .fontWeight(FontWeight.Bold)
                   .fontColor(ZhihuColors.text)
                   .maxLines(1)
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
                 Blank()
                 Text(formatRelativeTime(thread.updated_time))
-                  .fontSize(12)
+                  .fontSize(13)
                   .fontColor(ZhihuColors.textTertiary)
               }
               .width('100%')
               Text(thread.snippet)
-                .fontSize(14)
+                .fontSize(15)
                 .fontColor(ZhihuColors.textSecondary)
                 .maxLines(2)
                 .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -195,12 +195,12 @@ struct InboxPage {
     Column({ space: 16 }) {
       Blank()
       Text('查看私信前请先登录知乎账号')
-        .fontSize(15)
+        .fontSize(16)
         .fontColor(ZhihuColors.textSecondary)
       Button('去登录')
         .width(200)
         .height(42)
-        .fontSize(16)
+        .fontSize(17)
         .backgroundColor(ZhihuColors.primary)
         .onClick(() => {
           router.pushUrl({ url: 'pages/LoginPage' });
@@ -229,7 +229,7 @@ struct InboxPage {
         Column({ space: 16 }) {
           Text(this.error)
           Button('重试')
-            .fontSize(15)
+            .fontSize(16)
             .backgroundColor(ZhihuColors.primary)
             .onClick(() => {
               this.loadFirst();

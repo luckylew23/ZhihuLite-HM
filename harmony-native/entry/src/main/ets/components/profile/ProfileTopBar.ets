@@ -22,13 +22,13 @@ export struct ProfileTopBar {
           router.back();
         })
       Text(this.title)
-        .fontSize(18)
+        .fontSize(19)
         .fontWeight(FontWeight.Bold)
         .fontColor(ZhihuColors.text)
         .layoutWeight(1)
       if (this.rightText.length > 0) {
         Text(this.rightText)
-          .fontSize(16)
+          .fontSize(17)
           .fontColor(ZhihuColors.primary)
           .padding({ left: 8, right: 8, top: 4, bottom: 4 })
           .onClick(() => {

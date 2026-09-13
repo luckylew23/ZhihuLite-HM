@@ -243,7 +243,7 @@ struct FollowManagePage {
           router.back();
         })
       Text('关注')
-        .fontSize(18)
+        .fontSize(19)
         .fontWeight(FontWeight.Bold)
         .fontColor(ZhihuColors.text)
       Blank()
@@ -261,7 +261,7 @@ struct FollowManagePage {
       ForEach(TABS, (tab: FollowTab, index: number) => {
         Column({ space: 6 }) {
           Text(tab.label)
-            .fontSize(16)
+            .fontSize(17)
             .fontWeight(this.currentTab === index ? FontWeight.Bold : FontWeight.Normal)
             .fontColor(this.currentTab === index ? ZhihuColors.primary : ZhihuColors.textSecondary)
           Divider()
@@ -292,7 +292,7 @@ struct FollowManagePage {
           .backgroundColor(ZhihuColors.backgroundTertiary)
       } else {
         Text(item.name.substring(0, 1))
-          .fontSize(18)
+          .fontSize(19)
           .fontColor(ZhihuColors.primary)
           .width(52)
           .height(52)
@@ -302,26 +302,26 @@ struct FollowManagePage {
       }
       Column({ space: 4 }) {
         Text(item.name)
-          .fontSize(17)
+          .fontSize(18)
           .fontWeight(FontWeight.Bold)
           .fontColor(ZhihuColors.text)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
         if (item.intro.length > 0) {
           Text(item.intro)
-            .fontSize(14)
+            .fontSize(15)
             .fontColor(ZhihuColors.textSecondary)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
         }
         Text(item.meta)
-          .fontSize(13)
+          .fontSize(14)
           .fontColor(ZhihuColors.textTertiary)
       }
       .alignItems(HorizontalAlign.Start)
       .layoutWeight(1)
       Text('已关注')
-        .fontSize(14)
+        .fontSize(15)
         .fontColor(ZhihuColors.textSecondary)
         .padding({ left: 14, right: 14, top: 7, bottom: 7 })
         .backgroundColor(ZhihuColors.backgroundTertiary)
@@ -351,7 +351,7 @@ struct FollowManagePage {
       if (this.loading) {
         Column() {
           Text('加载中…')
-            .fontSize(15)
+            .fontSize(16)
             .fontColor(ZhihuColors.textTertiary)
         }
         .width('100%')
@@ -360,7 +360,7 @@ struct FollowManagePage {
       } else if (this.items.length === 0) {
         Column() {
           Text('暂无数据')
-            .fontSize(15)
+            .fontSize(16)
             .fontColor(ZhihuColors.textTertiary)
         }
         .width('100%')

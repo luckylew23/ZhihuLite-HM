@@ -70,7 +70,7 @@ struct PublishQuestionPage {
         })
       Blank()
       Text('提问题')
-        .fontSize(18)
+        .fontSize(19)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.text)
       Blank()
@@ -78,7 +78,7 @@ struct PublishQuestionPage {
         LoadingProgress().width(20).height(20).color(ZhihuColors.primary)
       } else {
         Text('发布')
-          .fontSize(16)
+          .fontSize(17)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.primary)
           .onClick(() => {
@@ -97,12 +97,12 @@ struct PublishQuestionPage {
     Column({ space: 16 }) {
       Blank()
       Text('发布内容前请先登录知乎账号')
-        .fontSize(15)
+        .fontSize(16)
         .fontColor(ZhihuColors.textSecondary)
       Button('去登录')
         .width(200)
         .height(42)
-        .fontSize(16)
+        .fontSize(17)
         .backgroundColor(ZhihuColors.primary)
         .onClick(() => {
           router.pushUrl({ url: 'pages/LoginPage' });
@@ -121,7 +121,7 @@ struct PublishQuestionPage {
         TextInput({ text: $$this.title, placeholder: '输入问题并以问号结尾' })
           .width('100%')
           .height(56)
-          .fontSize(19)
+          .fontSize(20)
           .fontWeight(FontWeight.Bold)
           .placeholderColor(ZhihuColors.textTertiary)
           .backgroundColor(ZhihuColors.backgroundSecondary)
@@ -132,13 +132,13 @@ struct PublishQuestionPage {
         TextArea({ text: $$this.content, placeholder: '补充问题背景和细节（可选）' })
           .width('100%')
           .height(320)
-          .fontSize(16)
+          .fontSize(17)
           .placeholderColor(ZhihuColors.textTertiary)
           .backgroundColor(ZhihuColors.backgroundSecondary)
 
         if (this.error.length > 0) {
           Text(this.error)
-            .fontSize(14)
+            .fontSize(15)
             .fontColor(ZhihuColors.danger)
             .width('100%')
         }

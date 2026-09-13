@@ -30,7 +30,7 @@ export struct HotCard {
     Row({ space: 12 }) {
       // 排名
       Text(String(this.item.rank))
-        .fontSize(18)
+        .fontSize(19)
         .fontWeight(FontWeight.Bold)
         .fontColor(rankColor(this.item.rank))
         .width(32)
@@ -41,14 +41,14 @@ export struct HotCard {
         Row({ space: 6 }) {
           if (this.item.labelArea && this.item.labelArea.text) {
             Text(this.item.labelArea.text)
-              .fontSize(10)
+              .fontSize(11)
               .fontColor(this.item.labelArea.normal_color ?? ZhihuColors.hotLabel)
               .border({ width: 0.5, color: this.item.labelArea.normal_color ?? ZhihuColors.hotLabel })
               .borderRadius(3)
               .padding({ left: 4, right: 4, top: 1, bottom: 1 })
           }
           Text(this.item.title)
-            .fontSize(16)
+            .fontSize(17)
             .fontWeight(FontWeight.Medium)
             .fontColor(ZhihuColors.text)
             .maxLines(2)
@@ -61,7 +61,7 @@ export struct HotCard {
 
         if (this.item.excerpt.length > 0) {
           Text(this.item.excerpt)
-            .fontSize(14)
+            .fontSize(15)
             .fontColor(ZhihuColors.textSecondary)
             .maxLines(2)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -72,11 +72,11 @@ export struct HotCard {
         Row({ space: 8 }) {
           if (this.item.hotValue.length > 0) {
             Text(this.item.hotValue)
-              .fontSize(13).fontColor(ZhihuColors.textTertiary)
+              .fontSize(14).fontColor(ZhihuColors.textTertiary)
           }
           if (this.item.answerCount > 0) {
             Text(String(this.item.answerCount) + ' 回答')
-              .fontSize(13)
+              .fontSize(14)
               .fontColor(ZhihuColors.textTertiary)
           }
         }

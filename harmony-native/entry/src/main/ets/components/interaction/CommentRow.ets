@@ -76,12 +76,12 @@ export struct CommentRow {
 
       Column({ space: 4 }) {
         Text(this.memberName())
-          .fontSize(14)
+          .fontSize(15)
           .fontColor(ZhihuColors.textSecondary)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(stripHtml(this.item.content))
-          .fontSize(16)
+          .fontSize(17)
           .fontColor(ZhihuColors.text)
           .width('100%')
           .textAlign(TextAlign.Start)
@@ -90,7 +90,7 @@ export struct CommentRow {
         Row({ space: 16 }) {
           if (this.metaText().length > 0) {
             Text(this.metaText())
-              .fontSize(13)
+              .fontSize(14)
               .fontColor(ZhihuColors.textTertiary)
               .layoutWeight(1)
           } else {
@@ -99,10 +99,10 @@ export struct CommentRow {
 
           Row({ space: 3 }) {
             Text(this.liked() ? '♥' : '♡')
-              .fontSize(14)
+              .fontSize(15)
               .fontColor(this.liked() ? ZhihuColors.primary : ZhihuColors.textTertiary)
             Text(String(this.likeCount()))
-              .fontSize(13)
+              .fontSize(14)
               .fontColor(ZhihuColors.textTertiary)
           }
           .onClick(() => {
@@ -111,7 +111,7 @@ export struct CommentRow {
 
           if (!this.isChild) {
             Text('回复')
-              .fontSize(13)
+              .fontSize(14)
               .fontColor(ZhihuColors.textTertiary)
               .onClick(() => {
                 this.onReply(this.item);
@@ -122,7 +122,7 @@ export struct CommentRow {
 
         if (!this.isChild && this.item.child_comment_count > 0) {
           Text(this.childExpanded ? '收起回复' : '查看全部 ' + this.item.child_comment_count + ' 条回复')
-            .fontSize(13)
+            .fontSize(14)
             .fontColor(ZhihuColors.primary)
             .padding({ top: 6 })
             .onClick(() => {

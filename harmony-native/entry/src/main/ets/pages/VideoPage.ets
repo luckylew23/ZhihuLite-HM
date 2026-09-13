@@ -37,7 +37,7 @@ struct VideoPage {
             .fontSize(44)
             .fontColor(ZhihuColors.textTertiary)
           Text('视频暂不支持内嵌播放')
-            .fontSize(14)
+            .fontSize(15)
             .fontColor(ZhihuColors.textTertiary)
         }
         .width('100%')
@@ -48,7 +48,7 @@ struct VideoPage {
 
         if (this.title.length > 0) {
           Text(this.title)
-            .fontSize(19)
+            .fontSize(20)
             .fontWeight(FontWeight.Bold)
             .fontColor(ZhihuColors.text)
             .width('100%')
@@ -56,13 +56,13 @@ struct VideoPage {
         }
         if (this.author.length > 0) {
           Text('作者：' + this.author)
-            .fontSize(14)
+            .fontSize(15)
             .fontColor(ZhihuColors.textSecondary)
             .width('100%')
         }
         if (this.desc.length > 0) {
           Text(this.desc)
-            .fontSize(15)
+            .fontSize(16)
             .fontColor(ZhihuColors.textSecondary)
             .lineHeight(21)
             .width('100%')
@@ -70,7 +70,7 @@ struct VideoPage {
         }
         if (this.videoId.length > 0) {
           Text('视频 ID：' + this.videoId)
-            .fontSize(13)
+            .fontSize(14)
             .fontColor(ZhihuColors.textTertiary)
             .width('100%')
         }

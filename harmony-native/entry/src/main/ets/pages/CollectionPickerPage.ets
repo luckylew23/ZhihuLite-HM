@@ -187,7 +187,7 @@ struct CollectionPickerPage {
             })
         }
         Text(this.creating ? '新建收藏夹' : '收藏至收藏夹')
-          .fontSize(17)
+          .fontSize(18)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.text)
         Blank()
@@ -281,7 +281,7 @@ struct CollectionPickerPage {
           .height(50)
           .backgroundColor(ZhihuColors.primary)
           .fontColor(ZhihuColors.textInverse)
-          .fontSize(17)
+          .fontSize(18)
           .margin({ bottom: 16, top: 8 })
           .onClick(() => {
             router.back();
@@ -290,7 +290,7 @@ struct CollectionPickerPage {
 
       if (this.toast.length > 0) {
         Text(this.toast)
-          .fontSize(13)
+          .fontSize(14)
           .fontColor(ZhihuColors.textInverse)
           .backgroundColor('#b3000000')
           .borderRadius(6)

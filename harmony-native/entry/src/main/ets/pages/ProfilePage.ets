@@ -88,7 +88,7 @@ export struct ProfilePage {
   @Builder
   iconBadge(glyph: string) {
     Text(glyph)
-      .fontSize(16)
+      .fontSize(17)
       .fontColor(ZhihuColors.primary)
       .width(36)
       .height(36)
@@ -101,11 +101,11 @@ export struct ProfilePage {
   statItem(label: string, value: number, clickable: boolean, route?: string) {
     Column({ space: 4 }) {
       Text(String(value))
-        .fontSize(19)
+        .fontSize(20)
         .fontWeight(FontWeight.Bold)
         .fontColor(ZhihuColors.text)
       Text(label)
-        .fontSize(13)
+        .fontSize(14)
         .fontColor(ZhihuColors.textSecondary)
     }
     .layoutWeight(1)
@@ -131,12 +131,12 @@ export struct ProfilePage {
     Row({ space: 14 }) {
       this.iconBadge(item.glyph)
       Text(item.label)
-        .fontSize(17)
+        .fontSize(18)
         .fontColor(ZhihuColors.text)
         .layoutWeight(1)
       if (item.badge.length > 0) {
         Text(item.badge)
-          .fontSize(14)
+          .fontSize(15)
           .fontColor(ZhihuColors.textTertiary)
       }
       Text('›')
@@ -158,7 +158,7 @@ export struct ProfilePage {
     Row({ space: 14 }) {
       this.iconBadge('昼')
       Text('主题模式')
-        .fontSize(17)
+        .fontSize(18)
         .fontColor(ZhihuColors.text)
         .layoutWeight(1)
         .onClick(() => {
@@ -178,7 +178,7 @@ export struct ProfilePage {
   @Builder
   themePill(label: string, value: ThemeMode) {
     Text(label)
-      .fontSize(13)
+      .fontSize(14)
       .fontColor(this.themeMode === value ? ZhihuColors.textInverse : ZhihuColors.text)
       .fontWeight(this.themeMode === value ? FontWeight.Bold : FontWeight.Normal)
       .padding({ left: 12, right: 12, top: 6, bottom: 6 })
@@ -194,12 +194,12 @@ export struct ProfilePage {
     Column({ space: 16 }) {
       Blank()
       Text('登录后同步你的关注、收藏与创作')
-        .fontSize(15)
+        .fontSize(16)
         .fontColor(ZhihuColors.textSecondary)
       Button('登录知乎')
         .width(220)
         .height(44)
-        .fontSize(17)
+        .fontSize(18)
         .backgroundColor(ZhihuColors.primary)
         .onClick(() => {
           router.pushUrl({ url: 'pages/LoginPage' });
@@ -230,7 +230,7 @@ export struct ProfilePage {
               .fontWeight(FontWeight.Bold)
               .fontColor(ZhihuColors.text)
             Text('点击查看个人主页')
-              .fontSize(14)
+              .fontSize(15)
               .fontColor(ZhihuColors.textSecondary)
           }
           .alignItems(HorizontalAlign.Start)
@@ -282,11 +282,11 @@ export struct ProfilePage {
           Row({ space: 14 }) {
             this.iconBadge('号')
             Text('切换账号')
-              .fontSize(17)
+              .fontSize(18)
               .fontColor(ZhihuColors.text)
               .layoutWeight(1)
             Text('1 个账号')
-              .fontSize(14)
+              .fontSize(15)
               .fontColor(ZhihuColors.textTertiary)
             Text('›')
               .fontSize(20)
@@ -307,7 +307,7 @@ export struct ProfilePage {
 
         // 退出账号
         Text('退出账号')
-          .fontSize(17)
+          .fontSize(18)
           .fontColor(ZhihuColors.danger)
           .width('100%')
           .height(52)

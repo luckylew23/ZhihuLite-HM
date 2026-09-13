@@ -120,7 +120,7 @@ export struct CollectionsListPage {
       .backgroundColor('rgba(0,132,255,0.06)')
       Column({ space: 3 }) {
         Text(item.title)
-          .fontSize(16)
+          .fontSize(17)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.text)
           .maxLines(1)
@@ -128,14 +128,14 @@ export struct CollectionsListPage {
           .width('100%')
         if (item.description && item.description.length > 0) {
           Text(item.description)
-            .fontSize(14)
+            .fontSize(15)
             .fontColor(ZhihuColors.textSecondary)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
             .width('100%')
         }
         Text((item.answer_count ?? 0) + ' 内容 · ' + (item.follower_count ?? 0) + ' 关注')
-          .fontSize(13)
+          .fontSize(14)
           .fontColor(ZhihuColors.textTertiary)
       }
       .alignItems(HorizontalAlign.Start)
@@ -166,7 +166,7 @@ export struct CollectionsListPage {
         .justifyContent(FlexAlign.Center).width('100%').padding(12)
       } else if (this.isEnd && this.items.length > 0) {
         Text('— 没有更多了 —')
-          .fontSize(14).fontColor(ZhihuColors.textTertiary)
+          .fontSize(15).fontColor(ZhihuColors.textTertiary)
           .width('100%').textAlign(TextAlign.Center).padding(12)
       }
     }
@@ -197,7 +197,7 @@ export struct CollectionsListPage {
         Column({ space: 16 }) {
           Text(this.error)
           Button('重试')
-            .fontSize(15).backgroundColor(ZhihuColors.primary)
+            .fontSize(16).backgroundColor(ZhihuColors.primary)
             .onClick(() => {
               this.loggedIn = authStore.isLoggedIn;
               if (this.loggedIn) {

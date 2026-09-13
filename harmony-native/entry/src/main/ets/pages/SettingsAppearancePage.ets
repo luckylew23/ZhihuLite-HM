@@ -74,7 +74,7 @@ struct SettingsAppearancePage {
           router.back();
         })
       Text('外观与定制')
-        .fontSize(18)
+        .fontSize(19)
         .fontWeight(FontWeight.Bold)
         .fontColor(ZhihuColors.text)
       Blank()
@@ -90,12 +90,12 @@ struct SettingsAppearancePage {
   themeRow(option: ThemeOption, index: number, total: number) {
     Row() {
       Text(option.label)
-        .fontSize(17)
+        .fontSize(18)
         .fontColor(ZhihuColors.text)
         .layoutWeight(1)
       if (this.mode === option.value) {
         Text('✓')
-          .fontSize(18)
+          .fontSize(19)
           .fontWeight(FontWeight.Bold)
           .fontColor(ZhihuColors.primary)
       }
@@ -118,7 +118,7 @@ struct SettingsAppearancePage {
       Scroll() {
         Column({ space: 0 }) {
           Text('主题模式')
-            .fontSize(14)
+            .fontSize(15)
             .fontColor(ZhihuColors.textSecondary)
             .width('100%')
             .padding({ left: 4, top: 4, bottom: 8 })
@@ -133,13 +133,13 @@ struct SettingsAppearancePage {
           .borderRadius(12)
 
           Text('选择后立即生效；“系统”跟随系统深浅色模式。')
-            .fontSize(13)
+            .fontSize(14)
             .fontColor(ZhihuColors.textTertiary)
             .width('100%')
             .padding({ left: 4, top: 16, bottom: 4 })
 
           Text('栏目展示')
-            .fontSize(14)
+            .fontSize(15)
             .fontColor(ZhihuColors.textSecondary)
             .width('100%')
             .padding({ left: 4, top: 12, bottom: 8 })
@@ -148,7 +148,7 @@ struct SettingsAppearancePage {
             ForEach(TAB_OPTIONS, (opt: TabOption, index: number) => {
               Row({ space: 12 }) {
                 Text(opt.label)
-                  .fontSize(17)
+                  .fontSize(18)
                   .fontColor(ZhihuColors.text)
                   .layoutWeight(1)
                 Toggle({ type: ToggleType.Switch, isOn: this.isTabOn(opt.key) })
@@ -171,7 +171,7 @@ struct SettingsAppearancePage {
           .borderRadius(12)
 
           Text('控制首页底栏可见栏目；个人中心与发布固定显示。')
-            .fontSize(13)
+            .fontSize(14)
             .fontColor(ZhihuColors.textTertiary)
             .width('100%')
             .padding({ left: 4, top: 12 })

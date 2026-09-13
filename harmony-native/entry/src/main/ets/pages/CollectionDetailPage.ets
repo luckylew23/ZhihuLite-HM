@@ -106,13 +106,13 @@ export struct CollectionDetailPage {
   headerBlock() {
     Column({ space: 6 }) {
       Text(this.title)
-        .fontSize(18)
+        .fontSize(19)
         .fontWeight(FontWeight.Bold)
         .fontColor(ZhihuColors.text)
         .width('100%')
       if (this.description.length > 0) {
         Text(this.description)
-          .fontSize(14)
+          .fontSize(15)
           .fontColor(ZhihuColors.textSecondary)
           .width('100%')
       }
@@ -148,7 +148,7 @@ export struct CollectionDetailPage {
         Column({ space: 16 }) {
           Text(this.error)
           Button('重试')
-            .fontSize(15).backgroundColor(ZhihuColors.primary)
+            .fontSize(16).backgroundColor(ZhihuColors.primary)
             .onClick(() => {
               this.loadAll();
             })

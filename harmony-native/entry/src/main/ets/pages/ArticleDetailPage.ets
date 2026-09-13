@@ -76,9 +76,9 @@ struct ArticleDetailPage {
                 .backgroundColor(ZhihuColors.backgroundTertiary)
               Column({ space: 2 }) {
                 Text(this.article.author.name)
-                  .fontSize(15).fontWeight(FontWeight.Medium).fontColor(ZhihuColors.text)
+                  .fontSize(16).fontWeight(FontWeight.Medium).fontColor(ZhihuColors.text)
                 Text(formatDate(this.article.created))
-                  .fontSize(13).fontColor(ZhihuColors.textTertiary)
+                  .fontSize(14).fontColor(ZhihuColors.textTertiary)
               }
               .alignItems(HorizontalAlign.Start)
               .layoutWeight(1)
@@ -88,7 +88,7 @@ struct ArticleDetailPage {
 
             Text(this.bodyText)
           .copyOption(CopyOptions.LocalDevice)
-              .fontSize(17)
+              .fontSize(18)
               .fontColor(ZhihuColors.text)
               .lineHeight(26)
               .width('100%')

@@ -127,7 +127,7 @@ export struct VotersPage {
         Column({ space: 16 }) {
           Text(this.error)
           Button('重试')
-            .fontSize(15).backgroundColor(ZhihuColors.primary)
+            .fontSize(16).backgroundColor(ZhihuColors.primary)
             .onClick(() => {
               this.loadFirst();
             })
@@ -161,7 +161,7 @@ export struct VotersPage {
         })
         .scrollBar(BarState.Off)
         Text('赞同者列表由知乎接口返回，可能受隐私设置影响')
-          .fontSize(13)
+          .fontSize(14)
           .fontColor(ZhihuColors.textTertiary)
           .width('100%')
           .textAlign(TextAlign.Center)
