@@ -48,7 +48,6 @@ export struct HotCard {
               .padding({ left: 4, right: 4, top: 1, bottom: 1 })
           }
           Text(this.item.title)
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(16)
             .fontWeight(FontWeight.Medium)
             .fontColor(ZhihuColors.text)
@@ -62,7 +61,6 @@ export struct HotCard {
 
         if (this.item.excerpt.length > 0) {
           Text(this.item.excerpt)
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(14)
             .fontColor(ZhihuColors.textSecondary)
             .maxLines(2)

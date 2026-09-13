@@ -23,7 +23,6 @@ export struct NewCollectionForm {
   build() {
     Column({ space: 12 }) {
       Text('标题')
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(16)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.text)
@@ -40,7 +39,6 @@ export struct NewCollectionForm {
         })
 
       Text('描述（可选）')
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(16)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.text)
@@ -60,9 +58,7 @@ export struct NewCollectionForm {
       Row() {
         Column({ space: 2 }) {
           Text('公开收藏夹')
-            .copyOption(CopyOptions.LocalDevice).fontSize(16).fontColor(ZhihuColors.text)
           Text('公开后其他用户可见')
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
         }
         .alignItems(HorizontalAlign.Start)
         .layoutWeight(1)

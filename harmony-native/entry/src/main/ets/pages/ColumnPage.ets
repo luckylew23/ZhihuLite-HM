@@ -154,13 +154,11 @@ struct ColumnPage {
         Row({ space: 8 }) {
           LoadingProgress().width(20).height(20).color(ZhihuColors.primary)
           Text('专栏加载中…')
-            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
         }
         .justifyContent(FlexAlign.Center).width('100%').padding(24)
       } else if (this.error.length > 0) {
         Column({ space: 12 }) {
           Text(this.error)
-            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textSecondary)
           Button('重试').fontSize(14).backgroundColor(ZhihuColors.primary)
             .onClick(() => { this.loadColumn(); })
         }
@@ -174,17 +172,14 @@ struct ColumnPage {
             .backgroundColor(ZhihuColors.backgroundTertiary)
           Column({ space: 6 }) {
             Text(this.column.title)
-              .copyOption(CopyOptions.LocalDevice)
               .fontSize(18).fontWeight(FontWeight.Bold).fontColor(ZhihuColors.text)
               .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
             Text(formatCount(this.followerCount) + ' 关注者 · ' +
               formatCount(this.column.items_count ?? this.column.articles_count ?? 0) + ' 文章')
-              .copyOption(CopyOptions.LocalDevice)
               .fontSize(14).fontColor(ZhihuColors.textSecondary)
           }
           .alignItems(HorizontalAlign.Start).layoutWeight(1)
           Text(this.following ? '已关注' : '关注')
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(14).fontWeight(FontWeight.Medium)
             .fontColor(this.following ? ZhihuColors.textSecondary : ZhihuColors.primary)
             .height(34)
@@ -199,7 +194,6 @@ struct ColumnPage {
         // 简介
         if ((this.column.intro ?? '').length > 0) {
           Text(stripHtml(this.column.intro ?? ''))
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(15).fontColor(ZhihuColors.textSecondary).lineHeight(21)
             .width('100%').textAlign(TextAlign.Start)
         }
@@ -213,9 +207,7 @@ struct ColumnPage {
               .backgroundColor(ZhihuColors.backgroundTertiary)
             Row({ space: 4 }) {
               Text('创建人:')
-                .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
               Text(this.column.author.name)
-                .copyOption(CopyOptions.LocalDevice)
                 .fontSize(14).fontWeight(FontWeight.Medium).fontColor(ZhihuColors.text)
             }
           }
@@ -233,27 +225,22 @@ struct ColumnPage {
   articleItem(item: ColumnArticleItem) {
     Column({ space: 8 }) {
       Text(item.title)
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(18).fontWeight(FontWeight.Bold).fontColor(ZhihuColors.text)
         .maxLines(2).lineHeight(24)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
         .width('100%')
       Text(item.excerpt)
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(15).fontColor(ZhihuColors.textSecondary).lineHeight(21)
         .maxLines(3).textOverflow({ overflow: TextOverflow.Ellipsis })
         .width('100%')
       Row({ space: 16 }) {
         Text(formatCount(item.voteup_count) + ' 赞同')
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(13).fontColor(ZhihuColors.textTertiary)
         Text(formatCount(item.comment_count) + ' 评论')
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(13).fontColor(ZhihuColors.textTertiary)
         Blank()
         if (item.updated > 0) {
           Text(formatDate(item.updated))
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
         }
       }
       .width('100%')
@@ -272,12 +259,10 @@ struct ColumnPage {
         Row({ space: 8 }) {
           LoadingProgress().width(16).height(16).color(ZhihuColors.textTertiary)
           Text('加载中…')
-            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
         }
         .justifyContent(FlexAlign.Center).width('100%').padding(12)
       } else if (this.isEnd && this.articles.length > 0) {
         Text('— 没有更多文章了 —')
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(14).fontColor(ZhihuColors.textTertiary)
           .width('100%').textAlign(TextAlign.Center).padding(12)
       }

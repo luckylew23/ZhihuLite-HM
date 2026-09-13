@@ -202,14 +202,12 @@ export struct FeedListPage {
         Row({ space: 8 }) {
           LoadingProgress().width(18).height(18).color(ZhihuColors.textTertiary)
           Text('加载中…')
-            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
         }
         .justifyContent(FlexAlign.Center)
         .width('100%')
         .padding(12)
       } else if (this.isEnd && (this.items.length > 0 || this.hotItems.length > 0)) {
         Text('— 没有更多了 —')
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(14)
           .fontColor(ZhihuColors.textTertiary)
           .width('100%')
@@ -223,11 +221,9 @@ export struct FeedListPage {
   searchHeader() {
     Row({ space: 8 }) {
       Text('🔍')
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(16)
         .fontColor(ZhihuColors.textTertiary)
       Text('搜索知乎')
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(15)
         .fontColor(ZhihuColors.textTertiary)
         .layoutWeight(1)
@@ -320,7 +316,6 @@ export struct FeedListPage {
         Column({ space: 8 }) {
           LoadingProgress().width(48).height(48).color(ZhihuColors.primary)
           Text('加载中…')
-            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
         }
       }
 
@@ -328,7 +323,6 @@ export struct FeedListPage {
       if (this.error.length > 0 && this.items.length === 0 && this.hotItems.length === 0) {
         Column({ space: 16 }) {
           Text(this.error)
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(15)
             .fontColor(ZhihuColors.textSecondary)
           Button('重试')

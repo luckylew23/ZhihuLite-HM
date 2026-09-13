@@ -94,7 +94,6 @@ struct ChatPage {
   topBar() {
     Row() {
       Text('←')
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(22)
         .fontColor(ZhihuColors.text)
         .width(40)
@@ -103,14 +102,12 @@ struct ChatPage {
         })
       Blank()
       Text(this.peerName)
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(18)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.text)
         .maxLines(1)
       Blank()
       Text('   ')
-        .copyOption(CopyOptions.LocalDevice).fontSize(22).width(40)
     }
     .width('100%')
     .height(52)
@@ -126,7 +123,6 @@ struct ChatPage {
           Row() {
             Column() {
               Text(this.bubbleText(msg))
-                .copyOption(CopyOptions.LocalDevice)
                 .fontSize(16)
                 .fontColor(this.isMe(msg) ? ZhihuColors.textInverse : ZhihuColors.text)
                 .padding({ left: 14, right: 14, top: 9, bottom: 9 })
@@ -185,7 +181,6 @@ struct ChatPage {
     Column({ space: 16 }) {
       Blank()
       Text('发私信前请先登录知乎账号')
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(15)
         .fontColor(ZhihuColors.textSecondary)
       Button('去登录')
@@ -212,7 +207,6 @@ struct ChatPage {
         Column({ space: 8 }) {
           LoadingProgress().width(40).height(40).color(ZhihuColors.primary)
           Text('加载中…')
-            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
         }
         .width('100%')
         .layoutWeight(1)
@@ -220,7 +214,6 @@ struct ChatPage {
       } else if (this.error.length > 0 && this.messages.length === 0) {
         Column({ space: 16 }) {
           Text(this.error)
-            .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textSecondary)
           Button('重试')
             .fontSize(15)
             .backgroundColor(ZhihuColors.primary)
@@ -235,7 +228,6 @@ struct ChatPage {
         this.messageList()
         if (this.error.length > 0) {
           Text(this.error)
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(13)
             .fontColor(ZhihuColors.danger)
             .width('100%')

@@ -19,7 +19,6 @@ export struct CollectionRow {
     Row({ space: 12 }) {
       Row() {
         Text(this.isPublic ? '📁' : '📂')
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(20)
       }
       .width(40)
@@ -30,7 +29,6 @@ export struct CollectionRow {
 
       Column({ space: 2 }) {
         Text(this.title)
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(17)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.text)
@@ -38,7 +36,6 @@ export struct CollectionRow {
           .textOverflow({ overflow: TextOverflow.Ellipsis })
         if (this.description.length > 0) {
           Text(this.description)
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(13)
             .fontColor(ZhihuColors.textTertiary)
             .maxLines(1)
@@ -52,7 +49,6 @@ export struct CollectionRow {
         LoadingProgress().width(20).height(20).color(ZhihuColors.primary)
       } else {
         Text(this.isFavorited ? '●' : '○')
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(20)
           .fontColor(this.isFavorited ? ZhihuColors.primary : ZhihuColors.textTertiary)
       }

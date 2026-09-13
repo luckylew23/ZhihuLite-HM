@@ -214,7 +214,6 @@ struct NotificationsPage {
   topBar() {
     Row() {
       Text('←')
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(22)
         .fontColor(ZhihuColors.text)
         .width(40)
@@ -223,7 +222,6 @@ struct NotificationsPage {
         })
       Blank()
       Text('消息通知')
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(18)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.text)
@@ -232,7 +230,6 @@ struct NotificationsPage {
         LoadingProgress().width(18).height(18).color(ZhihuColors.primary)
       } else {
         Text('全部已读')
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(15)
           .fontColor(ZhihuColors.primary)
           .onClick(() => {
@@ -251,7 +248,6 @@ struct NotificationsPage {
     Row({ space: 8 }) {
       ForEach(TABS, (tab: NotifyTab) => {
         Text(tab.label)
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(14)
           .fontWeight(this.tabValue === tab.value ? FontWeight.Bold : FontWeight.Normal)
           .fontColor(this.tabValue === tab.value ? ZhihuColors.primary : ZhihuColors.textSecondary)
@@ -276,14 +272,12 @@ struct NotificationsPage {
         Row({ space: 8 }) {
           LoadingProgress().width(16).height(16).color(ZhihuColors.textTertiary)
           Text('加载中…')
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
         }
         .justifyContent(FlexAlign.Center)
         .width('100%')
         .padding(12)
       } else if (this.isEnd && this.items.length > 0) {
         Text('— 没有更多了 —')
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(13)
           .fontColor(ZhihuColors.textTertiary)
           .width('100%')
@@ -307,19 +301,16 @@ struct NotificationsPage {
             Column({ space: 4 }) {
               Row() {
                 Text(item.content?.verb ?? '系统通知')
-                  .copyOption(CopyOptions.LocalDevice)
                   .fontSize(14)
                   .fontWeight(FontWeight.Bold)
                   .fontColor(this.iconColor(item))
                 Blank()
                 Text(formatRelativeTime(item.create_time ?? 0))
-                  .copyOption(CopyOptions.LocalDevice)
                   .fontSize(12)
                   .fontColor(ZhihuColors.textTertiary)
               }
               .width('100%')
               Text(this.bodyText(item))
-                .copyOption(CopyOptions.LocalDevice)
                 .fontSize(14)
                 .fontColor(ZhihuColors.text)
                 .maxLines(3)
@@ -356,7 +347,6 @@ struct NotificationsPage {
     Column({ space: 16 }) {
       Blank()
       Text('查看消息通知前请先登录知乎账号')
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(15)
         .fontColor(ZhihuColors.textSecondary)
       Button('去登录')
@@ -385,7 +375,6 @@ struct NotificationsPage {
           Column({ space: 8 }) {
             LoadingProgress().width(40).height(40).color(ZhihuColors.primary)
             Text('加载中…')
-              .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
           }
           .width('100%')
           .layoutWeight(1)
@@ -393,7 +382,6 @@ struct NotificationsPage {
         } else if (this.error.length > 0 && this.items.length === 0) {
           Column({ space: 16 }) {
             Text(this.error)
-              .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textSecondary)
             Button('重试')
               .fontSize(15)
               .backgroundColor(ZhihuColors.primary)
@@ -408,7 +396,6 @@ struct NotificationsPage {
           Column({ space: 8 }) {
             Blank()
             Text('暂无通知')
-              .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textTertiary)
             Blank()
           }
           .width('100%')

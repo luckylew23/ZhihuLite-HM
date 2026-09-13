@@ -179,7 +179,6 @@ export struct FollowingPage {
     if (this.recentItems.length > 0) {
       Column({ space: 8 }) {
         Text('最近更新')
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(14)
           .fontColor(ZhihuColors.textSecondary)
           .width('100%')
@@ -199,7 +198,6 @@ export struct FollowingPage {
                       .backgroundColor(ZhihuColors.backgroundTertiary)
                     if (r.unread_count > 0) {
                       Text(r.unread_count > 99 ? '99+' : String(r.unread_count))
-                        .copyOption(CopyOptions.LocalDevice)
                         .fontSize(9)
                         .fontColor(ZhihuColors.textInverse)
                         .backgroundColor(ZhihuColors.danger)
@@ -213,7 +211,6 @@ export struct FollowingPage {
                   .width(48)
                   .height(48)
                   Text(r.actor.name)
-                    .copyOption(CopyOptions.LocalDevice)
                     .fontSize(12)
                     .fontColor(ZhihuColors.textSecondary)
                     .maxLines(1)
@@ -244,7 +241,6 @@ export struct FollowingPage {
       // 类型行（「回答了问题」/「发布了想法」灰色小字）——无动作文案时整行不渲染
       if (item.actionText && item.actionText.length > 0) {
         Text(item.actionText)
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(13)
           .fontColor(ZhihuColors.textTertiary)
           .width('100%')
@@ -252,7 +248,6 @@ export struct FollowingPage {
       }
       // 作者名（粗体）
       Text(item.author.name)
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(15)
         .fontWeight(FontWeight.Bold)
         .fontColor(ZhihuColors.text)
@@ -263,7 +258,6 @@ export struct FollowingPage {
       // 问题标题（粗体可点）
       if (item.title.length > 0) {
         Text(item.title)
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(17)
           .fontWeight(FontWeight.Bold)
           .fontColor(ZhihuColors.text)
@@ -275,7 +269,6 @@ export struct FollowingPage {
       // 正文摘要
       if (item.excerpt.length > 0) {
         Text(item.excerpt)
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(15)
           .fontColor(ZhihuColors.textSecondary)
           .maxLines(3)
@@ -297,31 +290,25 @@ export struct FollowingPage {
       Row({ space: 18 }) {
         Row({ space: 4 }) {
           Text('▲')
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(13)
             .fontColor(ZhihuColors.textTertiary)
           Text(formatCount(item.voteCount))
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(14)
             .fontColor(ZhihuColors.textSecondary)
         }
         Row({ space: 4 }) {
           Text('○')
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(13)
             .fontColor(ZhihuColors.textTertiary)
           Text(formatCount(item.commentCount))
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(14)
             .fontColor(ZhihuColors.textSecondary)
         }
         Row({ space: 4 }) {
           Text('☆')
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(13)
             .fontColor(ZhihuColors.textTertiary)
           Text(formatCount(item.favlistsCount ?? 0))
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(14)
             .fontColor(ZhihuColors.textSecondary)
         }
@@ -343,14 +330,12 @@ export struct FollowingPage {
         Row({ space: 8 }) {
           LoadingProgress().width(18).height(18).color(ZhihuColors.textTertiary)
           Text('加载中…')
-            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
         }
         .justifyContent(FlexAlign.Center)
         .width('100%')
         .padding(12)
       } else if (this.isEnd && this.items.length > 0) {
         Text('— 已看完本次更新 —')
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(14)
           .fontColor(ZhihuColors.textTertiary)
           .width('100%')
@@ -404,7 +389,6 @@ export struct FollowingPage {
         Column({ space: 8 }) {
           LoadingProgress().width(48).height(48).color(ZhihuColors.primary)
           Text('加载中…')
-            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
         }
       }
 
@@ -412,7 +396,6 @@ export struct FollowingPage {
       if (this.error.length > 0 && this.items.length === 0) {
         Column({ space: 16 }) {
           Text(this.error)
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(15)
             .fontColor(ZhihuColors.textSecondary)
           Button('重试')

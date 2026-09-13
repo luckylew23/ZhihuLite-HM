@@ -46,7 +46,6 @@ struct FeedbackPage {
   topBar() {
     Row() {
       Text('←')
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(22)
         .fontColor(ZhihuColors.text)
         .width(40)
@@ -55,13 +54,11 @@ struct FeedbackPage {
         })
       Blank()
       Text('反馈与建议')
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(18)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.text)
       Blank()
       Text('   ')
-        .copyOption(CopyOptions.LocalDevice).fontSize(22).width(40)
     }
     .width('100%')
     .height(52)
@@ -75,7 +72,6 @@ struct FeedbackPage {
       Scroll() {
         Column({ space: 14 }) {
           Text('遇到问题或有功能建议？填写下面的表单告诉我们。')
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(15)
             .fontColor(ZhihuColors.textSecondary)
             .width('100%')
@@ -97,7 +93,6 @@ struct FeedbackPage {
 
             if (this.error.length > 0) {
               Text(this.error)
-                .copyOption(CopyOptions.LocalDevice)
                 .fontSize(14)
                 .fontColor(ZhihuColors.danger)
                 .width('100%')
@@ -105,7 +100,6 @@ struct FeedbackPage {
 
             if (this.submitted) {
               Text('已收到你的反馈（仅本地记录，未接入真实反馈通道）。')
-                .copyOption(CopyOptions.LocalDevice)
                 .fontSize(14)
                 .fontColor(ZhihuColors.success)
                 .width('100%')
@@ -115,7 +109,6 @@ struct FeedbackPage {
               Row({ space: 8 }) {
                 LoadingProgress().width(18).height(18).color(ZhihuColors.primary)
                 Text('提交中…')
-                  .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textSecondary)
               }
               .width('100%')
               .justifyContent(FlexAlign.Center)
@@ -136,7 +129,6 @@ struct FeedbackPage {
           .borderRadius(12)
 
           Text('说明：当前版本未接入知乎反馈接口，提交不会发送到服务端。')
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(13)
             .fontColor(ZhihuColors.textTertiary)
             .width('100%')

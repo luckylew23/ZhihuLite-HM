@@ -12,7 +12,6 @@ export struct DetailNavBar {
   build() {
     Row() {
       Text('‹')
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(30)
         .fontColor(ZhihuColors.text)
         .padding({ left: 6, right: 10 })
@@ -20,7 +19,6 @@ export struct DetailNavBar {
           router.back();
         })
       Text(this.title)
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(18)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.text)

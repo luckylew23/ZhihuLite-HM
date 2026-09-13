@@ -18,14 +18,12 @@ export struct StatusView {
       Column({ space: 10 }) {
         LoadingProgress().width(40).height(40).color(ZhihuColors.primary)
         Text('加载中…')
-          .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
       }
       .width('100%')
       .padding(40)
     } else if (this.error.length > 0) {
       Column({ space: 16 }) {
         Text(this.error)
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(15)
           .fontColor(ZhihuColors.textSecondary)
           .textAlign(TextAlign.Center)
@@ -40,7 +38,6 @@ export struct StatusView {
       .padding(40)
     } else if (this.emptyText.length > 0) {
       Text(this.emptyText)
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(15)
         .fontColor(ZhihuColors.textTertiary)
         .width('100%')

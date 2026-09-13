@@ -236,7 +236,6 @@ struct FollowManagePage {
   topBar() {
     Row() {
       Text('‹')
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(26)
         .fontColor(ZhihuColors.primary)
         .width(40)
@@ -244,7 +243,6 @@ struct FollowManagePage {
           router.back();
         })
       Text('关注')
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(18)
         .fontWeight(FontWeight.Bold)
         .fontColor(ZhihuColors.text)
@@ -263,7 +261,6 @@ struct FollowManagePage {
       ForEach(TABS, (tab: FollowTab, index: number) => {
         Column({ space: 6 }) {
           Text(tab.label)
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(16)
             .fontWeight(this.currentTab === index ? FontWeight.Bold : FontWeight.Normal)
             .fontColor(this.currentTab === index ? ZhihuColors.primary : ZhihuColors.textSecondary)
@@ -295,7 +292,6 @@ struct FollowManagePage {
           .backgroundColor(ZhihuColors.backgroundTertiary)
       } else {
         Text(item.name.substring(0, 1))
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(18)
           .fontColor(ZhihuColors.primary)
           .width(52)
@@ -306,7 +302,6 @@ struct FollowManagePage {
       }
       Column({ space: 4 }) {
         Text(item.name)
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(17)
           .fontWeight(FontWeight.Bold)
           .fontColor(ZhihuColors.text)
@@ -314,21 +309,18 @@ struct FollowManagePage {
           .textOverflow({ overflow: TextOverflow.Ellipsis })
         if (item.intro.length > 0) {
           Text(item.intro)
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(14)
             .fontColor(ZhihuColors.textSecondary)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
         }
         Text(item.meta)
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(13)
           .fontColor(ZhihuColors.textTertiary)
       }
       .alignItems(HorizontalAlign.Start)
       .layoutWeight(1)
       Text('已关注')
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(14)
         .fontColor(ZhihuColors.textSecondary)
         .padding({ left: 14, right: 14, top: 7, bottom: 7 })
@@ -359,7 +351,6 @@ struct FollowManagePage {
       if (this.loading) {
         Column() {
           Text('加载中…')
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(15)
             .fontColor(ZhihuColors.textTertiary)
         }
@@ -369,7 +360,6 @@ struct FollowManagePage {
       } else if (this.items.length === 0) {
         Column() {
           Text('暂无数据')
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(15)
             .fontColor(ZhihuColors.textTertiary)
         }

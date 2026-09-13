@@ -114,7 +114,6 @@ struct PublishPinPage {
   topBar() {
     Row() {
       Text('✕')
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(24)
         .fontColor(ZhihuColors.text)
         .width(44)
@@ -123,7 +122,6 @@ struct PublishPinPage {
         })
       Blank()
       Text('发想法')
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(18)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.text)
@@ -133,7 +131,6 @@ struct PublishPinPage {
           LoadingProgress().width(20).height(20).color(ZhihuColors.primary)
         } else {
           Text('发布')
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(16)
             .fontWeight(FontWeight.Medium)
             .fontColor(ZhihuColors.textInverse)
@@ -160,7 +157,6 @@ struct PublishPinPage {
     Column({ space: 16 }) {
       Blank()
       Text('发布想法前请先登录知乎账号')
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(15)
         .fontColor(ZhihuColors.textSecondary)
       Button('去登录')
@@ -192,7 +188,6 @@ struct PublishPinPage {
               .backgroundColor(ZhihuColors.backgroundTertiary)
             Stack() {
               Text('✕')
-                .copyOption(CopyOptions.LocalDevice).fontSize(12).fontColor(ZhihuColors.textInverse)
             }
             .width(20)
             .height(20)
@@ -214,9 +209,7 @@ struct PublishPinPage {
   addImageButton() {
     Row({ space: 8 }) {
       Text('🖼')
-        .copyOption(CopyOptions.LocalDevice).fontSize(17).fontColor(ZhihuColors.primary)
       Text('添加图片 (' + this.images.length + '/' + MAX_IMAGES + ')')
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(16)
         .fontColor(ZhihuColors.primary)
     }
@@ -259,7 +252,6 @@ struct PublishPinPage {
 
         if (this.error.length > 0) {
           Text(this.error)
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(14)
             .fontColor(ZhihuColors.danger)
             .width('100%')

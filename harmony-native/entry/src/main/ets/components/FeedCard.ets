@@ -70,7 +70,6 @@ export struct FeedCard {
       // 标题
       if (this.item.title.length > 0) {
         Text(this.item.title)
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(17)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.text)
@@ -83,7 +82,6 @@ export struct FeedCard {
       // 摘要
       if (this.item.excerpt.length > 0) {
         Text(this.item.excerpt)
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(15)
           .fontColor(ZhihuColors.textSecondary)
           .maxLines(3)

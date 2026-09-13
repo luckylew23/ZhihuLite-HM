@@ -76,13 +76,11 @@ export struct CommentRow {
 
       Column({ space: 4 }) {
         Text(this.memberName())
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(14)
           .fontColor(ZhihuColors.textSecondary)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(stripHtml(this.item.content))
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(16)
           .fontColor(ZhihuColors.text)
           .width('100%')
@@ -92,7 +90,6 @@ export struct CommentRow {
         Row({ space: 16 }) {
           if (this.metaText().length > 0) {
             Text(this.metaText())
-              .copyOption(CopyOptions.LocalDevice)
               .fontSize(13)
               .fontColor(ZhihuColors.textTertiary)
               .layoutWeight(1)
@@ -102,11 +99,9 @@ export struct CommentRow {
 
           Row({ space: 3 }) {
             Text(this.liked() ? '♥' : '♡')
-              .copyOption(CopyOptions.LocalDevice)
               .fontSize(14)
               .fontColor(this.liked() ? ZhihuColors.primary : ZhihuColors.textTertiary)
             Text(String(this.likeCount()))
-              .copyOption(CopyOptions.LocalDevice)
               .fontSize(13)
               .fontColor(ZhihuColors.textTertiary)
           }
@@ -116,7 +111,6 @@ export struct CommentRow {
 
           if (!this.isChild) {
             Text('回复')
-              .copyOption(CopyOptions.LocalDevice)
               .fontSize(13)
               .fontColor(ZhihuColors.textTertiary)
               .onClick(() => {
@@ -128,7 +122,6 @@ export struct CommentRow {
 
         if (!this.isChild && this.item.child_comment_count > 0) {
           Text(this.childExpanded ? '收起回复' : '查看全部 ' + this.item.child_comment_count + ' 条回复')
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(13)
             .fontColor(ZhihuColors.primary)
             .padding({ top: 6 })

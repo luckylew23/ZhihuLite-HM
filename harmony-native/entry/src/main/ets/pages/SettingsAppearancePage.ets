@@ -67,7 +67,6 @@ struct SettingsAppearancePage {
   topBar() {
     Row() {
       Text('‹')
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(26)
         .fontColor(ZhihuColors.primary)
         .width(40)
@@ -75,7 +74,6 @@ struct SettingsAppearancePage {
           router.back();
         })
       Text('外观与定制')
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(18)
         .fontWeight(FontWeight.Bold)
         .fontColor(ZhihuColors.text)
@@ -92,13 +90,11 @@ struct SettingsAppearancePage {
   themeRow(option: ThemeOption, index: number, total: number) {
     Row() {
       Text(option.label)
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(17)
         .fontColor(ZhihuColors.text)
         .layoutWeight(1)
       if (this.mode === option.value) {
         Text('✓')
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(18)
           .fontWeight(FontWeight.Bold)
           .fontColor(ZhihuColors.primary)
@@ -122,7 +118,6 @@ struct SettingsAppearancePage {
       Scroll() {
         Column({ space: 0 }) {
           Text('主题模式')
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(14)
             .fontColor(ZhihuColors.textSecondary)
             .width('100%')
@@ -138,14 +133,12 @@ struct SettingsAppearancePage {
           .borderRadius(12)
 
           Text('选择后立即生效；“系统”跟随系统深浅色模式。')
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(13)
             .fontColor(ZhihuColors.textTertiary)
             .width('100%')
             .padding({ left: 4, top: 16, bottom: 4 })
 
           Text('栏目展示')
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(14)
             .fontColor(ZhihuColors.textSecondary)
             .width('100%')
@@ -155,7 +148,6 @@ struct SettingsAppearancePage {
             ForEach(TAB_OPTIONS, (opt: TabOption, index: number) => {
               Row({ space: 12 }) {
                 Text(opt.label)
-                  .copyOption(CopyOptions.LocalDevice)
                   .fontSize(17)
                   .fontColor(ZhihuColors.text)
                   .layoutWeight(1)
@@ -179,7 +171,6 @@ struct SettingsAppearancePage {
           .borderRadius(12)
 
           Text('控制首页底栏可见栏目；个人中心与发布固定显示。')
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(13)
             .fontColor(ZhihuColors.textTertiary)
             .width('100%')

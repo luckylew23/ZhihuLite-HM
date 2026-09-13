@@ -93,7 +93,6 @@ struct PublishArticlePage {
   topBar() {
     Row() {
       Text('←')
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(22)
         .fontColor(ZhihuColors.text)
         .width(40)
@@ -102,7 +101,6 @@ struct PublishArticlePage {
         })
       Blank()
       Text('写文章')
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(18)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.text)
@@ -112,14 +110,12 @@ struct PublishArticlePage {
       } else {
         Row({ space: 14 }) {
           Text('存草稿')
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(16)
             .fontColor(ZhihuColors.textSecondary)
             .onClick(() => {
               this.run(false);
             })
           Text('发布')
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(16)
             .fontWeight(FontWeight.Medium)
             .fontColor(ZhihuColors.primary)
@@ -140,7 +136,6 @@ struct PublishArticlePage {
     Column({ space: 16 }) {
       Blank()
       Text('写文章前请先登录知乎账号')
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(15)
         .fontColor(ZhihuColors.textSecondary)
       Button('去登录')
@@ -182,14 +177,12 @@ struct PublishArticlePage {
 
         if (this.notice.length > 0) {
           Text(this.notice)
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(14)
             .fontColor(ZhihuColors.success)
             .width('100%')
         }
         if (this.error.length > 0) {
           Text(this.error)
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(14)
             .fontColor(ZhihuColors.danger)
             .width('100%')

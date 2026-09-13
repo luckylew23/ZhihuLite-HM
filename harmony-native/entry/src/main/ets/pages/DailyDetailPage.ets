@@ -81,14 +81,12 @@ struct DailyDetailPage {
             }
             Column({ space: 10 }) {
               Text(this.detail?.title ?? '')
-                .copyOption(CopyOptions.LocalDevice)
                 .fontSize(21)
                 .fontWeight(FontWeight.Bold)
                 .fontColor(ZhihuColors.text)
                 .width('100%')
               if (this.detail?.hint && this.detail.hint.length > 0) {
                 Text(this.detail.hint)
-                  .copyOption(CopyOptions.LocalDevice)
                   .fontSize(14)
                   .fontColor(ZhihuColors.textSecondary)
                   .width('100%')
@@ -96,14 +94,12 @@ struct DailyDetailPage {
               if (this.bodyText.length > 0) {
                 Divider().strokeWidth(0.5).color(ZhihuColors.divider).margin({ top: 4, bottom: 4 })
                 Text(this.bodyText)
-                  .copyOption(CopyOptions.LocalDevice)
                   .fontSize(16)
                   .lineHeight(24)
                   .fontColor(ZhihuColors.text)
                   .width('100%')
               } else {
                 Text('正文暂无法展示')
-                  .copyOption(CopyOptions.LocalDevice)
                   .fontSize(15)
                   .fontColor(ZhihuColors.textTertiary)
                   .width('100%')

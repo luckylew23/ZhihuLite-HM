@@ -79,7 +79,6 @@ struct InboxPage {
   topBar() {
     Row() {
       Text('←')
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(22)
         .fontColor(ZhihuColors.text)
         .width(40)
@@ -88,13 +87,11 @@ struct InboxPage {
         })
       Blank()
       Text('我的私信')
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(18)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.text)
       Blank()
       Text('   ')
-        .copyOption(CopyOptions.LocalDevice).fontSize(22).width(40)
     }
     .width('100%')
     .height(52)
@@ -109,14 +106,12 @@ struct InboxPage {
         Row({ space: 8 }) {
           LoadingProgress().width(16).height(16).color(ZhihuColors.textTertiary)
           Text('加载中…')
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
         }
         .justifyContent(FlexAlign.Center)
         .width('100%')
         .padding(12)
       } else if (this.isEnd && this.threads.length > 0) {
         Text('— 没有更多了 —')
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(13)
           .fontColor(ZhihuColors.textTertiary)
           .width('100%')
@@ -141,7 +136,6 @@ struct InboxPage {
                 .backgroundColor(ZhihuColors.backgroundTertiary)
               if (thread.unread_count > 0) {
                 Text(thread.unread_count > 99 ? '99+' : String(thread.unread_count))
-                  .copyOption(CopyOptions.LocalDevice)
                   .fontSize(10)
                   .fontColor(ZhihuColors.textInverse)
                   .backgroundColor(ZhihuColors.danger)
@@ -153,7 +147,6 @@ struct InboxPage {
             Column({ space: 4 }) {
               Row() {
                 Text(thread.participant.name)
-                  .copyOption(CopyOptions.LocalDevice)
                   .fontSize(17)
                   .fontWeight(FontWeight.Bold)
                   .fontColor(ZhihuColors.text)
@@ -161,13 +154,11 @@ struct InboxPage {
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
                 Blank()
                 Text(formatRelativeTime(thread.updated_time))
-                  .copyOption(CopyOptions.LocalDevice)
                   .fontSize(12)
                   .fontColor(ZhihuColors.textTertiary)
               }
               .width('100%')
               Text(thread.snippet)
-                .copyOption(CopyOptions.LocalDevice)
                 .fontSize(14)
                 .fontColor(ZhihuColors.textSecondary)
                 .maxLines(2)
@@ -204,7 +195,6 @@ struct InboxPage {
     Column({ space: 16 }) {
       Blank()
       Text('查看私信前请先登录知乎账号')
-        .copyOption(CopyOptions.LocalDevice)
         .fontSize(15)
         .fontColor(ZhihuColors.textSecondary)
       Button('去登录')
@@ -231,7 +221,6 @@ struct InboxPage {
         Column({ space: 8 }) {
           LoadingProgress().width(40).height(40).color(ZhihuColors.primary)
           Text('加载中…')
-            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
         }
         .width('100%')
         .layoutWeight(1)
@@ -239,7 +228,6 @@ struct InboxPage {
       } else if (this.error.length > 0 && this.threads.length === 0) {
         Column({ space: 16 }) {
           Text(this.error)
-            .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textSecondary)
           Button('重试')
             .fontSize(15)
             .backgroundColor(ZhihuColors.primary)
@@ -254,7 +242,6 @@ struct InboxPage {
         Column({ space: 8 }) {
           Blank()
           Text('暂无私信')
-            .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textTertiary)
           Blank()
         }
         .width('100%')

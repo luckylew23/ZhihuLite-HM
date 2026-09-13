@@ -71,11 +71,9 @@ struct PinDetailPage {
                 .backgroundColor(ZhihuColors.backgroundTertiary)
               Column({ space: 2 }) {
                 Text(this.pin.author.name)
-                  .copyOption(CopyOptions.LocalDevice)
                   .fontSize(16).fontWeight(FontWeight.Medium).fontColor(ZhihuColors.text)
                 if (this.pin.created && this.pin.created > 0) {
                   Text(formatDateTime(this.pin.created))
-                    .copyOption(CopyOptions.LocalDevice)
                     .fontSize(13).fontColor(ZhihuColors.textTertiary)
                 }
               }
@@ -87,7 +85,7 @@ struct PinDetailPage {
 
             if (this.bodyText.length > 0) {
               Text(this.bodyText)
-                .copyOption(CopyOptions.LocalDevice)
+          .copyOption(CopyOptions.LocalDevice)
                 .fontSize(17)
                 .fontColor(ZhihuColors.text)
                 .lineHeight(26)
@@ -117,17 +115,13 @@ struct PinDetailPage {
         Row({ space: 4 }) {
           Row({ space: 4 }) {
             Text('▲')
-              .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textSecondary)
             Text(formatCount(this.pin.like_count ?? 0))
-              .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textSecondary)
           }
           .layoutWeight(1).justifyContent(FlexAlign.Center).padding({ top: 12, bottom: 12 })
 
           Row({ space: 4 }) {
             Text('💬')
-              .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textSecondary)
             Text(formatCount(this.pin.comment_count ?? 0))
-              .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textSecondary)
           }
           .layoutWeight(1).justifyContent(FlexAlign.Center).padding({ top: 12, bottom: 12 })
           .onClick(() => {

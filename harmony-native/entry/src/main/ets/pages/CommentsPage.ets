@@ -318,7 +318,6 @@ struct CommentsPage {
         .backgroundColor(ZhihuColors.backgroundTertiary)
       Column({ space: 2 }) {
         Text(this.memberName(child) + '：' + stripHtml(child.content))
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(14)
           .fontColor(ZhihuColors.text)
           .width('100%')
@@ -339,18 +338,15 @@ struct CommentsPage {
           Row({ space: 6 }) {
             LoadingProgress().width(14).height(14).color(ZhihuColors.textTertiary)
             Text('回复加载中…')
-              .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
           }
           .width('100%')
         } else if (this.childList.length === 0) {
           Text('暂无回复')
-            .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary).width('100%')
         } else {
           ForEach(this.childList, (child: CommentItem) => {
             this.childRow(child)
           }, (child: CommentItem) => String(child.id))
           Text('收起回复')
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(13)
             .fontColor(ZhihuColors.primary)
             .width('100%')
@@ -366,7 +362,6 @@ struct CommentsPage {
           }
         }, (child: CommentItem, index: number) => String(child.id) + '-' + String(index))
         Text('查看全部 ' + item.child_comment_count + ' 条回复 →')
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(13)
           .fontColor(ZhihuColors.primary)
           .width('100%')
@@ -394,7 +389,6 @@ struct CommentsPage {
           .objectFit(ImageFit.Cover)
           .backgroundColor(ZhihuColors.backgroundTertiary)
         Text(this.memberName(item))
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(16)
           .fontWeight(FontWeight.Medium)
           .fontColor(ZhihuColors.text)
@@ -404,7 +398,7 @@ struct CommentsPage {
 
       // 正文
       Text(stripHtml(item.content))
-        .copyOption(CopyOptions.LocalDevice)
+          .copyOption(CopyOptions.LocalDevice)
         .fontSize(16)
         .fontColor(ZhihuColors.text)
         .width('100%')
@@ -415,7 +409,6 @@ struct CommentsPage {
       Row() {
         if (this.metaText(item).length > 0) {
           Text(this.metaText(item))
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(13)
             .fontColor(ZhihuColors.textTertiary)
             .layoutWeight(1)
@@ -425,11 +418,9 @@ struct CommentsPage {
 
         Row({ space: 4 }) {
           Text('▲')
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(13)
             .fontColor(this.liked(item) ? ZhihuColors.primary : ZhihuColors.textTertiary)
           Text(String(this.voteCount(item)))
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(13)
             .fontColor(ZhihuColors.textTertiary)
         }
@@ -439,7 +430,6 @@ struct CommentsPage {
         })
 
         Text('回复')
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(13)
           .fontColor(ZhihuColors.textTertiary)
           .padding({ left: 8, right: 4 })
@@ -459,7 +449,6 @@ struct CommentsPage {
       if (!authStore.isLoggedIn) {
         Row() {
           Text('登录后即可参与评论')
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(15)
             .fontColor(ZhihuColors.textTertiary)
             .layoutWeight(1)
@@ -478,12 +467,10 @@ struct CommentsPage {
         if (this.replyToId.length > 0) {
           Row({ space: 8 }) {
             Text('回复 ' + this.replyToName)
-              .copyOption(CopyOptions.LocalDevice)
               .fontSize(13)
               .fontColor(ZhihuColors.primary)
               .layoutWeight(1)
             Text('取消')
-              .copyOption(CopyOptions.LocalDevice)
               .fontSize(13)
               .fontColor(ZhihuColors.textTertiary)
               .onClick(() => {
@@ -505,7 +492,6 @@ struct CommentsPage {
               this.inputText = v;
             })
           Text(this.submitting ? '…' : '发布')
-            .copyOption(CopyOptions.LocalDevice)
             .fontSize(16)
             .fontWeight(FontWeight.Medium)
             .fontColor(ZhihuColors.primary)
@@ -527,7 +513,6 @@ struct CommentsPage {
       // 顶部栏：返回 + 标题「评论 (N)」 + 右侧排序入口
       Row() {
         Text('‹')
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(26)
           .fontColor(ZhihuColors.primary)
           .padding({ left: 4, right: 8 })
@@ -535,13 +520,11 @@ struct CommentsPage {
             router.back();
           })
         Text('评论 (' + this.commentTotal + ')')
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(18)
           .fontWeight(FontWeight.Bold)
           .fontColor(ZhihuColors.text)
           .layoutWeight(1)
         Text(this.orderBy === 'score' ? '默认' : '最新')
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(15)
           .fontColor(ZhihuColors.primary)
           .padding(8)
@@ -558,7 +541,6 @@ struct CommentsPage {
         Column({ space: 8 }) {
           LoadingProgress().width(40).height(40).color(ZhihuColors.primary)
           Text('评论加载中…')
-            .copyOption(CopyOptions.LocalDevice).fontSize(14).fontColor(ZhihuColors.textTertiary)
         }
         .width('100%')
         .layoutWeight(1)
@@ -566,7 +548,6 @@ struct CommentsPage {
       } else if (this.error.length > 0 && this.comments.length === 0) {
         Column({ space: 16 }) {
           Text(this.error)
-            .copyOption(CopyOptions.LocalDevice).fontSize(15).fontColor(ZhihuColors.textSecondary)
           Button('重试')
             .backgroundColor(ZhihuColors.primary)
             .onClick(() => {
@@ -582,12 +563,10 @@ struct CommentsPage {
             ListItem() {
               Column({ space: 4 }) {
                 Text('正在讨论')
-                  .copyOption(CopyOptions.LocalDevice)
                   .fontSize(13)
                   .fontWeight(FontWeight.Bold)
                   .fontColor(ZhihuColors.primary)
                 Text(this.quote)
-                  .copyOption(CopyOptions.LocalDevice)
                   .fontSize(14)
                   .fontColor(ZhihuColors.textSecondary)
                   .maxLines(3)
@@ -622,11 +601,9 @@ struct CommentsPage {
                 Row({ space: 8 }) {
                   LoadingProgress().width(16).height(16).color(ZhihuColors.textTertiary)
                   Text('加载中…')
-                    .copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor(ZhihuColors.textTertiary)
                 }
               } else if (this.isEnd && this.comments.length > 0) {
                 Text('— 没有更多评论了 —')
-                  .copyOption(CopyOptions.LocalDevice)
                   .fontSize(13)
                   .fontColor(ZhihuColors.textTertiary)
               }
@@ -646,7 +623,6 @@ struct CommentsPage {
 
       if (this.toast.length > 0) {
         Text(this.toast)
-          .copyOption(CopyOptions.LocalDevice)
           .fontSize(13)
           .fontColor(ZhihuColors.textInverse)
           .backgroundColor('#b3000000')
