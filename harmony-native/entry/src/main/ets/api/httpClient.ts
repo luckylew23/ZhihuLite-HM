@@ -546,9 +546,21 @@ class ZhihuHttpClient {
       throw new ApiError('响应为空', 0, -1, text);
     }
     try {
-      const obj = JSON.parse(text) as T;
-      return obj;
+      const obj = JSON.parse(text) as Record<string, object>;
+      // 知乎业务错误：{"error":{"code":101,"name":"AuthenticationError","message":"ZERR_NOT_LOGIN"}}
+      // HTTP 200 但业务失败（如未登录搜索）——统一抛 ApiError，页面可识别
+      const err = obj['error'];
+      if (err !== undefined && typeof err === 'object' && err !== null && 'code' in (err as object)) {
+        const errObj = err as Record<string, object>;
+        const msg: string = String(errObj['message'] ?? 'zhihu error');
+        const code: number = Number(errObj['code'] ?? -1);
+        throw new ApiError(msg, 200, code, text.substring(0, 200));
+      }
+      return obj as T;
     } catch (e) {
+      if (e instanceof ApiError) {
+        throw e;
+      }
       throw new ApiError('响应解析失败', 0, -1, text.substring(0, 200));
     }
   }

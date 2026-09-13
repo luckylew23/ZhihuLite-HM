@@ -8,6 +8,7 @@
 
 import { router } from '@kit.ArkUI';
 import { getSearchSuggest, searchContent, SearchContentOptions } from '../api/search';
+import { authStore } from '../store/authStore';
 import { ZhihuSearchResponse, ZhihuSearchResultItem } from '../model/zhihu';
 import { FeedItem, FeedAuthor } from '../api/feed';
 import { ZhihuColors } from '../utils/theme';
@@ -68,6 +69,7 @@ struct SearchPage {
   @State query: string = '';
   @State submitted: string = '';
   @State searching: boolean = false;
+  @State loggedIn: boolean = false;
   @State activeTab: number = 0;
 
   @State suggestions: SuggestHit[] = [];
@@ -88,6 +90,7 @@ struct SearchPage {
 
   aboutToAppear(): void {
     // 进入即聚焦输入由系统接管；不自动发请求
+    this.loggedIn = authStore.isLoggedIn;
   }
 
   // ---------------- Tab → API 参数 ----------------
@@ -218,7 +221,12 @@ struct SearchPage {
       this.pageOffset = offset + 20;
     } catch (e) {
       if (replace) {
-        this.error = '搜索失败，请稍后重试';
+        const msg: string = String(e);
+        if (!this.loggedIn || msg.indexOf('ZERR_NOT_LOGIN') >= 0 || msg.indexOf('101') >= 0) {
+          this.error = '搜索需要登录，请先登录知乎';
+        } else {
+          this.error = '搜索失败，请稍后重试';
+        }
       }
     } finally {
       this.inFlight = false;
@@ -685,7 +693,7 @@ struct SearchPage {
         this.suggestList()
       } else if (!this.searching) {
         Column() {
-          Text('搜索你想知道的内容')
+          Text(this.loggedIn ? '搜索你想知道的内容' : '登录后可使用搜索')
             .fontSize(17)
             .fontColor(ZhihuColors.textTertiary)
         }
