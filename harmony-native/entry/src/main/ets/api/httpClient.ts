@@ -336,7 +336,32 @@ class ZhihuHttpClient {
       if (body && body.length > 0) {
         options.extraData = body;
       }
-      const resp = await req.request(url, options);
+      let resp;
+      try {
+        resp = await req.request(url, options);
+      } catch (e) {
+        // 网络层异常（DNS 失败/连接失败/超时/权限被拒等）——转成带错误码的 ApiError，
+        // 让页面能显示具体原因而非通用文案。
+        let msg = '网络请求失败';
+        let code = -1;
+        if (e instanceof Error) {
+          msg = e.message;
+        } else if (e && typeof e === 'object') {
+          const obj = e as Record<string, object>;
+          const errObj = obj['cause'] as Record<string, object> | undefined;
+          const inner = errObj ?? obj;
+          if (typeof inner['message'] === 'string') {
+            msg = inner['message'] as string;
+          }
+          if (typeof inner['code'] === 'number') {
+            code = inner['code'] as number;
+          } else if (typeof obj['code'] === 'number') {
+            code = obj['code'] as number;
+          }
+        }
+        hilog.error(DOMAIN, TAG, 'http error: %{public}s code=%{public}d', msg, code);
+        throw new ApiError(msg, 0, code, '');
+      }
       const status: number = typeof resp.responseCode === 'number' ? resp.responseCode : 0;
       const respHeaders: Record<string, string> = {};
       const rawHeaders = resp.header as Record<string, string>;

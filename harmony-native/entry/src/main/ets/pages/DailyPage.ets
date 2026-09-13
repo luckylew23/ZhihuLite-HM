@@ -39,7 +39,11 @@ export struct DailyPage {
       this.stories = resp.stories ?? [];
       this.error = this.stories.length === 0 ? '本期日报暂无内容' : '';
     } catch (e) {
-      this.error = '日报加载失败，请检查网络后重试';
+      let detail = '网络异常';
+      if (e instanceof Error && e.message) {
+        detail = e.message;
+      }
+      this.error = '日报加载失败：' + detail;
     } finally {
       this.loading = false;
       this.inFlight = false;

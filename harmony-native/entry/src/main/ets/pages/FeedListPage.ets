@@ -70,7 +70,11 @@ export struct FeedListPage {
       const resp = await getFeed(this.entryUrl(), authStore.cookies);
       this.applyPage(resp, true);
     } catch (e) {
-      this.error = '加载失败，请检查网络后重试';
+      let detail = '网络异常';
+      if (e instanceof Error && e.message) {
+        detail = e.message;
+      }
+      this.error = '加载失败：' + detail;
     } finally {
       this.loading = false;
       this.inFlight = false;
