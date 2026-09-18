@@ -1,6 +1,7 @@
 /**
  * pages/ImageViewerPage —— 全屏看图（去水印原图）。
  * 参数：url（内容图 URL）；进入后自动转原图（无水印），单击关闭。
+ * 支持双指捏合缩放（1x~4x）+ 双指拖动平移。
  * 右上角：系统 SaveButton（保存到相册，无需危险权限）+ 复制链接。
  */
 
@@ -11,7 +12,6 @@ import { fileIo } from '@kit.CoreFileKit';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
 import { pasteboard } from '@kit.BasicServicesKit';
 import { promptAction } from '@kit.ArkUI';
-import { ZhihuColors } from '../utils/theme';
 import { readStringParam } from '../components/detail/detailUtils';
 import { toOriginalImageUrl } from '../utils/imageUrl';
 
@@ -24,6 +24,12 @@ const IMAGE_UA: string =
 struct ImageViewerPage {
   @State url: string = '';
   @State saving: boolean = false;
+  @State zoomScale: number = 1.0;
+  @State tx: number = 0;
+  @State ty: number = 0;
+  @State pinchStartScale: number = 1.0;
+  @State pinchStartTx: number = 0;
+  @State pinchStartTy: number = 0;
 
   aboutToAppear(): void {
     const p = router.getParams() as Record<string, object>;
@@ -31,7 +37,6 @@ struct ImageViewerPage {
     this.url = toOriginalImageUrl(raw);
   }
 
-  /** 先把网络图下载到内存 buffer，再经 SaveButton 授权后的 createAsset 写入相册 */
   private async saveToGallery(): Promise<void> {
     if (this.saving || this.url.length === 0) {
       return;
@@ -88,12 +93,12 @@ struct ImageViewerPage {
           .width('100%')
           .height('100%')
           .objectFit(ImageFit.Contain)
+          .scale({ x: this.zoomScale, y: this.zoomScale, centerX: '50%', centerY: '50%' })
+          .translate({ x: this.tx, y: this.ty })
       }
 
-      // 右上角操作层：内层 Stack 撑满并 TopEnd 对齐，按钮固定右上角
       Stack({ alignContent: Alignment.TopEnd }) {
         Row({ space: 8 }) {
-          // 复制链接（小圆图标，半透明）
           Text('⧉')
             .width(32)
             .height(32)
@@ -105,7 +110,6 @@ struct ImageViewerPage {
             .onClick(() => {
               this.copyLink();
             })
-          // 系统 SaveButton：纯图标圆形，无文字块，贴右上角不挡图
           SaveButton({
             icon: SaveIconStyle.FULL_FILLED,
             buttonType: ButtonType.Circle,
@@ -124,8 +128,42 @@ struct ImageViewerPage {
     .width('100%')
     .height('100%')
     .backgroundColor(Color.Black)
-    .onClick(() => {
-      router.back();
-    })
+    .gesture(
+      TapGesture({ count: 1 })
+        .onAction(() => {
+          router.back();
+        })
+    )
+    .gesture(
+      GestureGroup(
+        GestureMode.Parallel,
+        PinchGesture({ fingers: 2, distance: 5 })
+          .onActionStart(() => {
+            this.pinchStartScale = this.zoomScale;
+          })
+          .onActionUpdate((e: GestureEvent) => {
+            const next: number = this.pinchStartScale * e.scale;
+            this.zoomScale = Math.min(4, Math.max(1, next));
+          })
+          .onActionEnd(() => {
+            if (this.zoomScale <= 1.05) {
+              this.zoomScale = 1;
+              this.tx = 0;
+              this.ty = 0;
+            }
+          }),
+        PanGesture({ fingers: 2, distance: 5 })
+          .onActionStart(() => {
+            this.pinchStartTx = this.tx;
+            this.pinchStartTy = this.ty;
+          })
+          .onActionUpdate((e: GestureEvent) => {
+            if (this.zoomScale > 1.05) {
+              this.tx = this.pinchStartTx + e.offsetX;
+              this.ty = this.pinchStartTy + e.offsetY;
+            }
+          })
+      )
+    )
   }
 }

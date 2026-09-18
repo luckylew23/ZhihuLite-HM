@@ -387,3 +387,5 @@ $HDC -t <serial> shell aa start -a EntryAbility -b com.zhihulite.hmos
 | v0.3.11 | 搜索页：默认时间范围改为三月内 + 筛选面板（内容类型/排序/时间三行 chips 可选）+ 筛选按钮可点开 + 修复深色主题下搜索框字体颜色（TextInput 未设 fontColor）+ 时间 pill 硬编码浅蓝改主题色 |
 | v0.3.12 | 收藏按钮修复：详情页/回答卡片收藏状态（未收藏 ☆ 移至收藏 → 已收藏 ★ 取消收藏 橙色）+ 进入自动查询收藏状态 + 收藏后返回实时刷新 + 收藏回传带资源 ID 防串扰 |
 | v0.3.13 | 图片长按下载原图（无水印）：统一 NetImage 组件（推荐/热榜/日报/想法/问题详情）+ 原图 URL 转换（去水印参数/尺寸段/压缩段）+ photoAccessHelper 保存相册 + 相册权限 |
+| v0.3.14 | 正文图片体验完善：正文大图（w=0 占满 / h=260 Contain）+ 单击全屏看图（ImageViewerPage 黑底 Contain）+ 右上角 SaveButton 保存/复制链接（32×32 纯图标贴顶不挡图）+ 正文字号 +2（正文 20/30、日报 19/28）+ 日报答主头像保持 48×48 小圆形（第一个 image 块标记 __avatar__）+ SaveButton 系统组件免 WRITE_IMAGEVIDEO 危险权限 |
+| v0.3.15 | 全屏看图双指交互：PinchGesture 双指捏合缩放（1x~4x）+ PanGesture 双指拖动平移 + 小于 1.05x 自动回弹原图 + GestureGroup(Parallel) 与单击关闭共存 |
