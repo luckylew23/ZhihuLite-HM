@@ -213,6 +213,7 @@ struct DailyDetailPage {
                       }
                     }
                     .width('100%')
+                    .onClick(() => { if (this.originUrl.length > 0) this.openOriginArticle(); })
                   } else if (b.type === 'image') {
                     NetImage({ url: b.url, w: 0, h: 260, r: 8, fit: ImageFit.Contain, mt: 4, tapView: true })
                   } else {
