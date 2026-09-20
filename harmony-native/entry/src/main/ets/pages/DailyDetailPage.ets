@@ -148,11 +148,31 @@ struct DailyDetailPage {
                 Divider().strokeWidth(0.5).color(ZhihuColors.divider).margin({ top: 4, bottom: 4 })
                 ForEach(this.bodyBlocks, (b: HtmlBlock) => {
                   if (b.type === 'text') {
-                    Text(b.text)
-                      .fontSize(19)
-                      .lineHeight(28)
-                      .fontColor(ZhihuColors.text)
+                    if (b.text.indexOf('查看知乎原文') >= 0) {
+                      // 正文末尾"查看知乎原文"渲染为可点击链接（打开知乎原文）
+                      Column({ space: 4 }) {
+                        Text(b.text.replace(/查看知乎原文.*/, '').trimEnd())
+                          .fontSize(19)
+                          .lineHeight(28)
+                          .fontColor(ZhihuColors.text)
+                          .width('100%')
+                          .visibility(b.text.replace(/查看知乎原文.*/, '').trim().length > 0 ? Visibility.Visible : Visibility.Hidden)
+                        Text('查看知乎原文 ›')
+                          .fontSize(16)
+                          .fontColor(ZhihuColors.primary)
+                          .width('100%')
+                          .onClick(() => {
+                            this.openZhihuDiscussion();
+                          })
+                      }
                       .width('100%')
+                    } else {
+                      Text(b.text)
+                        .fontSize(19)
+                        .lineHeight(28)
+                        .fontColor(ZhihuColors.text)
+                        .width('100%')
+                    }
                   } else if (b.text === '__avatar__') {
                     // 答主头像：小圆形 48px
                     Row() {

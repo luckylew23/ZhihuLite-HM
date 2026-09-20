@@ -35,8 +35,7 @@ export function stripHtml(html: string): string {
   text = text.replace(/\u00a0/g, ' ');
   text = text.replace(/[ \t]+\n/g, '\n');
   text = text.replace(/\n{3,}/g, '\n\n');
-  // 日报/文章末尾"查看知乎原文"链接残留（带 windows.daily=true 等参数）直接过滤
-  text = text.replace(/查看知乎原文[^\n]*/gi, '');
+  // 日报/文章末尾"查看知乎原文"链接里的 windows.daily=true 参数残留过滤（文字保留，由页面渲染为可点击链接）
   text = text.replace(/windows\.daily=true[^\n]*/gi, '');
   return text.trim();
 }
