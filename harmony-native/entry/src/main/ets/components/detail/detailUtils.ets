@@ -72,6 +72,7 @@ export function parseHtmlBlocks(html: string): HtmlBlock[] {
     return blocks;
   }
   const regex: RegExp = /<img[^>]*>/gi;
+  const seen: Set<string> = new Set<string>();
   let last: number = 0;
   let m: RegExpExecArray | null = regex.exec(html);
   while (m !== null) {
@@ -81,14 +82,9 @@ export function parseHtmlBlocks(html: string): HtmlBlock[] {
       blocks.push({ type: 'text', text: t, url: '' });
     }
     const url: string = extractImgSrc(m[0]);
-    if (url.length > 0 && url.indexOf('data:') !== 0) {
-      // 去重：知乎正文同一张图常出现 <img 懒加载占位> + <img 原图> 两个标签，
-      // 或 <noscript> 里再嵌一份；相邻或同 URL 的 image block 只保留第一张。
-      const lastBlock: HtmlBlock | undefined = blocks.length > 0 ? blocks[blocks.length - 1] : undefined;
-      const dup: boolean = lastBlock !== undefined && lastBlock.type === 'image' && lastBlock.url === url;
-      if (!dup) {
-        blocks.push({ type: 'image', text: '', url: url });
-      }
+    if (url.length > 0 && url.indexOf('data:') !== 0 && !seen.has(url)) {
+      seen.add(url);
+      blocks.push({ type: 'image', text: '', url: url });
     }
     last = m.index + m[0].length;
     m = regex.exec(html);
