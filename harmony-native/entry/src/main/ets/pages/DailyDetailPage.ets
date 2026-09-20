@@ -202,8 +202,6 @@ struct DailyDetailPage {
                       }
                     }
                     .width('100%')
-                  } else if (b.type === 'text' && this.isAuthorText(idx)) {
-                    // 跳过已合并到作者行的 text block
                   } else if (b.type === 'image') {
                     NetImage({ url: b.url, w: 0, h: 260, r: 8, fit: ImageFit.Contain, mt: 4, tapView: true })
                   } else {
