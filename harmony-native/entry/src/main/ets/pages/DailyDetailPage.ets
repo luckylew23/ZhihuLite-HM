@@ -27,6 +27,7 @@ struct DailyDetailPage {
   @State detail: DailyDetailResponse | null = null;
   @State bodyBlocks: HtmlBlock[] = [];
   @State originUrl: string = '';
+  @State discussionUrl: string = '';
   private fallbackTitle: string = '';
 
   aboutToAppear(): void {
@@ -56,6 +57,11 @@ struct DailyDetailPage {
       const ou: RegExpExecArray | null = /<a[^>]*href="([^"]+)"[^>]*class="[^"]*originUrl[^"]*"[^>]*>/i.exec(d.body) || /<a[^>]*class="[^"]*originUrl[^"]*"[^>]*href="([^"]+)"/i.exec(d.body);
       if (ou !== null) {
         this.originUrl = ou[1];
+      }
+      // 提取 <div class="view-more"><a href="...">查看知乎讨论</a></div> 的真实链接
+      const vm: RegExpExecArray | null = /<div[^>]*class="[^"]*view-more[^"]*"[^>]*>\s*<a[^>]*href="([^"]+)"/i.exec(d.body);
+      if (vm !== null) {
+        this.discussionUrl = vm[1];
       }
       this.bodyBlocks = blocks;
     } catch (e) {
@@ -107,8 +113,8 @@ struct DailyDetailPage {
 
   /** app 内打开知乎原文/讨论页（解析 URL 路由到原生详情页；识别不了才回退浏览器） */
   private openZhihuDiscussion(): void {
-    // 优先用正文里 <a class="originUrl"> 的知乎主站链接（app 内可路由到 answer/question 详情）
-    const url: string = this.originUrl.length > 0 ? this.originUrl : (this.detail?.share_url ?? '');
+    // 查看知乎讨论 → 打开 question 详情页（app 内）
+    const url: string = this.discussionUrl.length > 0 ? this.discussionUrl : (this.originUrl.length > 0 ? this.originUrl : (this.detail?.share_url ?? ''));
     if (url.length === 0) {
       return;
     }
