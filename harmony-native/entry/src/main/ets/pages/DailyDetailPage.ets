@@ -26,6 +26,7 @@ struct DailyDetailPage {
   @State error: string = '';
   @State detail: DailyDetailResponse | null = null;
   @State bodyBlocks: HtmlBlock[] = [];
+  @State originUrl: string = '';
   private fallbackTitle: string = '';
 
   aboutToAppear(): void {
@@ -50,6 +51,11 @@ struct DailyDetailPage {
           blocks[k] = { type: 'image', text: '__avatar__', url: blocks[k].url };
           break;
         }
+      }
+      // 提取 <a class="originUrl" href="...">查看知乎原文</a> 的真实链接（知乎主站 answer/question）
+      const ou: RegExpExecArray | null = /<a[^>]*class="[^"]*originUrl[^"]*"[^>]*href="([^"]+)"/i.exec(d.body);
+      if (ou !== null) {
+        this.originUrl = ou[1];
       }
       this.bodyBlocks = blocks;
     } catch (e) {
@@ -101,7 +107,8 @@ struct DailyDetailPage {
 
   /** app 内打开知乎原文/讨论页（解析 URL 路由到原生详情页；识别不了才回退浏览器） */
   private openZhihuDiscussion(): void {
-    const url = this.detail?.share_url ?? '';
+    // 优先用正文里 <a class="originUrl"> 的知乎主站链接（app 内可路由到 answer/question 详情）
+    const url: string = this.originUrl.length > 0 ? this.originUrl : (this.detail?.share_url ?? '');
     if (url.length === 0) {
       return;
     }
