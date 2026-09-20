@@ -123,6 +123,11 @@ struct DailyDetailPage {
     return idx > 0 && this.bodyBlocks[idx - 1].type === 'image' && this.bodyBlocks[idx - 1].text === '__avatar__';
   }
 
+  private splitUrls(text: string): string[] {
+    // 在每个 http:// 或 https:// 前切开，保证相邻 URL 分开
+    return text.split(/(?=https?:\/\/)/g).filter((x: string) => x.length > 0);
+  }
+
   private openLink(url: string): void {
     // 知乎内部链接 app 内打开
     if (openZhihuUrl(url)) {
@@ -217,7 +222,7 @@ struct DailyDetailPage {
                   } else if (b.type === 'image') {
                     NetImage({ url: b.url, w: 0, h: 260, r: 8, fit: ImageFit.Contain, mt: 4, tapView: true })
                   } else {
-                    ForEach(b.text.split(/(https?:\/\/\S+)/g), (part: string) => {
+                    ForEach(this.splitUrls(b.text), (part: string) => {
                       if (/^https?:\/\//.test(part)) {
                         Text(part)
                           .fontSize(17)
