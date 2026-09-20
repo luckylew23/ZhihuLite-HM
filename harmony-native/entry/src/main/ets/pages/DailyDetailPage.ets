@@ -112,6 +112,14 @@ struct DailyDetailPage {
   }
 
   /** app 内打开知乎原文/讨论页（解析 URL 路由到原生详情页；识别不了才回退浏览器） */
+  private openOriginArticle(): void {
+    if (this.originUrl.length === 0) return;
+    if (openZhihuUrl(this.originUrl)) return;
+    const ctx = getContext(this) as common.UIAbilityContext;
+    const w: Want = { action: 'ohos.want.action.viewData', entities: ['entity.system.browsable'], uri: this.originUrl };
+    ctx.startAbility(w);
+  }
+
   private openZhihuDiscussion(): void {
     // 查看知乎讨论 → 打开 question 详情页（app 内）
     const url: string = this.discussionUrl.length > 0 ? this.discussionUrl : (this.originUrl.length > 0 ? this.originUrl : (this.detail?.share_url ?? ''));
@@ -165,23 +173,7 @@ struct DailyDetailPage {
                 Divider().strokeWidth(0.5).color(ZhihuColors.divider).margin({ top: 4, bottom: 4 })
                 ForEach(this.bodyBlocks, (b: HtmlBlock) => {
                   if (b.type === 'text') {
-                    if (b.text.indexOf('查看知乎原文') >= 0) {
-                      // 正文末尾：正文部分保持黑色，仅"查看知乎原文"几个字蓝色可点击
-                      Text() {
-                        Span(b.text.substring(0, b.text.indexOf('查看知乎原文')))
-                          .fontColor(ZhihuColors.text);
-                        Span('查看知乎原文')
-                          .fontColor(ZhihuColors.primary)
-                          .onClick(() => {
-                            this.openZhihuDiscussion();
-                          });
-                        Span(b.text.substring(b.text.indexOf('查看知乎原文') + '查看知乎原文'.length))
-                          .fontColor(ZhihuColors.text);
-                      }
-                      .fontSize(19)
-                      .lineHeight(28)
-                      .width('100%')
-                    } else {
+                    {
                       Text(b.text)
                         .fontSize(19)
                         .lineHeight(28)
@@ -210,16 +202,22 @@ struct DailyDetailPage {
             if (this.detail?.share_url && this.detail.share_url.length > 0) {
               Divider().strokeWidth(0.5).color(ZhihuColors.divider).margin({ top: 8, bottom: 12 })
                 .padding({ left: 16, right: 16 })
-              Row() {
+              Column({ space: 10 }) {
+                if (this.originUrl.length > 0) {
+                  Text('查看知乎原文 ›')
+                    .fontSize(15)
+                    .fontColor(ZhihuColors.primary)
+                    .width('100%')
+                    .onClick(() => this.openOriginArticle())
+                }
                 Text('查看知乎讨论 ›')
                   .fontSize(15)
                   .fontColor(ZhihuColors.primary)
+                  .width('100%')
+                  .onClick(() => this.openZhihuDiscussion())
               }
               .width('100%')
               .padding({ left: 16, right: 16, bottom: 24 })
-              .onClick(() => {
-                this.openZhihuDiscussion();
-              })
             }
           }
           .width('100%')
