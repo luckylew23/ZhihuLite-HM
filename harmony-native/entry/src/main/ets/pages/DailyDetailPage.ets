@@ -153,23 +153,15 @@ struct DailyDetailPage {
                 ForEach(this.bodyBlocks, (b: HtmlBlock) => {
                   if (b.type === 'text') {
                     if (b.text.indexOf('查看知乎原文') >= 0) {
-                      // 正文末尾"查看知乎原文"渲染为可点击链接（打开知乎原文）
-                      Column({ space: 4 }) {
-                        Text(b.text.replace(/查看知乎原文.*/, '').trimEnd())
-                          .fontSize(19)
-                          .lineHeight(28)
-                          .fontColor(ZhihuColors.text)
-                          .width('100%')
-                          .visibility(b.text.replace(/查看知乎原文.*/, '').trim().length > 0 ? Visibility.Visible : Visibility.Hidden)
-                        Text('查看知乎原文 ›')
-                          .fontSize(16)
-                          .fontColor(ZhihuColors.primary)
-                          .width('100%')
-                          .onClick(() => {
-                            this.openZhihuDiscussion();
-                          })
-                      }
-                      .width('100%')
+                      // 正文末尾"查看知乎原文"保留原文文字样式，整段可点击打开知乎原文
+                      Text(b.text)
+                        .fontSize(19)
+                        .lineHeight(28)
+                        .fontColor(ZhihuColors.primary)
+                        .width('100%')
+                        .onClick(() => {
+                          this.openZhihuDiscussion();
+                        })
                     } else {
                       Text(b.text)
                         .fontSize(19)
