@@ -36,8 +36,8 @@ export function stripHtml(html: string): string {
   text = text.replace(/[ \t]+\n/g, '\n');
   text = text.replace(/\n{3,}/g, '\n\n');
   // 日报/文章末尾链接残留过滤：windows.daily=true 参数、无链接的"查看知乎讨论"纯文本
-  text = text.replace(/https?:\/\/\S*windows\.daily\S*/gi, '');
-  text = text.replace(/windows\.daily[=?\S]*/gi, '');
+  text = text.replace(/https?:\/\/\S*(?:windows|window)\.daily\S*/gi, '');
+  text = text.replace(/(?:windows|window)\.daily[=?\S]*/gi, '');
   text = text.replace(/查看知乎讨论[^\n]*/gi, '');
   return text.trim();
 }
