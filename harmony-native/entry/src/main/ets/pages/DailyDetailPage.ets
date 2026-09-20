@@ -194,6 +194,12 @@ struct DailyDetailPage {
                           .textOverflow({ overflow: TextOverflow.Ellipsis })
                       }
                       .layoutWeight(1)
+                      if (this.originUrl.length > 0) {
+                        Text('查看知乎原文 ›')
+                          .fontSize(14)
+                          .fontColor(ZhihuColors.primary)
+                          .onClick(() => this.openOriginArticle())
+                      }
                     }
                     .width('100%')
                   } else if (b.type === 'text' && this.isAuthorText(idx)) {
@@ -208,14 +214,6 @@ struct DailyDetailPage {
                       .width('100%')
                   }
                 }, (b: HtmlBlock, i: number) => i.toString() + b.url + b.text.substring(0, 8))
-                if (this.originUrl.length > 0) {
-                  Text('查看知乎原文 ›')
-                    .fontSize(15)
-                    .fontColor(ZhihuColors.primary)
-                    .width('100%')
-                    .margin({ top: 10 })
-                    .onClick(() => this.openOriginArticle())
-                }
               } else {
                 Text('正文暂无法展示')
                   .fontSize(16)
