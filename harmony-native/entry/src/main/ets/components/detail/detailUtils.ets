@@ -8,7 +8,10 @@
  */
 
 import { router, promptAction } from '@kit.ArkUI';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 import { authStore } from '../../store/authStore';
+const DOMAIN: number = 0x0001;
+const TAG: string = 'ZhihuLite';
 
 /** 富文本 → 纯文本。块级标签先转成换行，再剥标签、解码实体。 */
 export function stripHtml(html: string): string {
@@ -82,8 +85,12 @@ export function parseHtmlBlocks(html: string): HtmlBlock[] {
       blocks.push({ type: 'text', text: t, url: '' });
     }
     const url: string = extractImgSrc(m[0]);
-    if (url.length > 0 && url.indexOf('data:') !== 0 && !seen.has(url)) {
-      seen.add(url);
+    // 知乎正文每张图有两个 img：原图(src=_r.jpg) + 懒加载占位(src=_720w.jpg 或 svg)，
+    // URL 不同但同一张图；用 v2-token 做去重 key。
+    const tk: RegExpExecArray | null = /v2-[a-f0-9]{20,}/i.exec(url);
+    const key: string = tk !== null ? tk[0] : url;
+    if (url.length > 0 && url.indexOf('data:') !== 0 && !seen.has(key)) {
+      seen.add(key);
       blocks.push({ type: 'image', text: '', url: url });
     }
     last = m.index + m[0].length;
