@@ -5,6 +5,7 @@
  */
 
 import { router } from '@kit.ArkUI';
+import { common, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import {
   DailyDetailResponse,
@@ -97,6 +98,21 @@ struct DailyDetailPage {
     return '';
   }
 
+  /** 用系统浏览器打开知乎讨论页 */
+  private openZhihuDiscussion(): void {
+    const url = this.detail?.share_url ?? '';
+    if (url.length === 0) {
+      return;
+    }
+    const ctx = getContext(this) as common.UIAbilityContext;
+    const w: Want = {
+      action: 'ohos.want.action.viewData',
+      entities: ['entity.system.browsable'],
+      uri: url,
+    };
+    ctx.startAbility(w);
+  }
+
   build() {
     Column() {
       DetailNavBar({ title: this.detail ? this.detail.title : (this.fallbackTitle.length > 0 ? this.fallbackTitle : '日报') })
@@ -156,6 +172,20 @@ struct DailyDetailPage {
               }
             }
             .padding({ left: 16, right: 16, top: 12, bottom: 24 })
+            if (this.detail?.share_url && this.detail.share_url.length > 0) {
+              Divider().strokeWidth(0.5).color(ZhihuColors.divider).margin({ top: 8, bottom: 12 })
+                .padding({ left: 16, right: 16 })
+              Row() {
+                Text('查看知乎讨论 ›')
+                  .fontSize(15)
+                  .fontColor(ZhihuColors.primary)
+              }
+              .width('100%')
+              .padding({ left: 16, right: 16, bottom: 24 })
+              .onClick(() => {
+                this.openZhihuDiscussion();
+              })
+            }
           }
           .width('100%')
         }

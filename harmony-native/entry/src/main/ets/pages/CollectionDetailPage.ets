@@ -43,6 +43,15 @@ export struct CollectionDetailPage {
     this.loadAll();
   }
 
+  // 从详情页/收藏操作返回时刷新（首次由 aboutToAppear 加载）
+  private shownOnce: boolean = false;
+  onPageShow(): void {
+    if (this.shownOnce) {
+      this.fetchPage(true);
+    }
+    this.shownOnce = true;
+  }
+
   async loadAll(): Promise<void> {
     this.loading = true;
     this.error = '';

@@ -27,6 +27,24 @@ struct DetailPage {
       this.url = String(p['url'] ?? '');
       this.questionId = String(p['questionId'] ?? '');
     }
+    // 有原生详情页的类型直接跳转，不再停留占位页
+    const t = this.contentType;
+    if ((t === 'article' || t === 'articles') && this.contentId.length > 0) {
+      router.replaceUrl({ url: 'pages/ArticleDetailPage', params: { id: this.contentId } });
+      return;
+    }
+    if ((t === 'answer' || t === 'answers') && this.contentId.length > 0) {
+      router.replaceUrl({ url: 'pages/AnswerDetailPage', params: { id: this.contentId, questionId: this.questionId } });
+      return;
+    }
+    if ((t === 'question' || t === 'questions') && this.contentId.length > 0) {
+      router.replaceUrl({ url: 'pages/QuestionDetailPage', params: { id: this.contentId } });
+      return;
+    }
+    if ((t === 'pin' || t === 'pins') && this.contentId.length > 0) {
+      router.replaceUrl({ url: 'pages/PinDetailPage', params: { id: this.contentId } });
+      return;
+    }
   }
 
   private targetUrl(): string {

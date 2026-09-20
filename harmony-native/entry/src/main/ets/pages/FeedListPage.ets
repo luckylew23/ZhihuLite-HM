@@ -282,7 +282,6 @@ export struct FeedListPage {
   feedListNormal() {
     Refresh({ refreshing: $$this.refreshing }) {
       Column() {
-        this.searchHeader()
         List({ space: 10, scroller: this.scroller }) {
         ForEach(this.items, (item: FeedItem, index: number) => {
           ListItem() {
@@ -314,7 +313,6 @@ export struct FeedListPage {
   feedListHot() {
     Refresh({ refreshing: $$this.refreshing }) {
       Column() {
-        this.searchHeader()
         List({ space: 6, scroller: this.scroller }) {
         ForEach(this.hotItems, (item: HotItem, index: number) => {
           ListItem() {

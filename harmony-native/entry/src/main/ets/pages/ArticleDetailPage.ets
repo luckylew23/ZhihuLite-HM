@@ -5,8 +5,9 @@
  * 降级：HTML 正文剥标签用 Text 渲染，不做 WebView；文章点赞仅展示计数（本期无 voteArticle 接口）。
  */
 
-import { router } from '@kit.ArkUI';
+import { router, promptAction } from '@kit.ArkUI';
 import { getArticle } from '../api/article';
+import { getArticleCollectionStatus, removeArticleFromCollection } from '../api/collection';
 import { ZhihuArticle } from '../model/zhihu';
 import { ZhihuColors } from '../utils/theme';
 import { formatDate } from '../utils/date';
@@ -14,7 +15,7 @@ import { getZhihuErrorMessage } from '../utils/zhihuError';
 import { DetailNavBar } from '../components/detail/DetailNavBar';
 import { StatusView } from '../components/detail/StatusView';
 import { NetImage } from '../components/NetImage';
-import { formatCount, HtmlBlock, parseHtmlBlocks, readStringParam } from '../components/detail/detailUtils';
+import { formatCount, guardLogin, HtmlBlock, parseHtmlBlocks, readStringParam } from '../components/detail/detailUtils';
 
 @Entry
 @Component
@@ -24,11 +25,67 @@ struct ArticleDetailPage {
   @State error: string = '';
   @State article: ZhihuArticle | null = null;
   @State bodyBlocks: HtmlBlock[] = [];
+  @State collected: boolean = false;
+  @State collectionId: string = '';
+  @StorageLink('collectPicked') @Watch('onCollectPicked') collectPicked: string = '';
+
+  onCollectPicked(): void {
+    if (this.collectPicked === this.articleId) {
+      this.collected = true;
+      this.collectPicked = '';
+    }
+  }
 
   aboutToAppear(): void {
     const p = router.getParams() as Record<string, object>;
     this.articleId = readStringParam(p, 'id');
     this.load();
+  }
+
+  private async refreshCollectionStatus(): Promise<void> {
+    if (this.articleId.length === 0) {
+      return;
+    }
+    try {
+      const st = await getArticleCollectionStatus(this.articleId, 1);
+      if (st.collected === true) {
+        this.collected = true;
+        const list = st.data ?? [];
+        if (list.length > 0) {
+          const first = list[0] as Record<string, object>;
+          this.collectionId = String(first['id'] ?? '');
+        }
+      }
+    } catch (e) {
+    }
+  }
+
+  private async onCollect(): Promise<void> {
+    if (!guardLogin()) {
+      return;
+    }
+    if (this.collected) {
+      if (this.collectionId.length === 0) {
+        await this.refreshCollectionStatus();
+        if (this.collectionId.length === 0) {
+          promptAction.showToast({ message: '无法获取收藏夹信息' });
+          return;
+        }
+      }
+      try {
+        await removeArticleFromCollection(this.collectionId, this.articleId);
+        this.collected = false;
+        this.collectionId = '';
+        promptAction.showToast({ message: '已取消收藏' });
+      } catch (e) {
+        promptAction.showToast({ message: '取消收藏失败' });
+      }
+      return;
+    }
+    router.pushUrl({
+      url: 'pages/CollectionPickerPage',
+      params: { resourceType: 'article', resourceId: this.articleId },
+    });
   }
 
   private async load(): Promise<void> {
@@ -38,6 +95,7 @@ struct ArticleDetailPage {
       const a: ZhihuArticle = await getArticle(this.articleId);
       this.article = a;
       this.bodyBlocks = parseHtmlBlocks(a.content);
+      this.refreshCollectionStatus();
     } catch (e) {
       this.error = getZhihuErrorMessage(e as object);
     } finally {
@@ -123,6 +181,19 @@ struct ArticleDetailPage {
           .layoutWeight(1).justifyContent(FlexAlign.Center).padding({ top: 12, bottom: 12 })
           .onClick(() => {
             this.onComment();
+          })
+
+          Row({ space: 4 }) {
+            Text(this.collected ? '★' : '☆')
+              .fontSize(17)
+              .fontColor(this.collected ? ZhihuColors.warning : ZhihuColors.textSecondary)
+            Text(this.collected ? '取消收藏' : '移至收藏')
+              .fontSize(16)
+              .fontColor(this.collected ? ZhihuColors.warning : ZhihuColors.textSecondary)
+          }
+          .layoutWeight(1).justifyContent(FlexAlign.Center).padding({ top: 12, bottom: 12 })
+          .onClick(() => {
+            this.onCollect();
           })
         }
         .width('100%')
