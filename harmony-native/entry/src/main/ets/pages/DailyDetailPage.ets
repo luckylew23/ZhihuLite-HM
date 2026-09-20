@@ -222,22 +222,11 @@ struct DailyDetailPage {
                   } else if (b.type === 'image') {
                     NetImage({ url: b.url, w: 0, h: 260, r: 8, fit: ImageFit.Contain, mt: 4, tapView: true })
                   } else {
-                    ForEach(this.splitUrls(b.text), (part: string) => {
-                      if (/^https?:\/\//.test(part)) {
-                        Text(part)
-                          .fontSize(17)
-                          .fontColor(ZhihuColors.primary)
-                          .width('100%')
-                          .margin({ top: 4, bottom: 4 })
-                          .onClick(() => this.openLink(part))
-                      } else if (part.length > 0) {
-                        Text(part)
-                          .fontSize(19)
-                          .lineHeight(28)
-                          .fontColor(ZhihuColors.text)
-                          .width('100%')
-                      }
-                    })
+                    Text(b.text)
+                      .fontSize(19)
+                      .lineHeight(28)
+                      .fontColor(ZhihuColors.text)
+                      .width('100%')
                   }
                 }, (b: HtmlBlock, i: number) => i.toString() + b.url + b.text.substring(0, 8))
               } else {
