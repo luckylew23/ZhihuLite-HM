@@ -409,7 +409,7 @@ struct SearchPage {
           router.back();
         })
       Row() {
-        Text('🔍')
+        Text('⌕')
         TextInput({ placeholder: '搜索知乎内容…', text: this.query })
           .layoutWeight(1)
           .height(36)
@@ -689,7 +689,7 @@ struct SearchPage {
       ForEach(this.suggestions, (s: SuggestHit, index: number) => {
         ListItem() {
           Row({ space: 12 }) {
-            Text('🔍')
+            Text('⌕')
             Text(s.query)
               .fontSize(17)
               .fontColor(ZhihuColors.text)

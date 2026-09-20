@@ -336,7 +336,7 @@ struct TopicPage {
               }
               Row({ space: 14 }) {
                 Text('▲ ' + formatCount(card.voteCount))
-                Text('💬 ' + formatCount(card.commentCount))
+                Text('○ ' + formatCount(card.commentCount))
               }
               .width('100%')
             }

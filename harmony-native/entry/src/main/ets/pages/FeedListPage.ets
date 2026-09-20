@@ -259,7 +259,7 @@ export struct FeedListPage {
   @Builder
   searchHeader() {
     Row({ space: 8 }) {
-      Text('🔍')
+      Text('⌕')
         .fontSize(17)
         .fontColor(ZhihuColors.textTertiary)
       Text('搜索知乎')

@@ -183,7 +183,7 @@ export struct AnswerCard {
         })
 
         Row({ space: 4 }) {
-          Text('💬')
+          Text('○')
           Text(formatCount(this.item.comment_count))
         }
         .padding({ left: 8, right: 8, top: 4, bottom: 4 })

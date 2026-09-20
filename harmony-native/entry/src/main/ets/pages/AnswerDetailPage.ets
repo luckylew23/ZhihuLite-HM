@@ -286,7 +286,7 @@ struct AnswerDetailPage {
           })
 
           Row({ space: 4 }) {
-            Text('💬')
+            Text('○')
             Text(formatCount(this.answer.comment_count))
           }
           .layoutWeight(1)

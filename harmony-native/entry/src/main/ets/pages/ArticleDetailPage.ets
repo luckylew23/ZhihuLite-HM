@@ -175,7 +175,7 @@ struct ArticleDetailPage {
           .layoutWeight(1).justifyContent(FlexAlign.Center).padding({ top: 12, bottom: 12 })
 
           Row({ space: 4 }) {
-            Text('💬')
+            Text('○')
             Text(formatCount(this.article.comment_count))
           }
           .layoutWeight(1).justifyContent(FlexAlign.Center).padding({ top: 12, bottom: 12 })

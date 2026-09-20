@@ -136,7 +136,7 @@ struct Index {
         (key: string) => key,
       )
       Blank()
-      Text('🔍')
+      Text('⌕')
         .fontSize(20)
         .fontColor(ZhihuColors.text)
         .padding(8)
