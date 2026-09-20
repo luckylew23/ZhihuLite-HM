@@ -146,7 +146,7 @@ export function guardLogin(): boolean {
 
 /** 把 router 参数 Record 安全取出字符串字段。 */
 export function readStringParam(params: Record<string, object> | null, key: string): string {
-  if (params === null) {
+  if (params === null || params === undefined) {
     return '';
   }
   const v: object | undefined = params[key];

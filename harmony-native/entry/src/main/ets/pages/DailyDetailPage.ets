@@ -16,6 +16,7 @@ import { DetailNavBar } from '../components/detail/DetailNavBar';
 import { StatusView } from '../components/detail/StatusView';
 import { HtmlBlock, parseHtmlBlocks, readStringParam } from '../components/detail/detailUtils';
 import { NetImage } from '../components/NetImage';
+import { openZhihuUrl } from '../utils/zhihuRouter';
 
 @Entry
 @Component
@@ -98,10 +99,13 @@ struct DailyDetailPage {
     return '';
   }
 
-  /** 用系统浏览器打开知乎讨论页 */
+  /** app 内打开知乎原文/讨论页（解析 URL 路由到原生详情页；识别不了才回退浏览器） */
   private openZhihuDiscussion(): void {
     const url = this.detail?.share_url ?? '';
     if (url.length === 0) {
+      return;
+    }
+    if (openZhihuUrl(url)) {
       return;
     }
     const ctx = getContext(this) as common.UIAbilityContext;
