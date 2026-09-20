@@ -172,22 +172,19 @@ struct DailyDetailPage {
               if (this.bodyBlocks.length > 0) {
                 Divider().strokeWidth(0.5).color(ZhihuColors.divider).margin({ top: 4, bottom: 4 })
                 ForEach(this.bodyBlocks, (b: HtmlBlock) => {
-                  if (b.type === 'text') {
-                    {
-                      Text(b.text)
-                        .fontSize(19)
-                        .lineHeight(28)
-                        .fontColor(ZhihuColors.text)
-                        .width('100%')
-                    }
-                  } else if (b.text === '__avatar__') {
-                    // 答主头像：小圆形 48px
+                  if (b.type === 'image' && b.text === '__avatar__') {
                     Row() {
                       NetImage({ url: b.url, w: 48, h: 48, r: 24 })
                     }
                     .width('100%')
-                  } else {
+                  } else if (b.type === 'image') {
                     NetImage({ url: b.url, w: 0, h: 260, r: 8, fit: ImageFit.Contain, mt: 4, tapView: true })
+                  } else {
+                    Text(b.text)
+                      .fontSize(19)
+                      .lineHeight(28)
+                      .fontColor(ZhihuColors.text)
+                      .width('100%')
                   }
                 }, (b: HtmlBlock, i: number) => i.toString() + b.url + b.text.substring(0, 8))
               } else {
