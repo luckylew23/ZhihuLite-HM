@@ -160,15 +160,21 @@ struct DailyDetailPage {
                 ForEach(this.bodyBlocks, (b: HtmlBlock) => {
                   if (b.type === 'text') {
                     if (b.text.indexOf('查看知乎原文') >= 0) {
-                      // 正文末尾"查看知乎原文"保留原文文字样式，整段可点击打开知乎原文
-                      Text(b.text)
-                        .fontSize(19)
-                        .lineHeight(28)
-                        .fontColor(ZhihuColors.primary)
-                        .width('100%')
-                        .onClick(() => {
-                          this.openZhihuDiscussion();
-                        })
+                      // 正文末尾：正文部分保持黑色，仅"查看知乎原文"几个字蓝色可点击
+                      Text() {
+                        Span(b.text.substring(0, b.text.indexOf('查看知乎原文')))
+                          .fontColor(ZhihuColors.text);
+                        Span('查看知乎原文')
+                          .fontColor(ZhihuColors.primary)
+                          .onClick(() => {
+                            this.openZhihuDiscussion();
+                          });
+                        Span(b.text.substring(b.text.indexOf('查看知乎原文') + '查看知乎原文'.length))
+                          .fontColor(ZhihuColors.text);
+                      }
+                      .fontSize(19)
+                      .lineHeight(28)
+                      .width('100%')
                     } else {
                       Text(b.text)
                         .fontSize(19)
