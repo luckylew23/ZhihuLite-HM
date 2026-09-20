@@ -123,6 +123,12 @@ struct DailyDetailPage {
     return idx > 0 && this.bodyBlocks[idx - 1].type === 'image' && this.bodyBlocks[idx - 1].text === '__avatar__';
   }
 
+  private openExternalUrl(url: string): void {
+    const ctx = getContext(this) as common.UIAbilityContext;
+    const w: Want = { action: 'ohos.want.action.viewData', entities: ['entity.system.browsable'], uri: url };
+    ctx.startAbility(w);
+  }
+
   private openOriginArticle(): void {
     if (this.originUrl.length === 0) return;
     if (openZhihuUrl(this.originUrl)) return;
@@ -205,11 +211,21 @@ struct DailyDetailPage {
                   } else if (b.type === 'image') {
                     NetImage({ url: b.url, w: 0, h: 260, r: 8, fit: ImageFit.Contain, mt: 4, tapView: true })
                   } else {
-                    Text(b.text)
-                      .fontSize(19)
-                      .lineHeight(28)
-                      .fontColor(ZhihuColors.text)
-                      .width('100%')
+                    Text() {
+                      ForEach(b.text.split(/(https?:\/\/\S+)/g), (part: string) => {
+                        if (/^https?:\/\//.test(part)) {
+                          Span(part)
+                            .fontColor(ZhihuColors.primary)
+                            .onClick(() => this.openExternalUrl(part))
+                        } else if (part.length > 0) {
+                          Span(part)
+                            .fontColor(ZhihuColors.text)
+                        }
+                      })
+                    }
+                    .fontSize(19)
+                    .lineHeight(28)
+                    .width('100%')
                   }
                 }, (b: HtmlBlock, i: number) => i.toString() + b.url + b.text.substring(0, 8))
               } else {
