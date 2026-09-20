@@ -18,6 +18,7 @@ const ZHIHU_WEB_HOSTS: Set<string> = new Set<string>([
   'www.zhihu.com',
   'zhuanlan.zhihu.com',
   'oia.zhihu.com',
+  'daily.zhihu.com',
 ]);
 
 const ZHIHU_APP_PROTOCOLS: Set<string> = new Set<string>(['zhihu:', 'zhihu--:']);
@@ -76,6 +77,10 @@ function normalizeSupportedPath(path: string): string | null {
     },
     {
       pattern: /^\/(?:articles?|p)\/(\d+)$/,
+      buildPath: (match) => `/article/${match[1]}`,
+    },
+    {
+      pattern: /^\/(?:story|stories)\/(\d+)$/,
       buildPath: (match) => `/article/${match[1]}`,
     },
     {
