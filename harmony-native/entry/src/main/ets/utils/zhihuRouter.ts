@@ -21,19 +21,19 @@ export function openZhihuUrl(url: string): boolean {
   try {
     switch (kind) {
       case 'answer':
-        router.pushUrl({ url: 'pages/AnswerDetailPage', params: { answerId: id } });
+        router.pushUrl({ url: 'pages/AnswerDetailPage', params: { id: id } });
         return true;
       case 'question':
-        router.pushUrl({ url: 'pages/QuestionDetailPage', params: { questionId: id } });
+        router.pushUrl({ url: 'pages/QuestionDetailPage', params: { id: id } });
         return true;
       case 'article':
-        router.pushUrl({ url: 'pages/ArticleDetailPage', params: { articleId: id } });
+        router.pushUrl({ url: 'pages/ArticleDetailPage', params: { id: id } });
         return true;
       case 'pin':
-        router.pushUrl({ url: 'pages/PinDetailPage', params: { pinId: id } });
+        router.pushUrl({ url: 'pages/PinDetailPage', params: { id: id } });
         return true;
       case 'user':
-        router.pushUrl({ url: 'pages/PeoplePage', params: { userId: id } });
+        router.pushUrl({ url: 'pages/PeoplePage', params: { id: id } });
         return true;
       case 'topic':
         router.pushUrl({ url: 'pages/TopicPage', params: { topicId: id } });
