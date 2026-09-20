@@ -123,22 +123,6 @@ struct DailyDetailPage {
     return idx > 0 && this.bodyBlocks[idx - 1].type === 'image' && this.bodyBlocks[idx - 1].text === '__avatar__';
   }
 
-  private splitUrls(text: string): string[] {
-    // 在每个 http:// 或 https:// 前切开，保证相邻 URL 分开
-    return text.split(/(?=https?:\/\/)/g).filter((x: string) => x.length > 0);
-  }
-
-  private openLink(url: string): void {
-    // 知乎内部链接 app 内打开
-    if (openZhihuUrl(url)) {
-      return;
-    }
-    // 外部链接跳浏览器
-    const ctx = getContext(this) as common.UIAbilityContext;
-    const w: Want = { action: 'ohos.want.action.viewData', entities: ['entity.system.browsable'], uri: url };
-    ctx.startAbility(w);
-  }
-
   private openOriginArticle(): void {
     if (this.originUrl.length === 0) return;
     if (openZhihuUrl(this.originUrl)) return;
@@ -218,7 +202,6 @@ struct DailyDetailPage {
                       }
                     }
                     .width('100%')
-                    .onClick(() => { if (this.originUrl.length > 0) this.openOriginArticle(); })
                   } else if (b.type === 'image') {
                     NetImage({ url: b.url, w: 0, h: 260, r: 8, fit: ImageFit.Contain, mt: 4, tapView: true })
                   } else {
