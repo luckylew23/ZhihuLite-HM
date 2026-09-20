@@ -112,6 +112,17 @@ struct DailyDetailPage {
   }
 
   /** app 内打开知乎原文/讨论页（解析 URL 路由到原生详情页；识别不了才回退浏览器） */
+  private getAuthorText(idx: number): string {
+    if (idx + 1 < this.bodyBlocks.length && this.bodyBlocks[idx + 1].type === 'text') {
+      return this.bodyBlocks[idx + 1].text;
+    }
+    return '';
+  }
+
+  private isAuthorText(idx: number): boolean {
+    return idx > 0 && this.bodyBlocks[idx - 1].type === 'image' && this.bodyBlocks[idx - 1].text === '__avatar__';
+  }
+
   private openOriginArticle(): void {
     if (this.originUrl.length === 0) return;
     if (openZhihuUrl(this.originUrl)) return;
@@ -171,12 +182,22 @@ struct DailyDetailPage {
               }
               if (this.bodyBlocks.length > 0) {
                 Divider().strokeWidth(0.5).color(ZhihuColors.divider).margin({ top: 4, bottom: 4 })
-                ForEach(this.bodyBlocks, (b: HtmlBlock) => {
+                ForEach(this.bodyBlocks, (b: HtmlBlock, idx: number) => {
                   if (b.type === 'image' && b.text === '__avatar__') {
-                    Row() {
+                    Row({ space: 10 }) {
                       NetImage({ url: b.url, w: 48, h: 48, r: 24 })
+                      Column() {
+                        Text(this.getAuthorText(idx))
+                          .fontSize(15)
+                          .fontColor(ZhihuColors.textSecondary)
+                          .maxLines(2)
+                          .textOverflow({ overflow: TextOverflow.Ellipsis })
+                      }
+                      .layoutWeight(1)
                     }
                     .width('100%')
+                  } else if (b.type === 'text' && this.isAuthorText(idx)) {
+                    // 跳过已合并到作者行的 text block
                   } else if (b.type === 'image') {
                     NetImage({ url: b.url, w: 0, h: 260, r: 8, fit: ImageFit.Contain, mt: 4, tapView: true })
                   } else {
