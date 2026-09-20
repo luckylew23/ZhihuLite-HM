@@ -169,6 +169,13 @@ struct DailyDetailPage {
                   .fontColor(ZhihuColors.textSecondary)
                   .width('100%')
               }
+              if (this.originUrl.length > 0) {
+                Text('查看知乎原文 ›')
+                  .fontSize(15)
+                  .fontColor(ZhihuColors.primary)
+                  .width('100%')
+                  .onClick(() => this.openOriginArticle())
+              }
               if (this.bodyBlocks.length > 0) {
                 Divider().strokeWidth(0.5).color(ZhihuColors.divider).margin({ top: 4, bottom: 4 })
                 ForEach(this.bodyBlocks, (b: HtmlBlock) => {
@@ -199,20 +206,11 @@ struct DailyDetailPage {
             if (this.detail?.share_url && this.detail.share_url.length > 0) {
               Divider().strokeWidth(0.5).color(ZhihuColors.divider).margin({ top: 8, bottom: 12 })
                 .padding({ left: 16, right: 16 })
-              Column({ space: 10 }) {
-                if (this.originUrl.length > 0) {
-                  Text('查看知乎原文 ›')
-                    .fontSize(15)
-                    .fontColor(ZhihuColors.primary)
-                    .width('100%')
-                    .onClick(() => this.openOriginArticle())
-                }
-                Text('查看知乎讨论 ›')
-                  .fontSize(15)
-                  .fontColor(ZhihuColors.primary)
-                  .width('100%')
-                  .onClick(() => this.openZhihuDiscussion())
-              }
+              Text('查看知乎讨论 ›')
+                .fontSize(15)
+                .fontColor(ZhihuColors.primary)
+                .width('100%')
+                .onClick(() => this.openZhihuDiscussion())
               .width('100%')
               .padding({ left: 16, right: 16, bottom: 24 })
             }
