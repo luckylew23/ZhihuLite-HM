@@ -177,14 +177,6 @@ struct DailyDetailPage {
                       NetImage({ url: b.url, w: 48, h: 48, r: 24 })
                     }
                     .width('100%')
-                    if (this.originUrl.length > 0) {
-                      Text('查看知乎原文 ›')
-                        .fontSize(15)
-                        .fontColor(ZhihuColors.primary)
-                        .width('100%')
-                        .margin({ top: 6 })
-                        .onClick(() => this.openOriginArticle())
-                    }
                   } else if (b.type === 'image') {
                     NetImage({ url: b.url, w: 0, h: 260, r: 8, fit: ImageFit.Contain, mt: 4, tapView: true })
                   } else {
@@ -195,6 +187,14 @@ struct DailyDetailPage {
                       .width('100%')
                   }
                 }, (b: HtmlBlock, i: number) => i.toString() + b.url + b.text.substring(0, 8))
+                if (this.originUrl.length > 0) {
+                  Text('查看知乎原文 ›')
+                    .fontSize(15)
+                    .fontColor(ZhihuColors.primary)
+                    .width('100%')
+                    .margin({ top: 10 })
+                    .onClick(() => this.openOriginArticle())
+                }
               } else {
                 Text('正文暂无法展示')
                   .fontSize(16)
