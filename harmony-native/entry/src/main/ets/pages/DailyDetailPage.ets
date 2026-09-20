@@ -53,7 +53,7 @@ struct DailyDetailPage {
         }
       }
       // 提取 <a class="originUrl" href="...">查看知乎原文</a> 的真实链接（知乎主站 answer/question）
-      const ou: RegExpExecArray | null = /<a[^>]*class="[^"]*originUrl[^"]*"[^>]*href="([^"]+)"/i.exec(d.body);
+      const ou: RegExpExecArray | null = /<a[^>]*href="([^"]+)"[^>]*class="[^"]*originUrl[^"]*"[^>]*>/i.exec(d.body) || /<a[^>]*class="[^"]*originUrl[^"]*"[^>]*href="([^"]+)"/i.exec(d.body);
       if (ou !== null) {
         this.originUrl = ou[1];
       }
