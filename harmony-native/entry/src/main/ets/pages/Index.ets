@@ -137,9 +137,9 @@ struct Index {
       )
       Blank()
       Text('⌕')
-        .fontSize(20)
+        .fontSize(26)
         .fontColor(ZhihuColors.text)
-        .padding(8)
+        .padding({ left: 8, right: 4, top: 0, bottom: 0 })
         .onClick(() => {
           router.pushUrl({ url: 'pages/SearchPage' });
         })
