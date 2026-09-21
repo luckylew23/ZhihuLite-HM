@@ -105,85 +105,46 @@ export function parseHtmlBlocks(html: string): HtmlBlock[] {
   return blocks;
 }
 
-/** 把一段 HTML 转成结构化 blocks（不处理图片）。 */
+/** 把一段 HTML 转成结构化 blocks（不处理图片）。递归处理嵌套块级标签（div 包 p/h2/ul/li 等）。 */
 function htmlToBlocks(html: string, out: HtmlBlock[]): void {
   let text: string = html;
-  // 去掉 script/style
   text = text.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
   text = text.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
-  // 块级标签按行切分
-  // 先按行处理，识别 heading/quote/code/list
-  // 用正则提取块级元素
-  const blockRe: RegExp = /<(h[1-6]|blockquote|pre|ul|ol|li|p|div|section)[^>]*>([\s\S]*?)<\/\1>/gi;
-  let lm: RegExpExecArray | null = blockRe.exec(text);
-  let lastPos: number = 0;
-  while (lm !== null) {
-    // 块之前的文本
-    const before: string = text.substring(lastPos, lm.index);
-    const plainBefore: string = stripHtml(before, true);
-    if (plainBefore.length > 0) {
-      pushTextBlocks(plainBefore, out);
+  const re: RegExp = /<(h[1-6]|blockquote|pre|ul|ol|li|p|div|section)[^>]*>([\s\S]*?)<\/\1>/i;
+  const m: RegExpExecArray | null = re.exec(text);
+  if (m === null) {
+    const plain: string = stripHtml(text, true);
+    if (plain.length > 0) {
+      out.push({ type: 'text', text: plain, url: '' });
     }
-    const tag: string = lm[1].toLowerCase();
-    const inner: string = lm[2];
-    if (tag.startsWith('h')) {
-      const lv: number = parseInt(tag.substring(1), 10);
-      const t: string = stripHtml(inner, true);
-      if (t.length > 0) out.push({ type: 'heading', text: t, url: '', level: lv });
-    } else if (tag === 'blockquote') {
-      const t: string = stripHtml(inner, true);
-      if (t.length > 0) out.push({ type: 'quote', text: t, url: '' });
-    } else if (tag === 'pre') {
-      const t: string = stripHtml(inner);
-      if (t.length > 0) out.push({ type: 'code', text: t, url: '' });
-    } else if (tag === 'li') {
-      const t: string = stripHtml(inner, true);
-      if (t.length > 0) out.push({ type: 'list', text: t, url: '' });
-    } else {
-      // p/div/section 普通段落
-      const t: string = stripHtml(inner, true);
-      if (t.length > 0) out.push({ type: 'text', text: t, url: '' });
-    }
-    lastPos = lm.index + lm[0].length;
-    lm = blockRe.exec(text);
+    return;
   }
-  // 剩余文本
-  const rest: string = text.substring(lastPos);
-  const plainRest: string = stripHtml(rest, true);
-  if (plainRest.length > 0) {
-    pushTextBlocks(plainRest, out);
+  const before: string = text.substring(0, m.index);
+  const plainBefore: string = stripHtml(before, true);
+  if (plainBefore.length > 0) {
+    out.push({ type: 'text', text: plainBefore, url: '' });
   }
-}
-
-/** 把纯文本按换行拆成 text blocks。 */
-function pushTextBlocks(plain: string, out: HtmlBlock[]): void {
-  const lines: string[] = plain.split('\n');
-  for (let i = 0; i < lines.length; i++) {
-    const ln: string = lines[i].trim();
-    if (ln.length > 0) {
-      out.push({ type: 'text', text: ln, url: '' });
-    }
+  const tag: string = m[1].toLowerCase();
+  const inner: string = m[2];
+  if (tag.startsWith('h')) {
+    const lv: number = parseInt(tag.substring(1), 10);
+    const t: string = stripHtml(inner, true);
+    if (t.length > 0) out.push({ type: 'heading', text: t, url: '', level: lv });
+  } else if (tag === 'blockquote') {
+    const t: string = stripHtml(inner, true);
+    if (t.length > 0) out.push({ type: 'quote', text: t, url: '' });
+  } else if (tag === 'pre') {
+    const t: string = stripHtml(inner, true);
+    if (t.length > 0) out.push({ type: 'code', text: t, url: '' });
+  } else if (tag === 'li') {
+    const t: string = stripHtml(inner, true);
+    if (t.length > 0) out.push({ type: 'list', text: t, url: '' });
+  } else {
+    // ul/ol/p/div/section：递归处理内层，让嵌套的 h2/li/blockquote 正确识别
+    htmlToBlocks(inner, out);
   }
-}
-
-/** 从 HTML 中抽出所有图片地址（去重，按出现顺序）。 */
-export function extractImageUrls(html: string): string[] {
-  const out: string[] = [];
-  if (html === null || html === undefined) {
-    return out;
-  }
-  const seen: Set<string> = new Set<string>();
-  const regex: RegExp = /<img[^>]+src="([^">]+)"/gi;
-  let m: RegExpExecArray | null = regex.exec(html);
-  while (m !== null) {
-    const url: string = m[1];
-    if (url.length > 0 && !seen.has(url)) {
-      seen.add(url);
-      out.push(url);
-    }
-    m = regex.exec(html);
-  }
-  return out;
+  const after: string = text.substring(m.index + m[0].length);
+  htmlToBlocks(after, out);
 }
 
 /** 行内富文本片段：bold=粗体；italic=斜体；code=等宽。 */
