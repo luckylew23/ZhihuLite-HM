@@ -249,7 +249,8 @@ struct DailyDetailPage {
                     }
                     .lineHeight(28)
                     .width('100%')
-                  } else {
+                  } else if (!this.isAuthorText(idx)) {
+                    // 作者名/介绍文本块已在头像行显示，这里跳过避免正文第一行重复
                     Text() {
                       ForEach(parseInline(b.text), (p: InlinePart) => {
                         Span(p.text)
