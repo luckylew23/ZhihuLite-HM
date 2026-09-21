@@ -204,6 +204,37 @@ struct DailyDetailPage {
                     .width('100%')
                   } else if (b.type === 'image') {
                     NetImage({ url: b.url, w: 0, h: 260, r: 8, fit: ImageFit.Contain, mt: 4, tapView: true })
+                  } else if (b.type === 'heading') {
+                    Text(b.text)
+                      .fontSize(b.level !== undefined && b.level <= 2 ? 22 : 20)
+                      .fontWeight(FontWeight.Bold)
+                      .fontColor(ZhihuColors.text)
+                      .width('100%')
+                      .margin({ top: 8, bottom: 4 })
+                  } else if (b.type === 'quote') {
+                    Text(b.text)
+                      .fontSize(18)
+                      .lineHeight(26)
+                      .fontColor(ZhihuColors.textSecondary)
+                      .fontStyle(FontStyle.Italic)
+                      .width('100%')
+                      .padding({ left: 12, top: 4, bottom: 4 })
+                      .borderWidth({ left: 3 })
+                      .borderColor({ left: ZhihuColors.primary })
+                  } else if (b.type === 'code') {
+                    Text(b.text)
+                      .fontSize(16)
+                      .lineHeight(24)
+                      .fontColor(ZhihuColors.text)
+                      .width('100%')
+                      .padding(10)
+                      .backgroundColor(ZhihuColors.backgroundSecondary)
+                  } else if (b.type === 'list') {
+                    Text('· ' + b.text)
+                      .fontSize(19)
+                      .lineHeight(28)
+                      .fontColor(ZhihuColors.text)
+                      .width('100%')
                   } else {
                     Text(b.text)
                       .fontSize(19)

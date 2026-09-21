@@ -46,11 +46,12 @@ export function stripHtml(html: string): string {
   return text.trim();
 }
 
-/** 正文富文本块：text=文本段；image=图片段（可长按下载）。 */
+/** 正文富文本块：text=段落；heading=标题；quote=引用；code=代码块；list=列表项；image=图片。 */
 export interface HtmlBlock {
-  type: 'text' | 'image';
+  type: 'text' | 'heading' | 'quote' | 'code' | 'list' | 'image';
   text: string;
   url: string;
+  level?: number;  // heading level 1-6
 }
 
 /** 从 <img ...> 标签里按优先级取真实 URL（知乎懒加载：data-actualsrc > data-original > data-src > src） */
@@ -67,27 +68,22 @@ function extractImgSrc(tag: string): string {
 }
 
 /**
- * 解析 HTML 正文 → 文本/图片交替块（正文内嵌图片显示 + 可长按下载）。
- * 按 <img> 切分：片段走 stripHtml（剥标签+实体解码），图片标签提取 src。
+ * 解析 HTML 正文 → 结构化块（标题/引用/代码/列表/段落/图片）。
  */
 export function parseHtmlBlocks(html: string): HtmlBlock[] {
   const blocks: HtmlBlock[] = [];
   if (html === null || html === undefined || typeof html !== 'string') {
     return blocks;
   }
-  const regex: RegExp = /<img[^>]*>/gi;
+  // 先按 <img> 切分，图片单独成块
+  const imgRe: RegExp = /<img[^>]*>/gi;
   const seen: Set<string> = new Set<string>();
   let last: number = 0;
-  let m: RegExpExecArray | null = regex.exec(html);
+  let m: RegExpExecArray | null = imgRe.exec(html);
   while (m !== null) {
     const seg: string = html.substring(last, m.index);
-    const t: string = stripHtml(seg);
-    if (t.length > 0) {
-      blocks.push({ type: 'text', text: t, url: '' });
-    }
+    htmlToBlocks(seg, blocks);
     const url: string = extractImgSrc(m[0]);
-    // 知乎正文每张图有两个 img：原图(src=_r.jpg) + 懒加载占位(src=_720w.jpg 或 svg)，
-    // URL 不同但同一张图；用 v2-token 做去重 key。
     const tk: RegExpExecArray | null = /v2-[a-f0-9]{20,}/i.exec(url);
     const key: string = tk !== null ? tk[0] : url;
     if (url.length > 0 && url.indexOf('data:') !== 0 && !seen.has(key)) {
@@ -95,13 +91,71 @@ export function parseHtmlBlocks(html: string): HtmlBlock[] {
       blocks.push({ type: 'image', text: '', url: url });
     }
     last = m.index + m[0].length;
-    m = regex.exec(html);
+    m = imgRe.exec(html);
   }
-  const tail: string = stripHtml(html.substring(last));
-  if (tail.length > 0) {
-    blocks.push({ type: 'text', text: tail, url: '' });
-  }
+  htmlToBlocks(html.substring(last), blocks);
   return blocks;
+}
+
+/** 把一段 HTML 转成结构化 blocks（不处理图片）。 */
+function htmlToBlocks(html: string, out: HtmlBlock[]): void {
+  let text: string = html;
+  // 去掉 script/style
+  text = text.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+  text = text.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+  // 块级标签按行切分
+  // 先按行处理，识别 heading/quote/code/list
+  // 用正则提取块级元素
+  const blockRe: RegExp = /<(h[1-6]|blockquote|pre|ul|ol|li|p|div|section)[^>]*>([\s\S]*?)<\/\1>/gi;
+  let lm: RegExpExecArray | null = blockRe.exec(text);
+  let lastPos: number = 0;
+  while (lm !== null) {
+    // 块之前的文本
+    const before: string = text.substring(lastPos, lm.index);
+    const plainBefore: string = stripHtml(before);
+    if (plainBefore.length > 0) {
+      pushTextBlocks(plainBefore, out);
+    }
+    const tag: string = lm[1].toLowerCase();
+    const inner: string = lm[2];
+    if (tag.startsWith('h')) {
+      const lv: number = parseInt(tag.substring(1), 10);
+      const t: string = stripHtml(inner);
+      if (t.length > 0) out.push({ type: 'heading', text: t, url: '', level: lv });
+    } else if (tag === 'blockquote') {
+      const t: string = stripHtml(inner);
+      if (t.length > 0) out.push({ type: 'quote', text: t, url: '' });
+    } else if (tag === 'pre') {
+      const t: string = stripHtml(inner);
+      if (t.length > 0) out.push({ type: 'code', text: t, url: '' });
+    } else if (tag === 'li') {
+      const t: string = stripHtml(inner);
+      if (t.length > 0) out.push({ type: 'list', text: t, url: '' });
+    } else {
+      // p/div/section 普通段落
+      const t: string = stripHtml(inner);
+      if (t.length > 0) out.push({ type: 'text', text: t, url: '' });
+    }
+    lastPos = lm.index + lm[0].length;
+    lm = blockRe.exec(text);
+  }
+  // 剩余文本
+  const rest: string = text.substring(lastPos);
+  const plainRest: string = stripHtml(rest);
+  if (plainRest.length > 0) {
+    pushTextBlocks(plainRest, out);
+  }
+}
+
+/** 把纯文本按换行拆成 text blocks。 */
+function pushTextBlocks(plain: string, out: HtmlBlock[]): void {
+  const lines: string[] = plain.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const ln: string = lines[i].trim();
+    if (ln.length > 0) {
+      out.push({ type: 'text', text: ln, url: '' });
+    }
+  }
 }
 
 /** 从 HTML 中抽出所有图片地址（去重，按出现顺序）。 */
