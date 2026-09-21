@@ -207,7 +207,7 @@ export function parseInline(text: string): InlinePart[] {
               out.push({ bold: false, italic: true, code: false, link: false, strike: false, text: is.substring(1, is.length - 1) });
             } else {
               // 检测裸 URL
-              const urlSegs: string[] = is.split(/(https?:\/\/[^\s<>"''\)\]]*?(?=https?:\/\/|[\s<>"''\)\]]|\$))/g);
+              const urlSegs: string[] = is.split(/(https?:\/\/[^\s<>"''\)\]]*?(?=https?:\/\/|[\s<>"''\)\]]|$))/g);
               for (let ui = 0; ui < urlSegs.length; ui++) {
                 const us: string = urlSegs[ui];
                 if (us.length === 0) continue;
