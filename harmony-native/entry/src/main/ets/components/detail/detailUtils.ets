@@ -172,7 +172,7 @@ export function parseInline(text: string): InlinePart[] {
       continue;
     }
     // 删除线 ~~text~~
-    const sSegs: string[] = cs.split(/(~~[^~]+~~)/g);
+    const sSegs: string[] = cs.split(/(~~[\s\S]+?~~)/g);
     for (let si = 0; si < sSegs.length; si++) {
       const ss: string = sSegs[si];
       if (ss.length === 0) continue;
@@ -190,7 +190,7 @@ export function parseInline(text: string): InlinePart[] {
           out.push({ bold: false, italic: false, code: false, link: true, strike: false, text: lk[1].length > 0 ? lk[1] : lk[2] });
           continue;
         }
-        const bSegs: string[] = ls.split(/(\*\*[^*]+\*\*)/g);
+        const bSegs: string[] = ls.split(/(\*\*[\s\S]+?\*\*)/g);
         for (let bi = 0; bi < bSegs.length; bi++) {
           const bs: string = bSegs[bi];
           if (bs.length === 0) continue;
@@ -198,7 +198,7 @@ export function parseInline(text: string): InlinePart[] {
             out.push({ bold: true, italic: false, code: false, link: false, strike: false, text: bs.substring(2, bs.length - 2) });
             continue;
           }
-          const iSegs: string[] = bs.split(/(\*[^*]+\*)/g);
+          const iSegs: string[] = bs.split(/(\*[\s\S]+?\*)/g);
           for (let ii = 0; ii < iSegs.length; ii++) {
             const is: string = iSegs[ii];
             if (is.length === 0) continue;

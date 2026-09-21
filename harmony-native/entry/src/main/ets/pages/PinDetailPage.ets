@@ -5,6 +5,7 @@
  * 降级：HTML 正文剥标签为纯文本；图片从 content_html 的 <img src> 抽取后单独渲染。
  */
 
+import hilog from '@ohos.hilog';
 import { router } from '@kit.ArkUI';
 import { NetImage } from '../components/NetImage';
 import { getPin, ZhihuPinDetail } from '../api/pin';
@@ -33,6 +34,7 @@ struct PinDetailPage {
 
   private async load(): Promise<void> {
     this.loading = true;
+    hilog.info(0x3100, 'ZhihuLiteDBG', 'PIN load START id=%{public}s', this.pinId);
     this.error = '';
     try {
       const pin: ZhihuPinDetail = await getPin(this.pinId);
@@ -40,6 +42,7 @@ struct PinDetailPage {
       const html: string = pin.content_html ?? pin.content ?? '';
       this.bodyBlocks = parseContent(html);
     } catch (e) {
+      hilog.error(0x3100, 'ZhihuLiteDBG', 'PIN load FAIL id=%{public}s err=%{public}s', this.pinId, JSON.stringify(e as object));
       this.error = getZhihuErrorMessage(e as object);
     } finally {
       this.loading = false;

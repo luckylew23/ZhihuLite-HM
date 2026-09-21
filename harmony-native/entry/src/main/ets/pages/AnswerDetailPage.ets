@@ -5,17 +5,20 @@
  * 降级：HTML 正文剥标签后用 Text 渲染，不做 WebView。
  */
 
+import hilog from '@ohos.hilog';
 import { router, promptAction } from '@kit.ArkUI';
 import { getAnswer, voteAnswer, AnswerDetail } from '../api/answer';
 import { getAnswerCollectionStatus, removeFromCollection } from '../api/collection';
 import { ZhihuColors } from '../utils/theme';
 import { formatDate } from '../utils/date';
 import { getZhihuErrorMessage } from '../utils/zhihuError';
+import { writeDebugLog } from '../utils/debugLog';
 import { DetailNavBar } from '../components/detail/DetailNavBar';
 import { StatusView } from '../components/detail/StatusView';
 import { formatCount, guardLogin, HtmlBlock, parseContent, readStringParam } from '../components/detail/detailUtils';
 import { NetImage } from '../components/NetImage';
 import { RichBody } from '../components/detail/RichBody';
+import { common } from '@kit.AbilityKit';
 
 @Entry
 @Component
@@ -55,6 +58,7 @@ struct AnswerDetailPage {
 
   private async load(): Promise<void> {
     this.loading = true;
+    hilog.info(0x3100, 'ZhihuLiteDBG', 'ANSWER load START id=%{public}s', this.answerId);
     this.error = '';
     this.refreshCollectionStatus();
     try {
@@ -63,7 +67,11 @@ struct AnswerDetailPage {
       this.voting = a.relationship?.voting ?? 0;
       this.voteCount = a.voteup_count ?? 0;
       this.bodyBlocks = parseContent(a.content);
+      const actx: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+      writeDebugLog(actx, 'ANSWER', 'id=' + this.answerId + ' len=' + a.content.length + ' preview=' + a.content.substring(0, 400));
+      writeDebugLog(actx, 'ANSWER', 'blocks=' + JSON.stringify(this.bodyBlocks.map((b: HtmlBlock) => b.type)));
     } catch (e) {
+      hilog.error(0x3100, 'ZhihuLiteDBG', 'ANSWER load FAIL id=%{public}s err=%{public}s', this.answerId, JSON.stringify(e as object));
       this.error = getZhihuErrorMessage(e as object);
     } finally {
       this.loading = false;
@@ -221,7 +229,6 @@ struct AnswerDetailPage {
             .width('100%')
             .alignItems(VerticalAlign.Center)
 
-            // 正文（结构化富文本：标题/粗体/列表/引用/代码/图片）
             RichBody({ blocks: this.bodyBlocks })
 
             if (this.metaText().length > 0) {

@@ -5,6 +5,7 @@
  * 降级：HTML 正文剥标签用 Text 渲染，不做 WebView；文章点赞仅展示计数（本期无 voteArticle 接口）。
  */
 
+import hilog from '@ohos.hilog';
 import { router, promptAction } from '@kit.ArkUI';
 import { getArticle } from '../api/article';
 import { getArticleCollectionStatus, removeArticleFromCollection } from '../api/collection';
@@ -12,11 +13,13 @@ import { ZhihuArticle } from '../model/zhihu';
 import { ZhihuColors } from '../utils/theme';
 import { formatDate } from '../utils/date';
 import { getZhihuErrorMessage } from '../utils/zhihuError';
+import { writeDebugLog } from '../utils/debugLog';
 import { DetailNavBar } from '../components/detail/DetailNavBar';
 import { StatusView } from '../components/detail/StatusView';
 import { NetImage } from '../components/NetImage';
 import { formatCount, guardLogin, HtmlBlock, parseContent, readStringParam } from '../components/detail/detailUtils';
 import { RichBody } from '../components/detail/RichBody';
+import { common } from '@kit.AbilityKit';
 
 @Entry
 @Component
@@ -96,8 +99,12 @@ struct ArticleDetailPage {
       const a: ZhihuArticle = await getArticle(this.articleId);
       this.article = a;
       this.bodyBlocks = parseContent(a.content);
+      const actx: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+      writeDebugLog(actx, 'ARTICLE', 'id=' + this.articleId + ' len=' + a.content.length + ' preview=' + a.content.substring(0, 400));
+      writeDebugLog(actx, 'ARTICLE', 'blocks=' + JSON.stringify(this.bodyBlocks.map((b: HtmlBlock) => b.type)));
       this.refreshCollectionStatus();
     } catch (e) {
+      hilog.error(0x3100, 'ZhihuLiteDBG', 'ARTICLE load FAIL id=%{public}s err=%{public}s', this.articleId, JSON.stringify(e as object));
       this.error = getZhihuErrorMessage(e as object);
     } finally {
       this.loading = false;
