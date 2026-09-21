@@ -13,7 +13,7 @@ import { formatDateTime } from '../utils/date';
 import { getZhihuErrorMessage } from '../utils/zhihuError';
 import { DetailNavBar } from '../components/detail/DetailNavBar';
 import { StatusView } from '../components/detail/StatusView';
-import { formatCount, HtmlBlock, parseHtmlBlocks, readStringParam } from '../components/detail/detailUtils';
+import { formatCount, HtmlBlock, parseContent, readStringParam } from '../components/detail/detailUtils';
 import { RichBody } from '../components/detail/RichBody';
 
 @Entry
@@ -38,7 +38,7 @@ struct PinDetailPage {
       const pin: ZhihuPinDetail = await getPin(this.pinId);
       this.pin = pin;
       const html: string = pin.content_html ?? pin.content ?? '';
-      this.bodyBlocks = parseHtmlBlocks(html);
+      this.bodyBlocks = parseContent(html);
     } catch (e) {
       this.error = getZhihuErrorMessage(e as object);
     } finally {

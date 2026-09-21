@@ -14,7 +14,7 @@ import {
 import { ZhihuColors } from '../utils/theme';
 import { DetailNavBar } from '../components/detail/DetailNavBar';
 import { StatusView } from '../components/detail/StatusView';
-import { HtmlBlock, parseHtmlBlocks, readStringParam, parseInline, InlinePart } from '../components/detail/detailUtils';
+import { HtmlBlock, parseContent, readStringParam, parseInline, InlinePart } from '../components/detail/detailUtils';
 import { NetImage } from '../components/NetImage';
 import { openZhihuUrl } from '../utils/zhihuRouter';
 
@@ -45,7 +45,7 @@ struct DailyDetailPage {
       this.detail = d;
       // 头图已用 images[0]，正文里的 [图片] 占位用 images[1..] 依次替换
       const bodyImgs: string[] = (d.images !== undefined && d.images.length > 1) ? d.images.slice(1) : [];
-      let blocks: HtmlBlock[] = this.fillPlaceholders(parseHtmlBlocks(d.body), bodyImgs);
+      let blocks: HtmlBlock[] = this.fillPlaceholders(parseContent(d.body), bodyImgs);
       // 正文第一个图片块即答主头像，标记为小圆形头像渲染
       for (let k = 0; k < blocks.length; k++) {
         if (blocks[k].type === 'image') {

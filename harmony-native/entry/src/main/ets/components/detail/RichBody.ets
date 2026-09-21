@@ -60,7 +60,8 @@ export struct RichBody {
                 .fontSize(19)
                 .fontWeight(p.bold ? FontWeight.Bold : FontWeight.Normal)
                 .fontStyle(p.italic ? FontStyle.Italic : FontStyle.Normal)
-                .fontColor(ZhihuColors.text)
+                .decoration({ type: p.strike ? TextDecorationType.LineThrough : TextDecorationType.None })
+                .fontColor(p.code || p.link ? ZhihuColors.primary : ZhihuColors.text)
             })
           }
           .copyOption(CopyOptions.LocalDevice)
@@ -74,7 +75,8 @@ export struct RichBody {
                 .lineHeight(28)
                 .fontWeight(p.bold ? FontWeight.Bold : FontWeight.Normal)
                 .fontStyle(p.italic ? FontStyle.Italic : FontStyle.Normal)
-                .fontColor(p.code ? ZhihuColors.primary : ZhihuColors.text)
+                .decoration({ type: p.strike ? TextDecorationType.LineThrough : TextDecorationType.None })
+                .fontColor(p.code || p.link ? ZhihuColors.primary : ZhihuColors.text)
             })
           }
           .copyOption(CopyOptions.LocalDevice)

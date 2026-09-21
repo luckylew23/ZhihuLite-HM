@@ -15,7 +15,7 @@ import { getZhihuErrorMessage } from '../utils/zhihuError';
 import { DetailNavBar } from '../components/detail/DetailNavBar';
 import { StatusView } from '../components/detail/StatusView';
 import { NetImage } from '../components/NetImage';
-import { formatCount, guardLogin, HtmlBlock, parseHtmlBlocks, readStringParam } from '../components/detail/detailUtils';
+import { formatCount, guardLogin, HtmlBlock, parseContent, readStringParam } from '../components/detail/detailUtils';
 import { RichBody } from '../components/detail/RichBody';
 
 @Entry
@@ -95,7 +95,7 @@ struct ArticleDetailPage {
     try {
       const a: ZhihuArticle = await getArticle(this.articleId);
       this.article = a;
-      this.bodyBlocks = parseHtmlBlocks(a.content);
+      this.bodyBlocks = parseContent(a.content);
       this.refreshCollectionStatus();
     } catch (e) {
       this.error = getZhihuErrorMessage(e as object);

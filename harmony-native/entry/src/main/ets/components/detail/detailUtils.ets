@@ -147,11 +147,13 @@ function htmlToBlocks(html: string, out: HtmlBlock[]): void {
   htmlToBlocks(after, out);
 }
 
-/** 行内富文本片段：bold=粗体；italic=斜体；code=等宽。 */
+/** 行内富文本片段：bold=粗体；italic=斜体；code=等宽；link=链接；strike=删除线。 */
 export interface InlinePart {
   bold: boolean;
   italic: boolean;
   code: boolean;
+  link: boolean;
+  strike: boolean;
   text: string;
 }
 
@@ -166,30 +168,160 @@ export function parseInline(text: string): InlinePart[] {
     const cs: string = codeSegs[ci];
     if (cs.length === 0) continue;
     if (cs.startsWith('`') && cs.endsWith('`') && cs.length > 2) {
-      out.push({ bold: false, italic: false, code: true, text: cs.substring(1, cs.length - 1) });
+      out.push({ bold: false, italic: false, code: true, link: false, strike: false, text: cs.substring(1, cs.length - 1) });
       continue;
     }
-    const bSegs: string[] = cs.split(/(\*\*[^*]+\*\*)/g);
-    for (let bi = 0; bi < bSegs.length; bi++) {
-      const bs: string = bSegs[bi];
-      if (bs.length === 0) continue;
-      if (bs.startsWith('**') && bs.endsWith('**') && bs.length > 4) {
-        out.push({ bold: true, italic: false, code: false, text: bs.substring(2, bs.length - 2) });
+    // 删除线 ~~text~~
+    const sSegs: string[] = cs.split(/(~~[^~]+~~)/g);
+    for (let si = 0; si < sSegs.length; si++) {
+      const ss: string = sSegs[si];
+      if (ss.length === 0) continue;
+      if (ss.startsWith('~~') && ss.endsWith('~~') && ss.length > 4) {
+        out.push({ bold: false, italic: false, code: false, link: false, strike: true, text: ss.substring(2, ss.length - 2) });
         continue;
       }
-      const iSegs: string[] = bs.split(/(\*[^*]+\*)/g);
-      for (let ii = 0; ii < iSegs.length; ii++) {
-        const is: string = iSegs[ii];
-        if (is.length === 0) continue;
-        if (is.startsWith('*') && is.endsWith('*') && is.length > 2) {
-          out.push({ bold: false, italic: true, code: false, text: is.substring(1, is.length - 1) });
-        } else {
-          out.push({ bold: false, italic: false, code: false, text: is });
+      // 链接 [text](url)
+      const lSegs: string[] = ss.split(/(\[[^\[\]]*\]\([^)]*\))/g);
+      for (let li = 0; li < lSegs.length; li++) {
+        const ls: string = lSegs[li];
+        if (ls.length === 0) continue;
+        const lk: RegExpExecArray | null = /^\[([^\[\]]*)\]\(([^)]*)\)$/.exec(ls);
+        if (lk !== null) {
+          out.push({ bold: false, italic: false, code: false, link: true, strike: false, text: lk[1].length > 0 ? lk[1] : lk[2] });
+          continue;
+        }
+        const bSegs: string[] = ls.split(/(\*\*[^*]+\*\*)/g);
+        for (let bi = 0; bi < bSegs.length; bi++) {
+          const bs: string = bSegs[bi];
+          if (bs.length === 0) continue;
+          if (bs.startsWith('**') && bs.endsWith('**') && bs.length > 4) {
+            out.push({ bold: true, italic: false, code: false, link: false, strike: false, text: bs.substring(2, bs.length - 2) });
+            continue;
+          }
+          const iSegs: string[] = bs.split(/(\*[^*]+\*)/g);
+          for (let ii = 0; ii < iSegs.length; ii++) {
+            const is: string = iSegs[ii];
+            if (is.length === 0) continue;
+            if (is.startsWith('*') && is.endsWith('*') && is.length > 2) {
+              out.push({ bold: false, italic: true, code: false, link: false, strike: false, text: is.substring(1, is.length - 1) });
+            } else {
+              out.push({ bold: false, italic: false, code: false, link: false, strike: false, text: is });
+            }
+          }
         }
       }
     }
   }
   return out;
+}
+
+/** 解析 markdown（CommonMark + GFM 核心）为结构化块。 */
+export function parseMarkdownBlocks(md: string): HtmlBlock[] {
+  const out: HtmlBlock[] = [];
+  if (md === null || md === undefined) {
+    return out;
+  }
+  const lines: string[] = md.replace(/\r\n/g, '\n').split('\n');
+  let i: number = 0;
+  while (i < lines.length) {
+    const trimmed: string = lines[i].trim();
+    // 围栏代码块
+    if (/^```/.test(trimmed)) {
+      const buf: string[] = [];
+      i++;
+      while (i < lines.length && !/^```/.test(lines[i].trim())) {
+        buf.push(lines[i]);
+        i++;
+      }
+      i++;
+      const code: string = buf.join('\n');
+      if (code.length > 0) {
+        out.push({ type: 'code', text: code, url: '' });
+      }
+      continue;
+    }
+    // ATX 标题
+    const h: RegExpExecArray | null = /^(#{1,6})\s+(.*)$/.exec(trimmed);
+    if (h !== null) {
+      out.push({ type: 'heading', text: h[2], url: '', level: h[1].length });
+      i++;
+      continue;
+    }
+    // 引用块（连续 > 行合并）
+    if (/^>\s?/.test(trimmed)) {
+      const buf: string[] = [];
+      while (i < lines.length && /^>\s?/.test(lines[i].trim())) {
+        buf.push(lines[i].trim().replace(/^>\s?/, ''));
+        i++;
+      }
+      out.push({ type: 'quote', text: buf.join('\n'), url: '' });
+      continue;
+    }
+    // 列表（-/*/+/数字 开头）
+    if (/^[-*+]\s+/.test(trimmed) || /^\d+[.、)]\s+/.test(trimmed)) {
+      while (i < lines.length) {
+        const tl: string = lines[i].trim();
+        if (/^[-*+]\s+/.test(tl)) {
+          let t: string = tl.replace(/^[-*+]\s+/, '');
+          const task: RegExpExecArray | null = /^\[([ xX])\]\s+/.exec(t);
+          if (task !== null) {
+            const mark: string = (task[1] === 'x' || task[1] === 'X') ? '☑ ' : '☐ ';
+            t = mark + t.substring(task[0].length);
+          }
+          out.push({ type: 'list', text: t, url: '' });
+          i++;
+        } else if (/^\d+[.、)]\s+/.test(tl)) {
+          out.push({ type: 'list', text: tl.replace(/^\d+[.、)]\s+/, ''), url: '' });
+          i++;
+        } else {
+          break;
+        }
+      }
+      continue;
+    }
+    // 独立行图片 ![alt](url)
+    const img: RegExpExecArray | null = /^!\[([^\]]*)\]\(([^)]+)\)\s*$/.exec(trimmed);
+    if (img !== null) {
+      out.push({ type: 'image', text: '', url: img[2] });
+      i++;
+      continue;
+    }
+    // 分隔线
+    if (/^(-{3,}|\*{3,}|_{3,})$/.test(trimmed)) {
+      i++;
+      continue;
+    }
+    // 普通段落（空行分隔）
+    const buf: string[] = [];
+    while (i < lines.length && lines[i].trim().length > 0) {
+      buf.push(lines[i].trim());
+      i++;
+    }
+    while (i < lines.length && lines[i].trim().length === 0) {
+      i++;
+    }
+    const para: string = buf.join('\n');
+    if (para.length > 0) {
+      out.push({ type: 'text', text: para, url: '' });
+    }
+  }
+  return out;
+}
+
+/** 统一富文本入口：自动检测 HTML / markdown，分派解析。 */
+export function parseContent(content: string): HtmlBlock[] {
+  if (content === null || content === undefined || typeof content !== 'string') {
+    return [];
+  }
+  const s: string = content.trim();
+  if (s.length === 0) {
+    return [];
+  }
+  // 含常见 HTML 块级/行内标签 → HTML 解析
+  if (/<\/?(p|div|h[1-6]|blockquote|pre|ul|ol|li|section|figure|img|strong|em|a|span|br|table)[\s>]/i.test(s)) {
+    return parseHtmlBlocks(s);
+  }
+  return parseMarkdownBlocks(s);
 }
 
 /** 数字缩写：1.2万 / 3.4亿。 */

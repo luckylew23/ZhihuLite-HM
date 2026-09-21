@@ -13,7 +13,7 @@ import { formatDate } from '../utils/date';
 import { getZhihuErrorMessage } from '../utils/zhihuError';
 import { DetailNavBar } from '../components/detail/DetailNavBar';
 import { StatusView } from '../components/detail/StatusView';
-import { formatCount, guardLogin, HtmlBlock, parseHtmlBlocks, readStringParam } from '../components/detail/detailUtils';
+import { formatCount, guardLogin, HtmlBlock, parseContent, readStringParam } from '../components/detail/detailUtils';
 import { NetImage } from '../components/NetImage';
 import { RichBody } from '../components/detail/RichBody';
 
@@ -62,7 +62,7 @@ struct AnswerDetailPage {
       this.answer = a;
       this.voting = a.relationship?.voting ?? 0;
       this.voteCount = a.voteup_count ?? 0;
-      this.bodyBlocks = parseHtmlBlocks(a.content);
+      this.bodyBlocks = parseContent(a.content);
     } catch (e) {
       this.error = getZhihuErrorMessage(e as object);
     } finally {
