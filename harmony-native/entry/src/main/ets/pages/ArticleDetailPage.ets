@@ -16,6 +16,7 @@ import { DetailNavBar } from '../components/detail/DetailNavBar';
 import { StatusView } from '../components/detail/StatusView';
 import { NetImage } from '../components/NetImage';
 import { formatCount, guardLogin, HtmlBlock, parseHtmlBlocks, readStringParam } from '../components/detail/detailUtils';
+import { RichBody } from '../components/detail/RichBody';
 
 @Entry
 @Component

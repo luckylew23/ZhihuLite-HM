@@ -14,6 +14,7 @@ import { getZhihuErrorMessage } from '../utils/zhihuError';
 import { DetailNavBar } from '../components/detail/DetailNavBar';
 import { StatusView } from '../components/detail/StatusView';
 import { formatCount, HtmlBlock, parseHtmlBlocks, readStringParam } from '../components/detail/detailUtils';
+import { RichBody } from '../components/detail/RichBody';
 
 @Entry
 @Component
@@ -82,19 +83,8 @@ struct PinDetailPage {
             .width('100%')
             .alignItems(VerticalAlign.Center)
 
-            ForEach(this.bodyBlocks, (b: HtmlBlock) => {
-              if (b.type === 'text') {
-                Text(b.text)
-                  .copyOption(CopyOptions.LocalDevice)
-                  .fontSize(20)
-                  .fontColor(ZhihuColors.text)
-                  .lineHeight(30)
-                  .width('100%')
-                  .textAlign(TextAlign.Start)
-              } else {
-                NetImage({ url: b.url, w: 0, h: 280, r: 8, fit: ImageFit.Contain, mt: 4, tapView: true })
-              }
-            }, (b: HtmlBlock, i: number) => i.toString() + b.url + b.text.substring(0, 8))
+            // 正文（结构化富文本）
+            RichBody({ blocks: this.bodyBlocks })
           }
           .width('100%')
           .padding(16)
