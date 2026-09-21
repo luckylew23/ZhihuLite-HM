@@ -262,7 +262,7 @@ struct DailyDetailPage {
                           .lineHeight(28)
                           .fontWeight(p.bold ? FontWeight.Bold : FontWeight.Normal)
                           .fontStyle(p.italic ? FontStyle.Italic : FontStyle.Normal)
-                          .fontColor(p.code ? ZhihuColors.primary : ZhihuColors.text)
+                          .fontColor(p.code || p.link ? ZhihuColors.primary : ZhihuColors.text)
                       })
                     }
                     .fontSize(19)
