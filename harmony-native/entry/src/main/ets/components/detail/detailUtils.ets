@@ -43,8 +43,6 @@ export function stripHtml(html: string): string {
   text = text.replace(/(?:windows|window)\.daily[=?\S]*/gi, '');
   text = text.replace(/查看知乎(原文|讨论)[^\n]*/gi, '');
   text = text.replace(/window\.daily\s*=?\s*true?/gi, '');
-  text = text.replace(/\s+/g, ' ');
-  text = text.replace(/(\s)*\n(\s)*/g, '\n');
   return text.trim();
 }
 
