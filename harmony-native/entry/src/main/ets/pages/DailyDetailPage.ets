@@ -14,7 +14,7 @@ import {
 import { ZhihuColors } from '../utils/theme';
 import { DetailNavBar } from '../components/detail/DetailNavBar';
 import { StatusView } from '../components/detail/StatusView';
-import { HtmlBlock, parseHtmlBlocks, readStringParam } from '../components/detail/detailUtils';
+import { HtmlBlock, parseHtmlBlocks, readStringParam, parseInline, InlinePart } from '../components/detail/detailUtils';
 import { NetImage } from '../components/NetImage';
 import { openZhihuUrl } from '../utils/zhihuRouter';
 
@@ -205,22 +205,30 @@ struct DailyDetailPage {
                   } else if (b.type === 'image') {
                     NetImage({ url: b.url, w: 0, h: 260, r: 8, fit: ImageFit.Contain, mt: 4, tapView: true })
                   } else if (b.type === 'heading') {
-                    Text(b.text)
-                      .fontSize(b.level !== undefined && b.level <= 2 ? 22 : 20)
-                      .fontWeight(FontWeight.Bold)
-                      .fontColor(ZhihuColors.text)
-                      .width('100%')
-                      .margin({ top: 8, bottom: 4 })
+                    Text() {
+                      ForEach(parseInline(b.text), (p: InlinePart) => {
+                        Span(p.text)
+                          .fontSize(22)
+                          .fontWeight(FontWeight.Bold)
+                          .fontColor(ZhihuColors.text)
+                      })
+                    }
+                    .width('100%')
+                    .margin({ top: 8, bottom: 4 })
                   } else if (b.type === 'quote') {
-                    Text(b.text)
-                      .fontSize(18)
-                      .lineHeight(26)
-                      .fontColor(ZhihuColors.textSecondary)
-                      .fontStyle(FontStyle.Italic)
-                      .width('100%')
-                      .padding({ left: 12, top: 4, bottom: 4 })
-                      .borderWidth({ left: 3 })
-                      .borderColor({ left: ZhihuColors.primary })
+                    Text() {
+                      ForEach(parseInline(b.text), (p: InlinePart) => {
+                        Span(p.text)
+                          .fontSize(18)
+                          .fontStyle(FontStyle.Italic)
+                          .fontColor(ZhihuColors.textSecondary)
+                      })
+                    }
+                    .lineHeight(26)
+                    .width('100%')
+                    .padding({ left: 12, top: 4, bottom: 4 })
+                    .borderWidth({ left: 3 })
+                    .borderColor({ left: ZhihuColors.primary })
                   } else if (b.type === 'code') {
                     Text(b.text)
                       .fontSize(16)
@@ -230,17 +238,31 @@ struct DailyDetailPage {
                       .padding(10)
                       .backgroundColor(ZhihuColors.backgroundSecondary)
                   } else if (b.type === 'list') {
-                    Text('· ' + b.text)
-                      .fontSize(19)
-                      .lineHeight(28)
-                      .fontColor(ZhihuColors.text)
-                      .width('100%')
+                    Text() {
+                      ForEach(parseInline(b.text), (p: InlinePart) => {
+                        Span((p.text.length > 0 ? '· ' + p.text : p.text))
+                          .fontSize(19)
+                          .fontWeight(p.bold ? FontWeight.Bold : FontWeight.Normal)
+                          .fontStyle(p.italic ? FontStyle.Italic : FontStyle.Normal)
+                          .fontColor(ZhihuColors.text)
+                      })
+                    }
+                    .lineHeight(28)
+                    .width('100%')
                   } else {
-                    Text(b.text)
-                      .fontSize(19)
-                      .lineHeight(28)
-                      .fontColor(ZhihuColors.text)
-                      .width('100%')
+                    Text() {
+                      ForEach(parseInline(b.text), (p: InlinePart) => {
+                        Span(p.text)
+                          .fontSize(19)
+                          .lineHeight(28)
+                          .fontWeight(p.bold ? FontWeight.Bold : FontWeight.Normal)
+                          .fontStyle(p.italic ? FontStyle.Italic : FontStyle.Normal)
+                          .fontColor(p.code ? ZhihuColors.primary : ZhihuColors.text)
+                      })
+                    }
+                    .fontSize(19)
+                    .lineHeight(28)
+                    .width('100%')
                   }
                 }, (b: HtmlBlock, i: number) => i.toString() + b.url + b.text.substring(0, 8))
               } else {

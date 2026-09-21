@@ -13,8 +13,8 @@ import { authStore } from '../../store/authStore';
 const DOMAIN: number = 0x0001;
 const TAG: string = 'ZhihuLite';
 
-/** 富文本 → 纯文本。块级标签先转成换行，再剥标签、解码实体。 */
-export function stripHtml(html: string): string {
+/** 富文本 → 纯文本。块级标签先转成换行，再剥标签、解码实体。keepMarkdown=true 时行内 strong/b/em/i/code 转成 ** * ` markdown 标记。 */
+export function stripHtml(html: string, keepMarkdown: boolean = false): string {
   if (html === null || html === undefined) {
     return '';
   }
@@ -22,6 +22,14 @@ export function stripHtml(html: string): string {
     return '';
   }
   let text: string = html;
+  if (keepMarkdown) {
+    text = text.replace(/<strong[^>]*>([\s\S]*?)<\/strong>/gi, '**$1**');
+    text = text.replace(/<b[^>]*>([\s\S]*?)<\/b>/gi, '**$1**');
+    text = text.replace(/<em[^>]*>([\s\S]*?)<\/em>/gi, '*$1*');
+    text = text.replace(/<i[^>]*>([\s\S]*?)<\/i>/gi, '*$1*');
+    text = text.replace(/<code[^>]*>([\s\S]*?)<\/code>/gi, '`$1`');
+    text = text.replace(/<a[^>]*>([\s\S]*?)<\/a>/gi, '$1');
+  }
   text = text.replace(/<br\s*\/?>/gi, '\n');
   text = text.replace(/<\/(p|div|section|article|h[1-6]|li|ul|ol|blockquote|figure)>/gi, '\n');
   text = text.replace(/<li[^>]*>/gi, '\n· ');
@@ -112,7 +120,7 @@ function htmlToBlocks(html: string, out: HtmlBlock[]): void {
   while (lm !== null) {
     // 块之前的文本
     const before: string = text.substring(lastPos, lm.index);
-    const plainBefore: string = stripHtml(before);
+    const plainBefore: string = stripHtml(before, true);
     if (plainBefore.length > 0) {
       pushTextBlocks(plainBefore, out);
     }
@@ -120,20 +128,20 @@ function htmlToBlocks(html: string, out: HtmlBlock[]): void {
     const inner: string = lm[2];
     if (tag.startsWith('h')) {
       const lv: number = parseInt(tag.substring(1), 10);
-      const t: string = stripHtml(inner);
+      const t: string = stripHtml(inner, true);
       if (t.length > 0) out.push({ type: 'heading', text: t, url: '', level: lv });
     } else if (tag === 'blockquote') {
-      const t: string = stripHtml(inner);
+      const t: string = stripHtml(inner, true);
       if (t.length > 0) out.push({ type: 'quote', text: t, url: '' });
     } else if (tag === 'pre') {
       const t: string = stripHtml(inner);
       if (t.length > 0) out.push({ type: 'code', text: t, url: '' });
     } else if (tag === 'li') {
-      const t: string = stripHtml(inner);
+      const t: string = stripHtml(inner, true);
       if (t.length > 0) out.push({ type: 'list', text: t, url: '' });
     } else {
       // p/div/section 普通段落
-      const t: string = stripHtml(inner);
+      const t: string = stripHtml(inner, true);
       if (t.length > 0) out.push({ type: 'text', text: t, url: '' });
     }
     lastPos = lm.index + lm[0].length;
@@ -141,7 +149,7 @@ function htmlToBlocks(html: string, out: HtmlBlock[]): void {
   }
   // 剩余文本
   const rest: string = text.substring(lastPos);
-  const plainRest: string = stripHtml(rest);
+  const plainRest: string = stripHtml(rest, true);
   if (plainRest.length > 0) {
     pushTextBlocks(plainRest, out);
   }
@@ -174,6 +182,51 @@ export function extractImageUrls(html: string): string[] {
       out.push(url);
     }
     m = regex.exec(html);
+  }
+  return out;
+}
+
+/** 行内富文本片段：bold=粗体；italic=斜体；code=等宽。 */
+export interface InlinePart {
+  bold: boolean;
+  italic: boolean;
+  code: boolean;
+  text: string;
+}
+
+/** 解析 markdown 行内标记（**粗体** / *斜体* / `代码`）成富文本片段。 */
+export function parseInline(text: string): InlinePart[] {
+  const out: InlinePart[] = [];
+  if (text === null || text === undefined || text.length === 0) {
+    return out;
+  }
+  const codeSegs: string[] = text.split(/(`[^`]+`)/g);
+  for (let ci = 0; ci < codeSegs.length; ci++) {
+    const cs: string = codeSegs[ci];
+    if (cs.length === 0) continue;
+    if (cs.startsWith('`') && cs.endsWith('`') && cs.length > 2) {
+      out.push({ bold: false, italic: false, code: true, text: cs.substring(1, cs.length - 1) });
+      continue;
+    }
+    const bSegs: string[] = cs.split(/(\*\*[^*]+\*\*)/g);
+    for (let bi = 0; bi < bSegs.length; bi++) {
+      const bs: string = bSegs[bi];
+      if (bs.length === 0) continue;
+      if (bs.startsWith('**') && bs.endsWith('**') && bs.length > 4) {
+        out.push({ bold: true, italic: false, code: false, text: bs.substring(2, bs.length - 2) });
+        continue;
+      }
+      const iSegs: string[] = bs.split(/(\*[^*]+\*)/g);
+      for (let ii = 0; ii < iSegs.length; ii++) {
+        const is: string = iSegs[ii];
+        if (is.length === 0) continue;
+        if (is.startsWith('*') && is.endsWith('*') && is.length > 2) {
+          out.push({ bold: false, italic: true, code: false, text: is.substring(1, is.length - 1) });
+        } else {
+          out.push({ bold: false, italic: false, code: false, text: is });
+        }
+      }
+    }
   }
   return out;
 }
