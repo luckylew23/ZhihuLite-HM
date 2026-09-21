@@ -215,6 +215,7 @@ struct DailyDetailPage {
                     }
                     .width('100%')
                     .margin({ top: 8, bottom: 4 })
+                    .copyOption(CopyOptions.LocalDevice)
                   } else if (b.type === 'quote') {
                     Text() {
                       ForEach(parseInline(b.text), (p: InlinePart) => {
@@ -229,6 +230,7 @@ struct DailyDetailPage {
                     .padding({ left: 12, top: 4, bottom: 4 })
                     .borderWidth({ left: 3 })
                     .borderColor({ left: ZhihuColors.primary })
+                    .copyOption(CopyOptions.LocalDevice)
                   } else if (b.type === 'code') {
                     Text(b.text)
                       .fontSize(16)
@@ -237,6 +239,7 @@ struct DailyDetailPage {
                       .width('100%')
                       .padding(10)
                       .backgroundColor(ZhihuColors.backgroundSecondary)
+                      .copyOption(CopyOptions.LocalDevice)
                   } else if (b.type === 'list') {
                     Text() {
                       ForEach(parseInline(b.text), (p: InlinePart) => {
@@ -249,6 +252,7 @@ struct DailyDetailPage {
                     }
                     .lineHeight(28)
                     .width('100%')
+                    .copyOption(CopyOptions.LocalDevice)
                   } else if (!this.isAuthorText(idx)) {
                     // 作者名/介绍文本块已在头像行显示，这里跳过避免正文第一行重复
                     Text() {
@@ -264,6 +268,7 @@ struct DailyDetailPage {
                     .fontSize(19)
                     .lineHeight(28)
                     .width('100%')
+                    .copyOption(CopyOptions.LocalDevice)
                   }
                 }, (b: HtmlBlock, i: number) => i.toString() + b.url + b.text.substring(0, 8))
               } else {
