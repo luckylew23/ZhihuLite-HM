@@ -131,6 +131,17 @@ struct DailyDetailPage {
     ctx.startAbility(w);
   }
 
+  private openLink(url: string): void {
+    if (url.length === 0) return;
+    if (openZhihuUrl(url)) return;
+    try {
+      const ctx = getContext(this) as common.UIAbilityContext;
+      const w: Want = { action: 'ohos.want.action.viewData', entities: ['entity.system.browsable'], uri: url };
+      ctx.startAbility(w);
+    } catch (e) {
+    }
+  }
+
   private openZhihuDiscussion(): void {
     // 查看知乎讨论 → 打开 question 详情页（app 内）
     const url: string = this.discussionUrl.length > 0 ? this.discussionUrl : (this.originUrl.length > 0 ? this.originUrl : (this.detail?.share_url ?? ''));
@@ -269,6 +280,15 @@ struct DailyDetailPage {
                     .lineHeight(28)
                     .width('100%')
                     .copyOption(CopyOptions.LocalDevice)
+                    .onClick(() => {
+                      const parts = parseInline(b.text);
+                      for (let i = 0; i < parts.length; i++) {
+                        if (parts[i].link && parts[i].url && parts[i].url!.length > 0) {
+                          this.openLink(parts[i].url!);
+                          return;
+                        }
+                      }
+                    })
                   }
                 }, (b: HtmlBlock, i: number) => i.toString() + b.url + b.text.substring(0, 8))
               } else {
