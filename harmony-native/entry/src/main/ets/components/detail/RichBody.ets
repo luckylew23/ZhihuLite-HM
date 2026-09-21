@@ -1,16 +1,29 @@
 /**
  * components/detail/RichBody —— 正文富文本渲染组件（关注/推荐/热榜/文章/想法详情共用）。
- * 渲染 HTML 解析出的结构化块：标题/引用/代码块/列表/普通段落（行内支持粗体/斜体/等宽代码）+ 图片。
- * 样式与日报详情一致（v0.3.51）。
  */
 
 import { HtmlBlock, parseInline, InlinePart } from './detailUtils';
 import { ZhihuColors } from '../../utils/theme';
 import { NetImage } from '../NetImage';
+import { common, Want } from '@kit.AbilityKit';
 
 @Component
 export struct RichBody {
   blocks: HtmlBlock[] = [];
+
+  private openLink(url: string): void {
+    if (url.length === 0) return;
+    try {
+      const ctx = getContext(this) as common.UIAbilityContext;
+      const w: Want = {
+        action: 'ohos.want.action.viewData',
+        entities: ['entity.system.browsable'],
+        uri: url,
+      };
+      ctx.startAbility(w);
+    } catch (e) {
+    }
+  }
 
   build() {
     Column() {
@@ -53,20 +66,6 @@ export struct RichBody {
             .width('100%')
             .padding(10)
             .backgroundColor(ZhihuColors.backgroundSecondary)
-        } else if (b.type === 'list') {
-          Text() {
-            ForEach(parseInline(b.text), (p: InlinePart, pi: number) => {
-              Span((pi === 0 ? '· ' : '') + p.text)
-                .fontSize(19)
-                .fontWeight(p.bold ? FontWeight.Bold : FontWeight.Normal)
-                .fontStyle(p.italic ? FontStyle.Italic : FontStyle.Normal)
-                .decoration({ type: p.strike ? TextDecorationType.LineThrough : TextDecorationType.None })
-                .fontColor(p.code || p.link ? ZhihuColors.primary : ZhihuColors.text)
-            })
-          }
-          .copyOption(CopyOptions.LocalDevice)
-          .lineHeight(28)
-          .width('100%')
         } else {
           Text() {
             ForEach(parseInline(b.text), (p: InlinePart) => {
@@ -83,6 +82,17 @@ export struct RichBody {
           .fontSize(19)
           .lineHeight(28)
           .width('100%')
+          .margin({ bottom: 4 })
+          .onClick(() => {
+            // 点击段落时，如果段落含链接，打开第一个链接
+            const parts = parseInline(b.text);
+            for (let i = 0; i < parts.length; i++) {
+              if (parts[i].link && parts[i].url && parts[i].url!.length > 0) {
+                this.openLink(parts[i].url!);
+                break;
+              }
+            }
+          })
         }
       }, (b: HtmlBlock, i: number) => i.toString() + b.url + b.text.substring(0, 8))
     }

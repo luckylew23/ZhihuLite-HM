@@ -28,7 +28,7 @@ export function stripHtml(html: string, keepMarkdown: boolean = false): string {
     text = text.replace(/<em[^>]*>([\s\S]*?)<\/em>/gi, '*$1*');
     text = text.replace(/<i[^>]*>([\s\S]*?)<\/i>/gi, '*$1*');
     text = text.replace(/<code[^>]*>([\s\S]*?)<\/code>/gi, '`$1`');
-    text = text.replace(/<a[^>]*>([\s\S]*?)<\/a>/gi, '$1');
+    text = text.replace(/<a[^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi, '[$2]($1)');
   }
   text = text.replace(/<br\s*\/?>/gi, '\n');
   text = text.replace(/<\/(p|div|section|article|h[1-6]|li|ul|ol|blockquote|figure)>/gi, '\n');
@@ -155,6 +155,7 @@ export interface InlinePart {
   link: boolean;
   strike: boolean;
   text: string;
+  url?: string;
 }
 
 /** 解析 markdown 行内标记（**粗体** / *斜体* / `代码`）成富文本片段。 */
@@ -187,7 +188,7 @@ export function parseInline(text: string): InlinePart[] {
         if (ls.length === 0) continue;
         const lk: RegExpExecArray | null = /^\[([^\[\]]*)\]\(([^)]*)\)$/.exec(ls);
         if (lk !== null) {
-          out.push({ bold: false, italic: false, code: false, link: true, strike: false, text: lk[1].length > 0 ? lk[1] : lk[2] });
+          out.push({ bold: false, italic: false, code: false, link: true, strike: false, text: lk[1].length > 0 ? lk[1] : lk[2], url: lk[2] });
           continue;
         }
         const bSegs: string[] = ls.split(/(\*\*[\s\S]+?\*\*)/g);
@@ -205,7 +206,17 @@ export function parseInline(text: string): InlinePart[] {
             if (is.startsWith('*') && is.endsWith('*') && is.length > 2) {
               out.push({ bold: false, italic: true, code: false, link: false, strike: false, text: is.substring(1, is.length - 1) });
             } else {
-              out.push({ bold: false, italic: false, code: false, link: false, strike: false, text: is });
+              // 检测裸 URL
+              const urlSegs: string[] = is.split(/(https?:\/\/[^\s<>"')\]]+)/g);
+              for (let ui = 0; ui < urlSegs.length; ui++) {
+                const us: string = urlSegs[ui];
+                if (us.length === 0) continue;
+                if (/^https?:\/\//.test(us)) {
+                  out.push({ bold: false, italic: false, code: false, link: true, strike: false, text: us, url: us });
+                } else {
+                  out.push({ bold: false, italic: false, code: false, link: false, strike: false, text: us });
+                }
+              }
             }
           }
         }
