@@ -19,7 +19,8 @@ import {
 } from '../api/feedParser';
 import { authStore } from '../store/authStore';
 import { ZhihuColors } from '../utils/theme';
-import { cacheWrite, cacheRead, CACHE_TWO_DAYS_MS, HotCachePayload } from '../utils/cacheStore';
+import { cacheWrite, cacheRead, CACHE_TWO_DAYS_MS, HotCachePayload, writeContentCache } from '../utils/cacheStore';
+import { getQuestion } from '../api/question';
 import { FeedCard } from '../components/FeedCard';
 import { HotCard } from '../components/HotCard';
 
@@ -79,6 +80,7 @@ export struct FeedListPage {
       const resp = await getFeed(this.entryUrl(), authStore.cookies);
       this.applyPage(resp, true);
       this.saveHotCache();
+      this.preCacheHotItems();
     } catch (e) {
       // 离线/失败：热榜优先读两天内缓存
       if (this.isHot() && this.loadHotCache()) {
@@ -104,6 +106,33 @@ export struct FeedListPage {
     const items = this.hotItems.slice();
     const payload: HotCachePayload = { savedAt: Date.now(), items: items as object[] };
     cacheWrite('hot_cache_v2', payload);
+  }
+
+  /** 后台预缓存热榜所有问题详情 */
+  private preCacheHotItems(): void {
+    if (!this.isHot()) {
+      return;
+    }
+    const items: HotItem[] = this.hotItems;
+    // 顺序预缓存，避免并发过多
+    const doCache = async (idx: number): Promise<void> => {
+      if (idx >= items.length) {
+        return;
+      }
+      const qid: string = items[idx].questionId;
+      if (qid.length === 0) {
+        await doCache(idx + 1);
+        return;
+      }
+      try {
+        const q = await getQuestion(qid);
+        writeContentCache('question', qid, q as object);
+      } catch (e) {
+        // 静默失败
+      }
+      await doCache(idx + 1);
+    };
+    doCache(0).catch(() => {});
   }
 
   /** 热榜离线：读两天内缓存，成功返回 true */
@@ -134,6 +163,7 @@ export struct FeedListPage {
       const resp = await getFeed(url, authStore.cookies);
       this.applyPage(resp, true);
       this.saveHotCache();
+      this.preCacheHotItems();
       this.error = '';
     } catch (e) {
       // 刷新失败保留旧列表

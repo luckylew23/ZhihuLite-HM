@@ -14,7 +14,8 @@ import {
   formatDailyDate,
 } from '../api/daily';
 import { ZhihuColors } from '../utils/theme';
-import { cacheWrite, cacheRead, CACHE_TWO_DAYS_MS, DailyCachePayload } from '../utils/cacheStore';
+import { cacheWrite, cacheRead, CACHE_TWO_DAYS_MS, DailyCachePayload, writeContentCache } from '../utils/cacheStore';
+import { getDailyDetail } from '../api/daily';
 
 @Component
 export struct DailyPage {
@@ -49,6 +50,7 @@ export struct DailyPage {
       this.stories = resp.stories ?? [];
       this.error = this.stories.length === 0 ? '本期日报暂无内容' : '';
       this.saveDailyCache();
+      this.preCacheStories();
     } catch (e) {
       // 离线/失败：优先读两天内缓存
       if (this.loadDailyCache()) {
@@ -73,6 +75,7 @@ export struct DailyPage {
       this.date = resp.date ?? '';
       this.stories = resp.stories ?? [];
       this.saveDailyCache();
+      this.preCacheStories();
       this.error = '';
     } catch (e) {
       // 刷新失败保留旧内容
@@ -117,6 +120,29 @@ export struct DailyPage {
     const stories = this.stories.slice();
     const payload: DailyCachePayload = { savedAt: Date.now(), date: this.date, stories: stories };
     cacheWrite('daily_cache_v2', payload);
+  }
+
+  /** 后台预缓存日报所有文章详情 */
+  private preCacheStories(): void {
+    const stories: DailyStory[] = this.stories;
+    const doCache = async (idx: number): Promise<void> => {
+      if (idx >= stories.length) {
+        return;
+      }
+      const sid: string = String(stories[idx].id ?? '');
+      if (sid.length === 0) {
+        await doCache(idx + 1);
+        return;
+      }
+      try {
+        const d = await getDailyDetail(sid);
+        writeContentCache('daily', sid, d as object);
+      } catch (e) {
+        // 静默失败
+      }
+      await doCache(idx + 1);
+    };
+    doCache(0).catch(() => {});
   }
 
   /** 日报离线：读两天内缓存，成功返回 true */

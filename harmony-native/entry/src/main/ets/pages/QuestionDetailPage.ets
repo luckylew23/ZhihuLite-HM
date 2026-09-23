@@ -19,15 +19,20 @@ import {
 import { AnswerDetail } from '../api/answer';
 import { ZhihuTopic } from '../model/zhihu';
 import { ZhihuColors } from '../utils/theme';
+import { readContentCache, writeContentCache } from '../utils/cacheStore';
+
 import { getZhihuErrorMessage } from '../utils/zhihuError';
 import { DetailNavBar } from '../components/detail/DetailNavBar';
 import { AnswerCard } from '../components/detail/AnswerCard';
 import {
+
   formatCount,
   guardLogin,
   readStringParam,
   stripHtml,
 } from '../components/detail/detailUtils';
+
+interface CachedQuestion { savedAt: number; data: ZhihuQuestionDetail; }
 
 const ANSWER_INCLUDE: string =
   'data[*].content,excerpt,voteup_count,comment_count,favlists_count,author.name,author.avatar_url,author.headline,author.is_following,relationship.voting,relationship.is_author,created_time,updated_time,ip_info,segment_infos';
@@ -71,13 +76,28 @@ struct QuestionDetailPage {
   private async loadQuestion(): Promise<void> {
     this.loadingQ = true;
     this.qError = '';
+    // 先读缓存
+    let hadCache: boolean = false;
+    const cached = readContentCache<CachedQuestion>('question', this.qId);
+    if (cached) {
+      const q = cached.data;
+      this.question = q;
+      this.following = q.relationship?.is_following ?? false;
+      this.followerCount = q.follower_count ?? 0;
+      this.loadingQ = false;
+      hadCache = true;
+    }
     try {
       const q: ZhihuQuestionDetail = await getQuestion(this.qId);
       this.question = q;
       this.following = q.relationship?.is_following ?? false;
       this.followerCount = q.follower_count ?? 0;
+      writeContentCache('question', this.qId, q as object);
+      this.qError = '';
     } catch (e) {
-      this.qError = getZhihuErrorMessage(e as object);
+      if (!hadCache) {
+        this.qError = getZhihuErrorMessage(e as object);
+      }
     } finally {
       this.loadingQ = false;
     }
