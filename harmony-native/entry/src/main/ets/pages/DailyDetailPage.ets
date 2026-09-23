@@ -45,7 +45,12 @@ struct DailyDetailPage {
       this.detail = d;
       // 头图已用 images[0]，正文里的 [图片] 占位用 images[1..] 依次替换
       const bodyImgs: string[] = (d.images !== undefined && d.images.length > 1) ? d.images.slice(1) : [];
-      let blocks: HtmlBlock[] = this.fillPlaceholders(parseContent(d.body), bodyImgs);
+      // 先移除"查看知乎原文"和"查看知乎讨论"链接（单独提取渲染，不进正文）
+      let cleanedBody: string = d.body;
+      cleanedBody = cleanedBody.replace(/<a[^>]*class="[^"]*originUrl[^"]*"[^>]*>[\s\S]*?<\/a>/gi, '');
+      cleanedBody = cleanedBody.replace(/<a[^>]*href="[^"]*"[^>]*class="[^"]*originUrl[^"]*"[^>]*>[\s\S]*?<\/a>/gi, '');
+      cleanedBody = cleanedBody.replace(/<div[^>]*class="[^"]*view-more[^"]*"[^>]*>[\s\S]*?<\/div>/gi, '');
+      let blocks: HtmlBlock[] = this.fillPlaceholders(parseContent(cleanedBody), bodyImgs);
       // 正文第一个图片块即答主头像，标记为小圆形头像渲染
       for (let k = 0; k < blocks.length; k++) {
         if (blocks[k].type === 'image') {

@@ -29,7 +29,6 @@ export function stripHtml(html: string, keepMarkdown: boolean = false): string {
     text = text.replace(/<i[^>]*>([\s\S]*?)<\/i>/gi, '*$1*');
     text = text.replace(/<code[^>]*>([\s\S]*?)<\/code>/gi, '`$1`');
     text = text.replace(/<a[^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi, '[$2]($1)\n');
-');
   }
   text = text.replace(/<br\s*\/?>/gi, '\n');
   text = text.replace(/<\/(p|div|section|article|h[1-6]|li|ul|ol|blockquote|figure)>/gi, '\n');
