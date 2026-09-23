@@ -31,6 +31,7 @@ struct Index {
   @State innerIndex: number = 0;
   // 首页组顶栏可见栏目 key 列表（aboutToAppear 读一次，改配置下次进入生效）
   @State visibleKeys: string[] = [];
+  @StorageProp('themeVersion') themeVersion: number = 0;
   // 内层 Tabs 控制器：保证顶栏点击/底栏首页回默认栏均能强制切换内容
   private tabsCtrl: TabsController = new TabsController();
   // 登录态版本号：登录/登出翻转时 +1 → 下方 Tabs/ProfilePage 的 key 变化 → 强制重建，

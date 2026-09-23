@@ -157,6 +157,8 @@ export function applyTheme(): void {
   ZhihuColors.hotRankThird = p.hotRankThird;
   ZhihuColors.hotLabel = p.hotLabel;
   ZhihuColors.primaryTransparent = p.primaryTransparent;
+  // 通知全局重建（根组件 @StorageProp 观察此值）
+  AppStorage.set<number>('themeVersion', Date.now());
 }
 
 /** 设置主题模式并立即应用。 */
