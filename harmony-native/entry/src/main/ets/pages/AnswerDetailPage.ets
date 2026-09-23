@@ -230,6 +230,15 @@ struct AnswerDetailPage {
                 .width(40).height(40).borderRadius(20)
                 .objectFit(ImageFit.Cover)
                 .backgroundColor(ZhihuColors.backgroundTertiary)
+                .onClick(() => {
+                  const author = this.answer?.author;
+                  if (author) {
+                    const token = author.url_token || author.id;
+                    if (token) {
+                      router.pushUrl({ url: 'pages/PeoplePage', params: { urlToken: token } });
+                    }
+                  }
+                })
               Column({ space: 2 }) {
                 Text(this.answer.author.name)
                   .fontSize(17).fontWeight(FontWeight.Medium).fontColor(ZhihuColors.text)

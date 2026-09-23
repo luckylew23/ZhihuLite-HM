@@ -80,7 +80,7 @@ struct PinDetailPage {
         Scroll() {
           Column({ space: 12 }) {
             Row({ space: 10 }) {
-              Image(this.pin.author.avatar_url)
+              Image(this.pin.author.avatar_url).onClick(() => { const author = this.pin?.author; if (author) { const token = author.url_token || author.id; if (token) { router.pushUrl({ url: 'pages/PeoplePage', params: { urlToken: token } }); } } })
                 .width(40).height(40).borderRadius(20)
                 .objectFit(ImageFit.Cover)
                 .backgroundColor(ZhihuColors.backgroundTertiary)

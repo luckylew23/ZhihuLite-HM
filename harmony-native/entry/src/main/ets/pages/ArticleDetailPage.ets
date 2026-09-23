@@ -149,7 +149,7 @@ struct ArticleDetailPage {
               .textAlign(TextAlign.Start)
 
             Row({ space: 10 }) {
-              Image(this.article.author.avatar_url)
+              Image(this.article.author.avatar_url).onClick(() => { const author = this.article?.author; if (author) { const token = author.url_token || author.id; if (token) { router.pushUrl({ url: 'pages/PeoplePage', params: { urlToken: token } }); } } })
                 .width(36).height(36).borderRadius(18)
                 .objectFit(ImageFit.Cover)
                 .backgroundColor(ZhihuColors.backgroundTertiary)
