@@ -184,6 +184,8 @@ struct AnswerDetailPage {
       // 尝试保存到公共 Documents，失败则回退到沙箱
       let savedPath: string = '';
       const publicDirs: string[] = [
+        '/storage/media/1000/download/zhihu_saves',
+        '/storage/media/1000/Download/zhihu_saves',
         '/storage/media/1000/documents/zhihu_saves',
         actx.filesDir + '/zhihu_saves',
       ];
