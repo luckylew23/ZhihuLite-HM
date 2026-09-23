@@ -184,7 +184,11 @@ export struct AnswerCard {
 
         Row({ space: 4 }) {
           Text('○')
+            .fontSize(16)
+            .fontColor(ZhihuColors.textTertiary)
           Text(formatCount(this.item.comment_count))
+            .fontSize(15)
+            .fontColor(ZhihuColors.textSecondary)
         }
         .padding({ left: 8, right: 8, top: 4, bottom: 4 })
         .onClick(() => {

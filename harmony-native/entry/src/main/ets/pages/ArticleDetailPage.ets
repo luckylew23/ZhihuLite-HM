@@ -184,7 +184,11 @@ struct ArticleDetailPage {
 
           Row({ space: 4 }) {
             Text('○')
+              .fontSize(16)
+              .fontColor(ZhihuColors.textTertiary)
             Text(formatCount(this.article.comment_count))
+              .fontSize(15)
+              .fontColor(ZhihuColors.textSecondary)
           }
           .layoutWeight(1).justifyContent(FlexAlign.Center).padding({ top: 12, bottom: 12 })
           .onClick(() => {

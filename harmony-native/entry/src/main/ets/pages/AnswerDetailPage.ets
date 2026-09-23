@@ -283,7 +283,11 @@ struct AnswerDetailPage {
 
           Row({ space: 4 }) {
             Text('○')
+              .fontSize(16)
+              .fontColor(ZhihuColors.textTertiary)
             Text(formatCount(this.answer.comment_count))
+              .fontSize(15)
+              .fontColor(ZhihuColors.textSecondary)
           }
           .layoutWeight(1)
           .justifyContent(FlexAlign.Center)
