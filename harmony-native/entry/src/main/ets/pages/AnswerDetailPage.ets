@@ -296,7 +296,7 @@ struct AnswerDetailPage {
             Text(this.collected ? '★' : '☆')
               .fontSize(17)
               .fontColor(this.collected ? ZhihuColors.warning : ZhihuColors.textSecondary)
-            Text(this.collected ? '取消收藏' : '移至收藏')
+            Text(this.collected ? '已收藏' : '收藏')
               .fontSize(16)
               .fontColor(this.collected ? ZhihuColors.warning : ZhihuColors.textSecondary)
           }

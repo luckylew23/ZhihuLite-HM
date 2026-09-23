@@ -195,7 +195,7 @@ export struct AnswerCard {
           Text(this.collected ? '★' : '☆')
             .fontSize(16)
             .fontColor(this.collected ? ZhihuColors.warning : ZhihuColors.textTertiary)
-          Text(this.collected ? '取消收藏' : '移至收藏')
+          Text(this.collected ? '已收藏' : '收藏')
             .fontSize(15)
             .fontColor(this.collected ? ZhihuColors.warning : ZhihuColors.textSecondary)
         }
