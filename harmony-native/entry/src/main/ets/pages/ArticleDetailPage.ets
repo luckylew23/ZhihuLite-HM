@@ -23,6 +23,7 @@ import { formatCount, guardLogin, HtmlBlock, parseContent, readStringParam, bloc
 import { RichBody } from '../components/detail/RichBody';
 import { common } from '@kit.AbilityKit';
 import { fileIo } from '@kit.CoreFileKit';
+import { picker } from '@kit.CoreFileKit';
 
 interface CachedArticle { savedAt: number; data: ZhihuArticle; }
 

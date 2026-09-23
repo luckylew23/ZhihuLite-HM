@@ -22,6 +22,7 @@ import { NetImage } from '../components/NetImage';
 import { RichBody } from '../components/detail/RichBody';
 import { common } from '@kit.AbilityKit';
 import { fileIo } from '@kit.CoreFileKit';
+import { picker } from '@kit.CoreFileKit';
 
 interface CachedAnswer { savedAt: number; data: AnswerDetail; }
 
@@ -178,34 +179,27 @@ struct AnswerDetailPage {
       const title: string = (this.answer?.question?.title ?? '').length > 0 ? this.answer!.question!.title : '回答_' + this.answerId;
       const author: string = this.answer?.author?.name ?? '';
       const md: string = blocksToMarkdown(this.bodyBlocks, title, author);
-      const actx: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
       const safeTitle: string = title.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, '_').substring(0, 50);
       const fileName: string = safeTitle + '.md';
-      // 尝试保存到公共 Documents，失败则回退到沙箱
-      let savedPath: string = '';
-      const publicDirs: string[] = [
-        '/storage/media/1000/download/zhihu_saves',
-        '/storage/media/1000/Download/zhihu_saves',
-        '/storage/media/1000/documents/zhihu_saves',
-        actx.filesDir + '/zhihu_saves',
-      ];
-      for (const dir of publicDirs) {
-        try {
-          try { fileIo.mkdirSync(dir, true); } catch (e) {}
-          const filePath: string = dir + '/' + fileName;
-          const f = fileIo.openSync(filePath, fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
-          fileIo.writeSync(f.fd, md);
-          fileIo.closeSync(f);
-          savedPath = filePath;
-          break;
-        } catch (e) {
-          continue;
-        }
-      }
-      if (savedPath.length > 0) {
-        promptAction.showToast({ message: '已保存: ' + savedPath });
-      } else {
-        promptAction.showToast({ message: '保存失败' });
+      // 先存沙箱临时文件，再通过系统选择器让用户保存到公共位置
+      const actx: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+      const tmpPath: string = actx.filesDir + '/tmp_save.md';
+      const f = fileIo.openSync(tmpPath, fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
+      fileIo.writeSync(f.fd, md);
+      fileIo.closeSync(f);
+      // 用 DocumentViewPicker 让用户选保存位置
+      const docPicker = new picker.DocumentViewPicker();
+      const saveOptions = new picker.DocumentSaveOptions();
+      saveOptions.newFileNames = [safeTitle];
+      
+      const uris: string[] = await docPicker.save(saveOptions);
+      if (uris.length > 0) {
+        // 用户选了位置，把内容写进去
+        const destUri: string = uris[0];
+        const destFile = fileIo.openSync(destUri, fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
+        fileIo.writeSync(destFile.fd, md);
+        fileIo.closeSync(destFile);
+        promptAction.showToast({ message: '已保存到文件管理器' });
       }
     } catch (e) {
       const errMsg: string = e instanceof Error ? e.message : JSON.stringify(e);
