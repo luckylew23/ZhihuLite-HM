@@ -200,8 +200,9 @@ export struct AnswerCard {
           .objectFit(ImageFit.Cover)
           .backgroundColor(ZhihuColors.backgroundTertiary)
           .onClick(() => {
-            if (this.item.author.id) {
-              router.pushUrl({ url: 'pages/PeoplePage', params: { urlToken: this.item.author.id } });
+            const token = this.item.author.url_token || this.item.author.id;
+            if (token) {
+              router.pushUrl({ url: 'pages/PeoplePage', params: { urlToken: token } });
             }
           })
         Column({ space: 2 }) {
