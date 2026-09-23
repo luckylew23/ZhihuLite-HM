@@ -345,7 +345,7 @@ struct DailyDetailPage {
               .width('100%')
               .padding({ left: 16, right: 16, bottom: 12 })
             }
-            Text('💾 保存为 Markdown')
+            Text('⇩ 保存为 Markdown')
               .fontSize(15)
               .fontColor(ZhihuColors.textSecondary)
               .width('100%')

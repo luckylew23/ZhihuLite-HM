@@ -221,7 +221,7 @@ struct ArticleDetailPage {
           })
 
           Row({ space: 4 }) {
-            Text('💾')
+            Text('⇩')
               .fontSize(16)
               .fontColor(ZhihuColors.textSecondary)
             Text('保存')

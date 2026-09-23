@@ -126,7 +126,7 @@ struct PinDetailPage {
           })
 
           Row({ space: 4 }) {
-            Text('💾')
+            Text('⇩')
           }
           .layoutWeight(1).justifyContent(FlexAlign.Center).padding({ top: 12, bottom: 12 })
           .onClick(() => this.saveContent())
