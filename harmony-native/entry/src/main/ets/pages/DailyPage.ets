@@ -37,7 +37,7 @@ export struct DailyPage {
       this.loading = false;
       this.inFlight = false;
       // 后台静默刷新
-      this.refresh();
+      this.refresh().catch(() => {});
       return;
     }
     this.loading = true;
