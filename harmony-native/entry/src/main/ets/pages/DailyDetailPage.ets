@@ -10,13 +10,17 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import {
   DailyDetailResponse,
   getDailyDetail,
+
 } from '../api/daily';
+import { readContentCache, writeContentCache } from '../utils/cacheStore';
 import { ZhihuColors } from '../utils/theme';
 import { DetailNavBar } from '../components/detail/DetailNavBar';
 import { StatusView } from '../components/detail/StatusView';
 import { HtmlBlock, parseContent, readStringParam, parseInline, InlinePart } from '../components/detail/detailUtils';
 import { NetImage } from '../components/NetImage';
 import { openZhihuUrl } from '../utils/zhihuRouter';
+
+interface CachedDaily { savedAt: number; data: DailyDetailResponse; }
 
 @Entry
 @Component
@@ -40,40 +44,47 @@ struct DailyDetailPage {
   private async load(): Promise<void> {
     this.loading = true;
     this.error = '';
+    // 先读缓存即时渲染
+    const cached = readContentCache<CachedDaily>('daily', this.storyId);
+    if (cached) {
+      this.applyDailyDetail(cached.data as DailyDetailResponse);
+      this.loading = false;
+    }
     try {
       const d: DailyDetailResponse = await getDailyDetail(this.storyId);
       this.detail = d;
-      // 头图已用 images[0]，正文里的 [图片] 占位用 images[1..] 依次替换
-      const bodyImgs: string[] = (d.images !== undefined && d.images.length > 1) ? d.images.slice(1) : [];
-      // 先移除"查看知乎原文"和"查看知乎讨论"链接（单独提取渲染，不进正文）
-      let cleanedBody: string = d.body;
-      cleanedBody = cleanedBody.replace(/<a[^>]*class="[^"]*originUrl[^"]*"[^>]*>[\s\S]*?<\/a>/gi, '');
-      cleanedBody = cleanedBody.replace(/<a[^>]*href="[^"]*"[^>]*class="[^"]*originUrl[^"]*"[^>]*>[\s\S]*?<\/a>/gi, '');
-      cleanedBody = cleanedBody.replace(/<div[^>]*class="[^"]*view-more[^"]*"[^>]*>[\s\S]*?<\/div>/gi, '');
-      let blocks: HtmlBlock[] = this.fillPlaceholders(parseContent(cleanedBody), bodyImgs);
-      // 正文第一个图片块即答主头像，标记为小圆形头像渲染
-      for (let k = 0; k < blocks.length; k++) {
-        if (blocks[k].type === 'image') {
-          blocks[k] = { type: 'image', text: '__avatar__', url: blocks[k].url };
-          break;
-        }
-      }
-      // 提取 <a class="originUrl" href="...">查看知乎原文</a> 的真实链接（知乎主站 answer/question）
-      const ou: RegExpExecArray | null = /<a[^>]*href="([^"]+)"[^>]*class="[^"]*originUrl[^"]*"[^>]*>/i.exec(d.body) || /<a[^>]*class="[^"]*originUrl[^"]*"[^>]*href="([^"]+)"/i.exec(d.body);
-      if (ou !== null) {
-        this.originUrl = ou[1];
-      }
-      // 提取 <div class="view-more"><a href="...">查看知乎讨论</a></div> 的真实链接
-      const vm: RegExpExecArray | null = /<div[^>]*class="[^"]*view-more[^"]*"[^>]*>\s*<a[^>]*href="([^"]+)"/i.exec(d.body);
-      if (vm !== null) {
-        this.discussionUrl = vm[1];
-      }
-      this.bodyBlocks = blocks;
+      writeContentCache('daily', this.storyId, d as object);
+      this.applyDailyDetail(d);
     } catch (e) {
       this.error = '日报内容加载失败，请稍后重试';
     } finally {
       this.loading = false;
     }
+  }
+
+  private applyDailyDetail(d: DailyDetailResponse): void {
+    this.detail = d;
+    const bodyImgs: string[] = (d.images !== undefined && d.images.length > 1) ? d.images.slice(1) : [];
+    let cleanedBody: string = d.body;
+    cleanedBody = cleanedBody.replace(/<a[^>]*class="[^"]*originUrl[^"]*"[^>]*>[\s\S]*?<\/a>/gi, '');
+    cleanedBody = cleanedBody.replace(/<a[^>]*href="[^"]*"[^>]*class="[^"]*originUrl[^"]*"[^>]*>[\s\S]*?<\/a>/gi, '');
+    cleanedBody = cleanedBody.replace(/<div[^>]*class="[^"]*view-more[^"]*"[^>]*>[\s\S]*?<\/div>/gi, '');
+    let blocks: HtmlBlock[] = this.fillPlaceholders(parseContent(cleanedBody), bodyImgs);
+    for (let k = 0; k < blocks.length; k++) {
+      if (blocks[k].type === 'image') {
+        blocks[k] = { type: 'image', text: '__avatar__', url: blocks[k].url };
+        break;
+      }
+    }
+    const ou: RegExpExecArray | null = /<a[^>]*href="([^"]+)"[^>]*class="[^"]*originUrl[^"]*"[^>]*>/i.exec(d.body) || /<a[^>]*class="[^"]*originUrl[^"]*"[^>]*href="([^"]+)"/i.exec(d.body);
+    if (ou !== null) {
+      this.originUrl = ou[1];
+    }
+    const vm: RegExpExecArray | null = /<div[^>]*class="[^"]*view-more[^"]*"[^>]*>\s*<a[^>]*href="([^"]+)"/i.exec(d.body);
+    if (vm !== null) {
+      this.discussionUrl = vm[1];
+    }
+    this.bodyBlocks = blocks;
   }
 
   /** 把正文文本里的 [图片] 字面占位，按顺序替换为正文图片块（对应 images[1..]）。

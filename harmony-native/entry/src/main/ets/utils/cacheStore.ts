@@ -99,3 +99,50 @@ export interface DailyCachePayload {
   stories: object[];
   top_stories?: object[];
 }
+
+/** 内容缓存 key 生成 */
+export function contentCacheKey(type: string, id: string | number): string {
+  return 'content_' + type + '_' + String(id);
+}
+
+/** 读取内容缓存 */
+export function readContentCache<T>(type: string, id: string | number): T | null {
+  return cacheRead<T>(contentCacheKey(type, id), CACHE_TWO_DAYS_MS);
+}
+
+/** 写入内容缓存 */
+export function writeContentCache(type: string, id: string | number, data: object): void {
+  cacheWrite(contentCacheKey(type, id), {
+    savedAt: Date.now(),
+    type: type,
+    id: String(id),
+    data: data,
+  });
+}
+
+/** 清理过期缓存（超过2天的内容缓存文件） */
+export function cleanupOldCache(): void {
+  if (!dirReady || appContext === null) {
+    return;
+  }
+  try {
+    const dir: string = appContext.filesDir + '/zhihu_cache';
+    const files: string[] = fs.listFileSync(dir);
+    const now: number = Date.now();
+    for (const f of files) {
+      if (!f.startsWith('content_')) {
+        continue;
+      }
+      try {
+        const stat = fs.statSync(dir + '/' + f);
+        if (now - stat.mtime * 1000 > CACHE_TWO_DAYS_MS) {
+          fs.unlinkSync(dir + '/' + f);
+        }
+      } catch (e) {
+        // skip
+      }
+    }
+  } catch (e) {
+    console.error('[ZhihuLite] cleanupOldCache fail err=' + String(e));
+  }
+}

@@ -8,6 +8,8 @@
 import hilog from '@ohos.hilog';
 import { router, promptAction } from '@kit.ArkUI';
 import { getAnswer, voteAnswer, AnswerDetail } from '../api/answer';
+import { readContentCache, writeContentCache } from '../utils/cacheStore';
+
 import { getAnswerCollectionStatus, removeFromCollection } from '../api/collection';
 import { ZhihuColors } from '../utils/theme';
 import { formatDate } from '../utils/date';
@@ -19,6 +21,8 @@ import { formatCount, guardLogin, HtmlBlock, parseContent, readStringParam } fro
 import { NetImage } from '../components/NetImage';
 import { RichBody } from '../components/detail/RichBody';
 import { common } from '@kit.AbilityKit';
+
+interface CachedAnswer { savedAt: number; data: AnswerDetail; }
 
 @Entry
 @Component
@@ -61,12 +65,23 @@ struct AnswerDetailPage {
     hilog.info(0x3100, 'ZhihuLiteDBG', 'ANSWER load START id=%{public}s', this.answerId);
     this.error = '';
     this.refreshCollectionStatus();
+    // 先读缓存即时渲染
+    const cached = readContentCache<CachedAnswer>('answer', this.answerId);
+    if (cached) {
+      const a = cached.data;
+      this.answer = a;
+      this.voting = a.relationship?.voting ?? 0;
+      this.voteCount = a.voteup_count ?? 0;
+      this.bodyBlocks = parseContent(a.content);
+      this.loading = false;
+    }
     try {
       const a: AnswerDetail = await getAnswer(this.answerId);
       this.answer = a;
       this.voting = a.relationship?.voting ?? 0;
       this.voteCount = a.voteup_count ?? 0;
       this.bodyBlocks = parseContent(a.content);
+      writeContentCache('answer', this.answerId, a as object);
       const actx: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
       writeDebugLog(actx, 'ANSWER', 'id=' + this.answerId + ' len=' + a.content.length + ' preview=' + a.content.substring(0, 400));
       writeDebugLog(actx, 'ANSWER', 'blocks=' + JSON.stringify(this.bodyBlocks.map((b: HtmlBlock) => b.type)));

@@ -8,6 +8,8 @@
 import hilog from '@ohos.hilog';
 import { router, promptAction } from '@kit.ArkUI';
 import { getArticle } from '../api/article';
+import { readContentCache, writeContentCache } from '../utils/cacheStore';
+
 import { getArticleCollectionStatus, removeArticleFromCollection } from '../api/collection';
 import { ZhihuArticle } from '../model/zhihu';
 import { ZhihuColors } from '../utils/theme';
@@ -20,6 +22,8 @@ import { NetImage } from '../components/NetImage';
 import { formatCount, guardLogin, HtmlBlock, parseContent, readStringParam } from '../components/detail/detailUtils';
 import { RichBody } from '../components/detail/RichBody';
 import { common } from '@kit.AbilityKit';
+
+interface CachedArticle { savedAt: number; data: ZhihuArticle; }
 
 @Entry
 @Component
@@ -77,10 +81,20 @@ struct ArticleDetailPage {
   private async load(): Promise<void> {
     this.loading = true;
     this.error = '';
+    // 先读缓存即时渲染
+    const cached = readContentCache<CachedArticle>('article', this.articleId);
+    if (cached) {
+      const a = cached.data;
+      this.article = a;
+      this.bodyBlocks = parseContent(a.content);
+      this.loading = false;
+      this.refreshCollectionStatus();
+    }
     try {
       const a: ZhihuArticle = await getArticle(this.articleId);
       this.article = a;
       this.bodyBlocks = parseContent(a.content);
+      writeContentCache('article', this.articleId, a as object);
       const actx: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
       writeDebugLog(actx, 'ARTICLE', 'id=' + this.articleId + ' len=' + a.content.length + ' preview=' + a.content.substring(0, 400));
       writeDebugLog(actx, 'ARTICLE', 'blocks=' + JSON.stringify(this.bodyBlocks.map((b: HtmlBlock) => b.type)));
