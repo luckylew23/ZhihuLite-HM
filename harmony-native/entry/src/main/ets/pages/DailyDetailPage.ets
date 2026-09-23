@@ -45,18 +45,24 @@ struct DailyDetailPage {
     this.loading = true;
     this.error = '';
     // 先读缓存即时渲染
+    let hadCache: boolean = false;
     const cached = readContentCache<CachedDaily>('daily', this.storyId);
     if (cached) {
       this.applyDailyDetail(cached.data as DailyDetailResponse);
       this.loading = false;
+      hadCache = true;
     }
     try {
       const d: DailyDetailResponse = await getDailyDetail(this.storyId);
       this.detail = d;
       writeContentCache('daily', this.storyId, d as object);
       this.applyDailyDetail(d);
+      this.error = '';
     } catch (e) {
-      this.error = '日报内容加载失败，请稍后重试';
+      // 已有缓存时不显示错误，保留缓存内容
+      if (!hadCache) {
+        this.error = '日报内容加载失败，请稍后重试';
+      }
     } finally {
       this.loading = false;
     }

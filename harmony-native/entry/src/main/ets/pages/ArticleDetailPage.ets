@@ -111,6 +111,7 @@ struct ArticleDetailPage {
     this.loading = true;
     this.error = '';
     // 先读缓存即时渲染
+    let hadCache: boolean = false;
     const cached = readContentCache<CachedArticle>('article', this.articleId);
     if (cached) {
       const a = cached.data;
@@ -118,6 +119,7 @@ struct ArticleDetailPage {
       this.bodyBlocks = parseContent(a.content);
       this.loading = false;
       this.refreshCollectionStatus();
+      hadCache = true;
     }
     try {
       const a: ZhihuArticle = await getArticle(this.articleId);
@@ -130,7 +132,9 @@ struct ArticleDetailPage {
       this.refreshCollectionStatus();
     } catch (e) {
       hilog.error(0x3100, 'ZhihuLiteDBG', 'ARTICLE load FAIL id=%{public}s err=%{public}s', this.articleId, JSON.stringify(e as object));
-      this.error = getZhihuErrorMessage(e as object);
+      if (!hadCache) {
+        this.error = getZhihuErrorMessage(e as object);
+      }
     } finally {
       this.loading = false;
     }

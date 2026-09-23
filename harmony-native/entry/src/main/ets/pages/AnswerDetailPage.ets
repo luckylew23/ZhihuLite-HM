@@ -67,6 +67,7 @@ struct AnswerDetailPage {
     this.error = '';
     this.refreshCollectionStatus();
     // 先读缓存即时渲染
+    let hadCache: boolean = false;
     const cached = readContentCache<CachedAnswer>('answer', this.answerId);
     if (cached) {
       const a = cached.data;
@@ -75,6 +76,7 @@ struct AnswerDetailPage {
       this.voteCount = a.voteup_count ?? 0;
       this.bodyBlocks = parseContent(a.content);
       this.loading = false;
+      hadCache = true;
     }
     try {
       const a: AnswerDetail = await getAnswer(this.answerId);
@@ -88,7 +90,9 @@ struct AnswerDetailPage {
       writeDebugLog(actx, 'ANSWER', 'blocks=' + JSON.stringify(this.bodyBlocks.map((b: HtmlBlock) => b.type)));
     } catch (e) {
       hilog.error(0x3100, 'ZhihuLiteDBG', 'ANSWER load FAIL id=%{public}s err=%{public}s', this.answerId, JSON.stringify(e as object));
-      this.error = getZhihuErrorMessage(e as object);
+      if (!hadCache) {
+        this.error = getZhihuErrorMessage(e as object);
+      }
     } finally {
       this.loading = false;
     }
