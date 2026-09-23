@@ -1,8 +1,9 @@
-# ZhihuLite-HM 项目设计文档
+# ZhihuLite-HM 项目设计文档（基线版 v0.3.61）
 
 > **项目**：ZhihuLite-HM（知乎Lite）—— 上游 [zhihu--](https://github.com/luckylew23/zhihu--) v0.6.0（React Native / Expo）的 HarmonyOS NEXT 原生移植
-> **技术路线**：方案 B —— 复用上游纯 TypeScript 业务逻辑 + ArkTS 重写 UI（旧 WebView 壳方案已否决，`harmony/` 目录保留归档）
+> **技术路线**：复用上游纯 TypeScript 业务逻辑 + ArkTS 原生重写 UI
 > **本文件**：特性 / C4 架构 / 设计 / 测试验证 / 要求的唯一事实来源，随开发持续迭代更新
+> **基线版本**：v0.3.61（versionCode 154）
 
 ---
 
@@ -11,359 +12,267 @@
 | 项 | 值 |
 |---|---|
 | 应用显示名 | 知乎Lite |
-| Bundle Name | `com.zhihulite.hmos`（与原版 `com.huamu013.ZhihuMinusMinus` 隔离，不冲突） |
-| 当前版本 | v0.3.13（versionCode 148） |
-| 上游基线 | `~/workbuddy/zhihu--/`（HEAD bf28d4a，v0.6.0） |
-| 工程目录 | `~/workbuddy/zhihu--HMOS/harmony-native/` |
-| 远程仓库 | `git@github.com:luckylew23/ZhihuLite-HM.git` |
-| 页面 / API 模块 | 36 个页面（`main_pages.json` 33 条路由）、27 个 API 模块 |
-| SDK | DevEco Studio 内置 OpenHarmony SDK 6.0.2 / API 20 |
-| 签名 | 华为开发者签名链（真机可装）；自签仅模拟器信任 |
+| Bundle Name | `com.zhihulite.hmos`（与原版隔离，可共存安装） |
+| 当前版本 | v0.3.61（versionCode 154） |
+| 上游基线 | `~/workbuddy/zhihu--/`（v0.6.0） |
+| 原生工程 | `~/Work/zhihuLite-HM/harmony-native/` |
+| 远程仓库 | `git@github.com:luckylew23/ZhihuLite-HM.git`（main） |
+| 页面数 | 37 个页面 |
+| API 模块 | 27 个 |
+| SDK | OpenHarmony SDK 6.0.2 / API 20 |
+| 权限 | INTERNET / GET_NETWORK_INFO（无危险权限） |
+| 签名 | 华为开发者签名链（真机可装） |
 
 ### 1.1 快速开始
 
-**环境要求**
-- macOS + DevEco Studio（含 OpenHarmony SDK 6.0.2 / API 20）
-- 真机需开启开发者模式；命令行构建无需 IDE GUI
-
-**构建**
 ```bash
-cd ~/workbuddy/zhihu--HMOS/harmony-native
+# 构建
+cd ~/Work/zhihuLite-HM/harmony-native
 /Applications/DevEco-Studio.app/Contents/tools/node/bin/node \
   /Applications/DevEco-Studio.app/Contents/tools/hvigor/bin/hvigorw.js \
   assembleHap --mode module -p product=default --no-daemon
-```
-产物：`entry/build/default/outputs/default/entry-default-signed.hap`（华为签名，真机可装）。
 
-**安装**
-```bash
+# 产物：entry/build/default/outputs/default/entry-default-signed.hap
+# 安装
 HDC=/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc
-$HDC list targets                                   # 确认设备在线
-$HDC -t <serial> install -r ZhihuLite-HM-v0.3.12-signed.hap
+$HDC list targets
+$HDC -t <serial> install -r ZhihuLite-HM-v0.3.61-signed.hap
 ```
-已交付 HAP 均保留在 `~/workbuddy/zhihu--HMOS/`，命名 `ZhihuLite-HM-v<版本>-signed.hap`。
 
 ### 1.2 项目结构
 
 ```
-zhihu--HMOS/
-├── harmony-native/        ★ 原生工程（当前主线）
-│   ├── entry/src/main/ets/{pages,components,api,store,model,utils}
-│   ├── PORTING_SPEC.md    移植规范（所有移植工作的事实来源）
-│   ├── AUDIT_REPORT.md    缺陷审计报告（H/M/L 分级 + 降级项）
-│   └── projectdesign.md   特性/C4/设计/测试/要求（本文件）
-├── harmony/               旧 WebView 壳（已否决，归档保留）
-├── scripts/               构建 / 签名 / SDK 补丁脚本
+zhihuLite-HM/
+├── harmony-native/          ★ 原生工程（当前主线）
+│   ├── entry/src/main/ets/
+│   │   ├── pages/            37 个页面
+│   │   ├── components/       detail / interaction / profile 分组组件
+│   │   ├── api/              27 个 API 模块 + httpClient + zse96/
+│   │   ├── store/            authStore / settingsStore
+│   │   ├── model/zhihu.ts    知乎数据模型接口
+│   │   └── utils/            theme / date / url / zhihuError / cacheStore / md5
+│   └── ...
+├── scripts/                 构建 / 签名脚本
 ├── HarmonyOS 版可行性分析.md
-└── ZhihuLite-HM-v*.hap    各版本交付产物
+└── ZhihuLite-HM-v*.hap      各版本交付产物
 ```
-
-### 1.3 文档索引
-
-| 文档 | 内容 |
-|---|---|
-| [projectdesign.md](projectdesign.md) | 特性、C4 架构、设计、测试验证、要求（唯一事实来源） |
-| [AUDIT_REPORT.md](harmony-native/AUDIT_REPORT.md) | 缺陷清单（H1-H4/M1-M10/L 系列）+ 已知降级项 |
-| [PORTING_SPEC.md](harmony-native/PORTING_SPEC.md) | 移植规范、ArkTS 硬坑、页面约定 |
-| [scripts/sdk-build-patch.md](scripts/sdk-build-patch.md) | 命令行构建打通与 SDK 补丁方案 |
-| `~/Notebook/Duobao/zhihu--HarmonyOS原生移植记录-v0.2.md` | 逐版本移植/修复/验证记录与经验沉淀 |
 
 ---
 
 ## 2. 特性（Features）
 
 ### 2.1 首页与栏目
-- **底栏三槽**：首页（字符 ⌂ + 文字标签）/ 发布（+）/ 我的（字符 👤 + 文字标签）
-- **首页内层可滑动 Tabs**：关注 / 推荐 / 热榜 / 日报，默认进推荐；栏目可见性可配置（`settingsStore.visibleTabs`），至少保留一栏、profile 常驻
+- **底栏三槽**：首页（⌂）/ 发布（+）/ 我的（👤）
+- **首页内层 Tabs**：关注 / 推荐 / 热榜 / 日报，可配置展示，至少保留一栏
 - **登录后状态刷新**：登录/登出翻转 `loginVersion`，主框架按 key 强制重建各列表页
 - 下拉刷新 + 触底加载更多（cursor/offset 分页）
 
 ### 2.2 登录与会话
-- WebView 内嵌知乎登录（LoginPage，失败有错误提示 + 重试）
-- Cookie 持久化（preferences），启动 bootstrap 恢复登录态
-- `z_c0` 判定登录；401 自动刷新会话（token refresh + oauth sign_in）
+- WebView 内嵌知乎登录
+- Cookie 持久化（preferences），启动恢复登录态
+- `z_c0` 判定登录；401 自动刷新会话
 
 ### 2.3 内容浏览
-- 推荐流 / 关注流 / 热榜（热度值+回答数）/ 日报（每日 5 篇带图）
-- 问题详情、回答、文章、想法（pin）、视频、专栏、话题详情
-- 富文本正文（回答/文章 HTML）**降级为纯文本渲染**（剥标签 + 解码实体，图片占位 `[图片]`）
+- 推荐流 / 关注流 / 热榜 / 日报
+- 问题详情、回答、文章、想法（pin）、视频、专栏、话题
+- **富文本渲染**：HTML → HtmlBlock[] → 结构化渲染（标题/粗体/斜体/列表/引用/代码/图片/链接），支持 GFM
+- **正文内链接**：蓝色下划线，点击在应用内打开（不跳浏览器）
+- **图片**：正文大图占满、单击全屏双指缩放、长按保存原图/复制链接（右上角按钮）
 
 ### 2.4 互动与创作
-- 点赞 / 收藏（收藏夹：我的收藏内容 + 分类）/ 关注 / 评论
-- 写回答、写文章、发想法、提问（发布页入口 + 四类发布页）
-- 赞同者列表、我的点赞、浏览历史
+- 赞成 / 反对 / 评论 / 收藏（收藏夹分类选择）/ 关注
+- 写回答、写文章、发想法、提问
+- **保存为 Markdown**：回答/文章/想法/日报均可保存为 .md 文件，通过系统 DocumentViewPicker 选择保存位置
 
 ### 2.5 搜索
-- 综合 / 用户两个 tab、筛选、时间范围、重置
-- 搜索接口 `search_v3` **强制登录**（未登录明确提示）
-- 结果解析对 `object` / `highlight` / `question` 等 null 字段全防护（v0.3.8 修复）
-
-### 2.10 最近浏览（浏览历史）
-- 进入即异步加载（点击后加载，慢可接受）；默认只展示**最近两天**的浏览记录（按 `extra.read_time` 秒级时间戳过滤，48 小时窗口）
-- 触底翻页继续加载更早记录；长按多选批量删除、右上角清空
-- 解析全防护：`item.data.extra/header/content/matrix` 空引用安全访问 + 逐条跳过残缺条目（v0.3.10 修复闪退）
+- 综合 / 用户双 tab，强制登录
+- 筛选：内容类型 / 排序 / 时间范围（默认三月内）
+- 结果解析全 null 防护
 
 ### 2.6 个人中心
-- 我的统计（回答/文章/粉丝可点）、收藏、私信（HTTP 降级，无 WebSocket）、通知、历史、赞同
-- 他人主页：时间线、统计、关注/私信入口、互相关注
+- 我的收藏（内容 + 分类）、历史、通知、私信、赞同
+- 他人主页、赞同者列表
 
 ### 2.7 设置
-- 主题模式（auto / light / dark，默认 auto 深色）、栏目可见性、默认首页栏目、内容过滤
-- 外观 / 筛选页持久化
+- 主题（自动/浅色/深色）
+- 栏目可见性配置
+- 默认首页
+- 内容过滤
 
-### 2.9 离线缓存（热榜 / 日报）
-- **进入即缓存**：热榜、日报加载成功后立即把当天内容写入本地文件缓存（`{filesDir}/zhihu_cache/hot_cache_v2.json`、`daily_cache_v2.json`）
-- **缓存有效期两天**：`CACHE_TWO_DAYS_MS = 2*24*60*60*1000`，超龄自动失效
-- **离线可看**：网络请求失败（断网/接口异常）时自动回退读取两天内缓存，仍可正常浏览热榜与日报内容
-- 实现：`utils/cacheStore.ts`（fs 同步 API：accessSync 探活目录 + mkdirSync 创建 + openSync/writeSync/closeSync 写入 + statSync/readTextSync 读取），缓存失败静默不影响主流程
-- 注意：`fileIo.stat().mtime` 单位为**秒**，与 `Date.now()` 毫秒需换算（v0.3.9 修复，否则缓存永远判过期）
+### 2.8 可发现性
+- 包内搜索关键词：知乎、zhihu、知乎Lite、轻量、知乎第三方、知乎鸿蒙版等
 
-### 2.11 图片显示与长按下载原图
-- **内容图片统一组件 `NetImage`**：推荐/热榜/日报/想法/问题详情等主要图片（v0.3.13 起）
-- **长按下载原图（无水印）**：`utils/imageUrl.ts` 转换（去 `source=` 水印参数 + 去 `_400x400` 尺寸段 + 去 `/80/` 压缩段）→ `utils/imageDownload.ts` 二进制下载 → `photoAccessHelper.createAsset` 写入系统相册
-- 权限：`ohos.permission.WRITE_IMAGEVIDEO`（首次弹窗授权，`reason` 文案已配置）
-- 反馈：下载中/成功/失败均 toast；日志 TAG ZhihuLite
-- 已知边界：`uitest longClick` 无法注入 ArkUI 长按手势，长按交互需真机人工验证
-
-### 2.8 搜索关键词（应用可发现性）
-- 包内 `metadata.keywords`：知乎,zhihu,知乎Lite,ZhihuLite,zhihulite,轻量,知乎第三方,知乎鸿蒙版,知乎客户端,鸿蒙知乎,知乎轻量版,zhihu-lite,知乎minimal
-- 应用描述 `description_application`（关于页可见，含关键词文案）
-- 说明：应用市场搜索关键词主配置在 AGC 发布后台，包内 keywords/description 为辅助
+### 2.9 离线缓存
+- **热榜/日报列表**：进入即缓存，stale-while-revalidate（先展示缓存，后台静默刷新）
+- **文章详情预缓存**：列表加载后后台顺序预缓存所有条目详情（热榜=问题详情，日报=文章详情）
+- **内容缓存有效期**：两天
+- **断网可看**：有缓存时网络失败不显示错误页，直接展示缓存内容
 
 ---
 
 ## 3. C4 架构
 
-### 3.0 架构概览（一图流）
+### 3.1 上下文（C1）
 
 ```
-用户 ──▶ ZhihuLite-HM（ArkTS 原生 UI，36 页面）
-              │
-              ├── api/  27 个知乎 API 模块
-              │     └── httpClient（Cookie Jar + x-zse-96 签名 + 401 自动刷新 + 请求日志）
-              │     └── zse96/（签名算法，与上游逐行对齐）
-              ├── store/  authStore / settingsStore（preferences 持久化）
-              └── 知乎服务端（www / api / zhuanlan / oauth 四域名）
-```
-
-### 3.1 系统上下文（C1）
-
-```
-┌──────────┐  使用   ┌──────────────────┐   HTTPS    ┌────────────────────────────┐
-│  用户     │ ─────▶ │ ZhihuLite-HM 应用 │ ─────────▶ │ 知乎服务端（四个域名）        │
-│ (真机)    │        │  (HarmonyOS HAP)  │ ◀───────── │ www.zhihu.com 网页端点       │
-└──────────┘        └──────────────────┘   响应+签名  │ api.zhihu.com 设备态端点     │
-                                                      │ zhuanlan.zhihu.com 专栏      │
-                                                      │ api.zhihu.com/oauth 认证     │
-                                                      └────────────────────────────┘
+用户 ──→ ZhihuLite-HM ──→ 知乎 API（www.zhihu.com / api.zhihu.com / zhuanlan.zhihu.com）
+                              ↓
+                        Cookie Jar + 签名头（zse96）
 ```
 
 ### 3.2 容器（C2）
 
-```
-ZhihuLite-HM (entry HAP)
-│
-├── UI 层（ArkTS）         36 pages + components（List/ForEach/Image，无 WebView 渲染内容）
-│     ├── pages/Index.ets  主框架：底栏 3 槽 + 内层 Tabs + loginVersion 重建
-│     ├── pages/*Detail*   详情页族（问题/回答/文章/想法/视频/专栏/话题）
-│     ├── pages/Publish*   发布页族（问题/回答/文章/想法）
-│     ├── pages/Profile*   个人中心族（我的/他人主页/收藏/历史/通知/私信）
-│     └── components/      复用组件（FeedCard/HotCard/AnswerCard/CommentRow/...）
-│
-├── API 适配层（api/）      27 个模块：feed / question / answer / article / pin / daily /
-│                          search / collection / me / member / chat / notification / ...
-│     └── httpClient.ts    核心单例：@ohos.net.http 替代 axios
-│                            · Cookie Jar（持久化 + 按 URL 取 cookie）
-│                            · 自动签名头（x-zse-96 / x-zse-93 / X-Udid / x-xsrftoken）
-│                            · 401 自动刷新会话
-│                            · ApiError（status/code/body/message）+ 200+error 业务错误识别
-│                            · hilog 全量请求/响应日志（URL+status+len+err）
-│     └── zse96/           x-zse-96 签名算法（hmac / encryptZseV4 / zse_purity 常量）
-│
-├── 状态层（store/）        authStore（登录态+cookie 持久化）、settingsStore（主题/栏目/默认页）
-│                            AppStorage 全局态（loginVersion 重建信号）
-│
-└── 基础设施
-      ├── 存储：@kit.ArkData preferences（cookie / user_name / 设置项）
-      ├── 日志：@kit.PerformanceAnalysisKit hilog（TAG ZhihuHttp / JSAPP）
-      └── 网络：@kit.NetworkKit http（无 CORS 约束）
-```
+| 层 | 职责 |
+|---|---|
+| UI 层（ArkTS） | 页面 + 组件，纯声明式渲染 |
+| 业务层（api/） | HTTP 请求、签名、Cookie、数据解析 |
+| 状态层（store/） | 登录态、设置项持久化 |
+| 工具层（utils/） | 主题、日期、缓存、错误处理 |
 
 ### 3.3 组件（C3）
 
 | 组件 | 职责 | 关键文件 |
 |---|---|---|
-| 主框架 | 底栏 + 内层 Tabs + 栏目动态渲染 + 登录重建 | `pages/Index.ets` |
-| 详情页族 | 类型分发（复数类型兼容）+ 各内容详情 | `DetailPage` / `QuestionDetailPage` / `AnswerDetailPage` / `ArticleDetailPage` / `PinDetailPage` / `VideoPage` / `ColumnPage` / `TopicPage` |
-| 发布页族 | 四类创作入口与表单 | `PublishPage` + `PublishQuestion/Answer/Article/Pin` |
-| 个人中心族 | 我的 / 他人主页 / 收藏 / 历史 / 通知 / 私信 | `ProfilePage` / `PeoplePage` / `CollectionsListPage` / `CollectionDetailPage` / `UserLikesPage` / `HistoryPage` / `NotificationsPage` / `InboxPage` / `ChatPage` |
-| 搜索 | 综合/用户搜索 + 结果解析防护 | `SearchPage` |
-| 列表卡片 | 信息流 / 热榜 / 评论 / 收藏 / 成员行 | `FeedCard` / `HotCard` / `CommentRow` / `CollectionRow` / `MemberRow` / `AnswerCard` |
-| 会话 | 登录 WebView 页 | `LoginPage` |
-| 设置 | 外观 / 栏目 / 过滤 | `SettingsAppearancePage` / `SettingsFilterPage` |
+| 主框架 | 底栏 + Tabs + 登录重建 | `pages/Index.ets` |
+| 详情页族 | 问题/回答/文章/想法/视频/专栏/话题 | `*DetailPage.ets` |
+| **公共操作栏** | 赞成▲/反对▼/评论○/收藏☆/保存⇩ 五项 | `components/detail/DetailActionBar.ets` |
+| 富文本渲染 | HTML→Blocks→结构化渲染 | `components/detail/RichBody.ets` |
+| 图片组件 | 网络图片 + 长按下载 + 全屏查看 | `components/NetImage.ets` |
+| 发布页族 | 四类创作 | `Publish*Page.ets` |
+| 个人中心族 | 收藏/历史/通知/私信 | `*Page.ets` |
+| 搜索 | 综合/用户 + 筛选 | `SearchPage.ets` |
 
 ### 3.4 代码（C4）
 
 ```
-harmony-native/entry/src/main/ets/
-├── entryability/EntryAbility.ets      入口 Ability（setAppContext、暗色跟随）
-├── pages/                             36 个页面
-├── components/                        detail / interaction / profile 分组组件
-├── api/                               27 个 API 模块 + httpClient + zse96/
-├── store/                             authStore / settingsStore
-├── model/zhihu.ts                     知乎数据模型接口
-└── utils/                             theme / date / url / zhihuError / feedIdentity / md5
+entry/src/main/ets/
+├── entryability/EntryAbility.ets
+├── pages/                    37 个页面
+├── components/detail/
+│   ├── DetailActionBar.ets    ★ 公共五项操作栏
+│   ├── AnswerCard.ets        回答卡片
+│   ├── DetailNavBar.ets      导航栏
+│   ├── detailUtils.ets       工具函数（blocksToMarkdown / saveMarkdownToFile / parseInline / stripHtml）
+│   ├── RichBody.ets         富文本渲染
+│   └── StatusView.ets       加载/错误/空态
+├── api/                      27 个模块
+├── store/                    authStore / settingsStore
+├── model/zhihu.ts
+└── utils/
+    ├── theme.ts              ZhihuColors 双套色板
+    ├── cacheStore.ts        ★ 缓存读写（列表 + 内容级）
+    └── ...
 ```
-
-关键实现要点（代码层）：
-- **签名算法**：`zse96/hmac.ts` + `encryptZseV4`，与上游逐行对齐；zhuanlan 主机豁免、oauth/token-refresh 走 rawRequest 不被错签
-- **Cookie Jar**：`cookieStringFor(url)` 按域取 cookie；游客 bootstrap（`GET www.zhihu.com/` 种 d_c0）；登录后 z_c0 持久化
-- **登录态判定**：`hasAuthenticationCookie`（`/(?:^|;\s*)z_c0=/`）
-- **页面重建**：`AppStorage 'loginVersion'` + 组件 `key` 绑定，登录/登出后强制刷新列表
 
 ---
 
 ## 4. 设计
 
 ### 4.1 UI 设计
-- **主题**：`utils/theme.ts` 导出 `ZhihuColors`（primary `#0084ff`），light/dark 双套；应用默认深色（auto 跟随系统）；颜色一律走主题，禁止硬编码
-- **UI 对齐**：对照 Android 版截图（`screenshot/v0.6.0/`）原样复制布局与交互
-- **字号**：默认正文偏大（v0.3.2 全局 +1，满足可读性）
-- **文字可选**：仅阅读场景保留 `copyOption`（详情正文/评论），全局 421→6 处——copyOption 是性能毒药，列表/按钮/标签全部禁用
-- **品牌**：应用名"知乎Lite"、图标蓝底白"知"字 + LITE 标；底栏用字符 ⌂ / 👤 + 文字标签
-- **顶栏**：页面内自绘 Row（返回 ← + 标题），不依赖系统标题栏
+- **主题**：`ZhihuColors` 双套色板（light/dark），auto 跟随系统，禁止硬编码
+- **图标风格**：极简线条字符（△▲/▽▼/○/☆★/⇩），不用 emoji，深浅主题自适应
+- **字号**：正文偏大（可读性优先），标题/正文/辅助文字分级
+- **文字可选**：仅阅读场景保留 `copyOption`（正文/评论），列表/按钮全部禁用（性能）
+- **品牌**：应用名"知乎Lite"、独立图标，底栏用字符 + 文字标签
 
 ### 4.2 网络设计
-- 单例 `zhihuClient.get/post/send<T>`，`ApiResponse<T> = {status, headers, data}`
-- 自动处理：Cookie Jar → 签名头 → 请求 → 401 刷新 → 重试；业务错误（200 + `{error}`）统一抛 `ApiError`
-- 设备态端点（api.zhihu.com）需 `appApi.ts` 的专用头（`getZhihuAppEndpointHeaders`）
-- 日志可观测：`hilog 'ZhihuHttp'` 打印 `method url status len err`，`hilog -x | grep ZhihuHttp` 可抓
+- 单例 HTTP client，自动处理 Cookie Jar → 签名头 → 请求 → 401 刷新 → 重试
+- 签名：`zse96/hmac.ts` + `encryptZseV4`
+- 设备态端点需专用头
 
 ### 4.3 数据与存储设计
-- `preferences`（`@kit.ArkData`）持久化：`auth_cookie` / `user_name` / `theme_mode` / `visible_tabs` / `default_tab` / 过滤项
-- 单账号模型（v1.0 简化）；卸载重装清登录态（Cookie 在应用沙箱）
+- `preferences` 持久化：登录态、主题、栏目配置、默认首页、过滤项
+- **文件缓存**：`cacheStore.ts`
+  - 列表缓存：`hot_cache_v2` / `daily_cache_v2`
+  - 内容缓存：`content_{type}_{id}`，有效期两天
+  - 预缓存：列表加载后后台顺序预缓存所有条目详情
+- **文件保存**：`saveMarkdownToFile()` → DocumentViewPicker → 用户选位置
 
-### 4.4 DFX 设计（可靠性 / 主题适配 / 性能）
+### 4.4 DFX 设计
 
-#### 4.4.1 可靠性 —— 功能正常、不闪退（验收项 1）
-- 全量回归基线：推荐 / 关注 / 热榜 / 日报 / 问题详情 / 回答详情 / 文章 / 想法 / 收藏夹（分类→列表→详情）/ 搜索 / 我的 —— 每次发版前按此清单真机回归
-- **解析全防护**：所有列表解析（收藏 items、搜索 object/highlight/question、feed 各类型）逐条 try/catch + null 跳过，单条坏数据不拖垮整页（v0.3.8 搜索 / v0.3.9 收藏夹）
-- **类型防护**：`stripHtml` 增加 `typeof html !== 'string'` 前置判断（上游 pin.content 可能为对象，v0.3.9 修复"undefined is not callable"）
-- 崩溃监控：hilog 业务前缀 `[ZhihuLite]`，请求链路 `ZhihuHttp`（req METHOD url status=.. len=.. err=..），回归脚本 grep AppCrash/FATAL 零命中
+#### 4.4.1 可靠性（不闪退）
+- 全量回归基线：推荐/关注/热榜/日报/详情/收藏/搜索/我的
+- 解析全防护：逐条 try/catch + null 跳过
+- 类型防护：`typeof` 前置判断
 
-#### 4.4.2 主题适配 —— 深色背景浅色文字、浅色背景深色文字（验收项 2）
-- 双套调色板 `utils/theme.ts`：`LIGHT_PALETTE`（背景 #f6f6f6、文字 #1a1a1a）/ `DARK_PALETTE`（背景 #121212、文字 #ffffff），textSecondary/textTertiary/surface/border/divider 等全量配套
-- 模式：auto（跟随系统）/ light / dark，`settingsStore.theme_mode` 持久化，我的→设置→外观切换，`applyTheme()` 就地注入 `ZhihuColors` 保持页面零改动
-- 硬编码颜色审计：仅登录页错误红 `#ff4d4f` 等语义色（深浅主题皆可用）保留，半透明遮罩 `#xx000000` 属通用蒙层
+#### 4.4.2 主题适配
+- 双套调色板，所有颜色走 `ZhihuColors`
+- 深浅主题切换零页面改动
 
-#### 4.4.3 性能 —— 点击响应 ≤ 3s，超限优化（验收项 3）
-- **点击响应硬指标 ≤ 3s**（点击→内容出现，冷启动约 7-10s 不计入交互响应）
-- 实测（v0.3.9 真机）：热榜 tab 点击→内容渲染 <2.8s；日报（命中缓存）<2.3s
-- 已实施优化：
-  - copyOption 全局最小化（421→6 处）——ArkUI 文本选择能力注册开销大，是"点击半天不响应"的根因
-  - 登录重建机制（loginVersion + key）控制重建开销
-  - 分页触底加载、图片懒加载（List 机制）
-  - 热榜/日报离线缓存命中后秒出内容（见 2.9）
-- 优化手段兜底：定位长任务→拆分/异步化；列表只渲染可视项；避免 build 内做网络/文件 IO
+#### 4.4.3 性能（≤ 3s）
+- 点击响应硬指标 ≤ 3s
+- copyOption 最小化（性能杀手）
+- 缓存命中秒出内容
+- 列表懒加载、图片懒加载
+- 预缓存后台顺序执行，不阻塞主流程
 
-### 4.5 安全与签名
-- 华为签名链（DevEco 自动签名，物料 `~/.ohos/config/default_harmony-native_*.p12/.p7b`）——真机安装必需
-- 命令行签名链路已打通（见 `scripts/sdk-build-patch.md`），IDE 非必需
-- 不携带任何额外权限（仅 INTERNET / GET_NETWORK_INFO）
+### 4.5 安全
+- 华为签名链
+- 无危险权限（仅网络）
+- Cookie 沙箱存储
 
 ---
 
 ## 5. 测试与验证
 
-### 5.1 静态审计（AUDIT_REPORT.md）
-- 分级：高=运行时必现崩溃/主链路不可用；中=功能缺失/静默错行为；低=边缘/装饰
-- **高（H1-H4）已修**：视频路由名、写回答接线、活动时间线 URL、推荐刷新参数合并
-- **中（M1-M10）已修**：视频卡类型、私信参数、通知分发、5 个死路由入口、moments 参数、question guest 缺省、PATCH 映射、member 归一化、私信入口、我的统计可点
-- **低（L 系列）**：L1/L6/L7/L8/L11 已修（热榜配图兜底、详情类型分发、onPageShow 刷新、登录错误提示、2xx 空 body）；其余记录在案
+### 5.1 回归清单（每次发版前真机验证）
+1. 推荐流加载 + 文章详情打开
+2. 关注流加载
+3. 热榜加载 + 问题详情
+4. 日报加载 + 日报文章详情
+5. 搜索（登录后）
+6. 收藏（收藏夹选择 + 状态刷新）
+7. 保存为 Markdown
+8. 图片查看（全屏 + 双指缩放 + 保存）
+9. 我的页面
+10. 断网缓存验证
 
-### 5.2 构建验证
-- 命令行构建：`hvigorw assembleHap --mode module -p product=default --no-daemon`
-- 编译期问题全为 ArkTS 规则（见 6.2 平台坑），构建输出 `entry-default-signed.hap`
-- 资源/配置变更后必须重新构建验证（如 string.json 格式错误会阻断构建）
-
-### 5.3 真机验证（自动化 + 真人）
-- 工具链：`hdc`（`/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc`）
-- `uitest dumpLayout -p <json>` 拿控件真实 bounds（比猜坐标可靠）；`uitest uiInput click/swipe/keyEvent Back/Home` 可自动化
-- 无文本注入手段 → 搜索等需输入场景交真人验证
-- 页面栈残留会误导测试 → 先 `aa force-stop` 冷启动
-- **v0.3.6 全面验证通过**：四 tab 有内容 / 热榜→原生详情 / 收藏夹 1303+7 分类 / 底栏/名称/图标正常
-- **v0.3.8**：搜索请求 200+192KB 数据、解析 null 崩溃修复（真机日志确认 `TypeError: Cannot read property 'title' of null` 消失）
-- **v0.3.9**：全回归（推荐/文章详情/热榜/日报/关注/最近更新作者/我的收藏夹 1303+7 分类/收藏详情/收藏条目详情）+ 深浅主题核查（双套色板、切换入口）+ 点击响应实测（热榜 <2.8s、日报 <2.3s）+ 离线缓存验证（断网模拟 404 时热榜完整显示缓存内容，`hot cache read hit n=30`）+ 无 AppCrash/FATAL
-- **v0.3.10**：最近浏览回归（进入不闪退、显示今日记录、点击进文章详情正常）+ 底栏发布按钮视觉调整（去圆圈）+ 无 AppCrash/FATAL
-- **v0.3.11**：搜索页回归（搜索框深浅主题正常、placeholder 灰字、搜索按钮蓝色；默认时间三月内）+ 筛选面板逻辑走查 + 真机验证受限说明（HDC 文本注入仅进输入法候选区、无法提交，搜索链路需人工键入验证）
-- **v0.3.12**：收藏按钮回归（详情页底部"☆ 移至收藏"未收藏态 → 选择收藏夹收藏 → 返回变"★ 取消收藏"橙色 → 再点取消恢复未收藏态，全链路真机通过）+ 资源 ID 防串扰（收藏回传标志带 resourceId，避免跨页面误刷新）
-- **v0.3.13**：NetImage 图片组件回归（首页推荐带图卡片正常渲染、无崩溃）+ 长按下载链路构建验证通过 + 自动化局限（uitest 无法注入长按手势，需人工验证下载）
-
-### 5.4 已知降级项（确认仍为降级，不计缺陷）
-1. 日报正文 HTML 剥标签纯文本
-2. 发布图片上传 OSS 未实现（仅本地选择/占位）
-3. 私信无 WebSocket，HTTP 降级
-4. 设置部分静态（外观/通知，仅 visibleTabs/defaultTab/theme/filter 持久化）
-5. 富文本/LaTeX 纯文本渲染
-6. FollowManagePage 后三子 tab（话题/问题/收藏夹）空态
-7. 深色模式未逐屏真机视觉回归（待补）
+### 5.2 工具
+- `hdc`：安装/启动/截图
+- `uitest dumpLayout`：控件定位
+- `hilog`：日志抓取（grep ZhihuHttp / AppCrash）
 
 ---
 
 ## 6. 要求（Requirements）
 
-### 6.1 硬约束（用户明确要求，不可退让）
-1. **完整移植不丢功能**：zhihu-- 整个项目移完整植，未登录/登录后功能都要有
-2. **UI 与 Android 版原样复制**（对照 `screenshot/v0.6.0/`）
-3. **包名/应用名不与原版冲突**：bundleName `com.zhihulite.hmos`、应用名"知乎Lite"、图标独立
-4. **构建包名用应用名称**：产物命名 `ZhihuLite-HM-v<版本>-signed.hap`
-5. **文字可选可复制**：至少阅读场景（正文/评论）可选中复制
-6. **默认字号调大**（参考原版可读性）
-7. **栏目可配置**：关注/推荐/热榜/日报等可配置是否展现
-8. **搜索关键词**：知乎、zhihu、lite、轻量、知乎第三方、知乎鸿蒙版等（已配置，见 2.8）
-9. **每次发版递增版本号**（versionCode 递增，versionName 语义化）
-10. **搜索功能可用**（v0.3.8 起搜索解析全防护）
+### 6.1 硬约束
+1. 完整移植不丢功能
+2. UI 与 Android 版对齐
+3. 包名/应用名不与原版冲突
+4. 每次发版递增版本号
+5. 文字阅读场景可选可复制
+6. 默认字号偏大
+7. 栏目可配置
+8. 全功能正常不闪退
+9. 深浅主题适配
+10. 点击响应 ≤ 3s
+11. 热榜/日报断网可看（缓存两天）
 
-### 6.2 平台坑清单（ArkTS / HarmonyOS）
+### 6.2 ArkTS 平台坑
 | 坑 | 规避 |
 |---|---|
+| import 后不能有其他语句再接 import | interface 放所有 import 之后 |
+| 禁裸对象字面量 | 显式声明 interface |
+| 禁 any/unknown | 显式类型 + as 转换 |
 | import 不带扩展名 | `from '../api/foo'` |
-| 无浏览器 URL 类 | `@kit.ArkTS` 的 `url.URL` + `searchParams` |
-| 禁止对象/数组展开 | 逐字段赋值 / push 循环 |
-| `@State` 不能叫 `id` | 改名 `itemId` 等 |
-| 类型严格、禁隐式 any | 显式 `as X`，可空用 `| null` |
-| 禁裸对象字面量（`arkts-no-untyped-obj-literals`） | 显式声明类型；空对象用 nullable + 条件判断 |
-| 禁 `Object.create`（`arkts-limited-stdlib`） | 不用标准库受限 API |
-| 禁 `unknown`（`arkts-no-any-unknown`） | 用宽类型 + 显式转换 |
-| AppStorage V1 为全局 API（SDK 6.0.2 Kit 不导出） | 直接全局用，不从 Kit import |
-| Stack 内自定义组件链式报错 | 外层包 Column |
-| `@ohos.net.http` 无 PATCH | POST 替代或验证服务端兼容 |
 | copyOption 性能杀手 | 仅阅读场景保留 |
+| 第三方应用不能直接写公共存储 | 用 DocumentViewPicker |
 
 ### 6.3 构建与发布流程
 ```bash
-# 构建（工程目录内）
-cd ~/workbuddy/zhihu--HMOS/harmony-native
-/Applications/DevEco-Studio.app/Contents/tools/node/bin/node \
-  /Applications/DevEco-Studio.app/Contents/tools/hvigor/bin/hvigorw.js \
-  assembleHap --mode module -p product=default --no-daemon
-# 产物 → 按应用名+版本交付
-cp entry/build/default/outputs/default/entry-default-signed.hap \
-   ~/workbuddy/zhihu--HMOS/ZhihuLite-HM-v0.3.8-signed.hap
-# 安装（真机在线）
-HDC=/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc
-$HDC list targets
-$HDC -t <serial> install -r <hap>
-# 冷启动测试
-$HDC -t <serial> shell aa force-stop com.zhihulite.hmos
-$HDC -t <serial> shell aa start -a EntryAbility -b com.zhihulite.hmos
+# 构建
+cd ~/Work/zhihuLite-HM/harmony-native
+hvigorw assembleHap --mode module -p product=default --no-daemon
+# 复制产物
+cp entry/build/.../entry-default-signed.hap ~/Work/zhihuLite-HM/ZhihuLite-HM-v<版本>-signed.hap
+# 装机
+hdc install -r <hap>
+# 提交
+git add -A && git commit && git push origin main
+# Release
+gh release upload v<版本> <hap> --clobber
 ```
-
-### 6.4 文档迭代要求（持续）
-- 本文件（projectdesign.md）= 特性/C4/设计/测试/要求的唯一事实来源，随开发同步更新
-- `README.md` = 项目对外说明（简介/特性速览/已知限制/致谢），发版时刷新
-- `AUDIT_REPORT.md` / `PORTING_SPEC.md` / 移植记录（`~/Notebook/Duobao/`）同步维护
-- 每次任务完成沉淀经验教训，防重踩
 
 ---
 
@@ -371,21 +280,18 @@ $HDC -t <serial> shell aa start -a EntryAbility -b com.zhihulite.hmos
 
 | 版本 | 里程碑 |
 |---|---|
-| v0.1 | 自签包 1.1M，首版可跑（仅浏览） |
-| v0.2 | 华为签名 2.5M，命令行构建打通，交互初修 |
-| v0.3 | copyOption 全局减负 421→6，点击响应大幅提升 |
-| v0.3.1 | 收藏夹修复（不再回落 me 路径）+ 错误详情可见 |
-| v0.3.2 | 全局字号 +1 |
-| v0.3.3 | 底栏字符化（⌂ / + / 👤） |
-| v0.3.4 | 应用名"知乎Lite"+ 新图标（蓝底白知字 LITE） |
-| v0.3.5 | 搜索登录提示（search_v3 强制登录） |
-| v0.3.6 | 合集版：全量审计项修复 + 真机全面验证通过 |
-| v0.3.7 | 全量 HTTP 日志，定位搜索解析崩溃 |
-| v0.3.8 | 搜索修复：结果解析 null 全防护 + 搜索关键词配置 |
-| v0.3.9 | 全回归修复：收藏夹解析防护 + pin.content 类型防护 + HTML 实体解码 + 热榜/日报两天离线缓存（进入即缓存、离线可看）+ DFX 设计（不闪退/深浅主题/点击≤3s）|
-| v0.3.10 | 最近浏览闪退修复（extra/header/content/matrix 空引用全防护 + 逐条解析）+ 默认加载最近两天浏览记录 + 底栏发布按钮去圆圈改纯 + 号 |
-| v0.3.11 | 搜索页：默认时间范围改为三月内 + 筛选面板（内容类型/排序/时间三行 chips 可选）+ 筛选按钮可点开 + 修复深色主题下搜索框字体颜色（TextInput 未设 fontColor）+ 时间 pill 硬编码浅蓝改主题色 |
-| v0.3.12 | 收藏按钮修复：详情页/回答卡片收藏状态（未收藏 ☆ 移至收藏 → 已收藏 ★ 取消收藏 橙色）+ 进入自动查询收藏状态 + 收藏后返回实时刷新 + 收藏回传带资源 ID 防串扰 |
-| v0.3.13 | 图片长按下载原图（无水印）：统一 NetImage 组件（推荐/热榜/日报/想法/问题详情）+ 原图 URL 转换（去水印参数/尺寸段/压缩段）+ photoAccessHelper 保存相册 + 相册权限 |
-| v0.3.14 | 正文图片体验完善：正文大图（w=0 占满 / h=260 Contain）+ 单击全屏看图（ImageViewerPage 黑底 Contain）+ 右上角 SaveButton 保存/复制链接（32×32 纯图标贴顶不挡图）+ 正文字号 +2（正文 20/30、日报 19/28）+ 日报答主头像保持 48×48 小圆形（第一个 image 块标记 __avatar__）+ SaveButton 系统组件免 WRITE_IMAGEVIDEO 危险权限 |
-| v0.3.15 | 全屏看图双指交互：PinchGesture 双指捏合缩放（1x~4x）+ PanGesture 双指拖动平移 + 小于 1.05x 自动回弹原图 + GestureGroup(Parallel) 与单击关闭共存 |
+| v0.1 | 首版可跑（仅浏览） |
+| v0.2 | 命令行构建打通 |
+| v0.3 | copyOption 减负，响应提速 |
+| v0.3.1-v0.3.13 | 收藏/搜索/图片下载等功能修复 |
+| v0.3.14-v0.3.15 | 正文大图/全屏看图/双指缩放 |
+| v0.3.16-v0.3.44 | 富文本渲染（GFM）、文章内链接、收藏状态、反对按钮 |
+| v0.3.45-v0.3.55 | 缓存体系（列表 + 内容级预缓存）、断网可看 |
+| v0.3.56-v0.3.60 | 保存为 Markdown（DocumentViewPicker）、公共 DetailActionBar 组件 |
+| **v0.3.61** | **基线版本**：公共操作栏统一线条图标、保存功能全覆盖（回答/文章/想法/日报）、内容预缓存、断网两天可读 |
+
+---
+
+## 8. 致谢
+
+本项目初始版本参考复刻：[zhihu--](https://github.com/luckylew23/zhihu--)（上游 React Native 知乎客户端，MIT）
