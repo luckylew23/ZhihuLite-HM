@@ -179,7 +179,7 @@ struct AnswerDetailPage {
       const title: string = (this.answer?.question?.title ?? '').length > 0 ? this.answer!.question!.title : '回答_' + this.answerId;
       const author: string = this.answer?.author?.name ?? '';
       const md: string = blocksToMarkdown(this.bodyBlocks, title, author);
-      const safeTitle: string = title.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, '_').substring(0, 50);
+      const safeTitle: string = title.replace(/[^\u4e00-\u9fa5a-zA-Z0-9\s]/g, '').replace(/\s+/g, ' ').trim().substring(0, 50);
       const fileName: string = safeTitle + '.md';
       // 先存沙箱临时文件，再通过系统选择器让用户保存到公共位置
       const actx: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
@@ -190,7 +190,7 @@ struct AnswerDetailPage {
       // 用 DocumentViewPicker 让用户选保存位置
       const docPicker = new picker.DocumentViewPicker();
       const saveOptions = new picker.DocumentSaveOptions();
-      saveOptions.newFileNames = [safeTitle];
+      saveOptions.newFileNames = [safeTitle + '.md'];
       
       const uris: string[] = await docPicker.save(saveOptions);
       if (uris.length > 0) {
