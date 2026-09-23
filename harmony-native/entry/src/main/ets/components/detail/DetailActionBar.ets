@@ -73,7 +73,7 @@ export struct DetailActionBar {
 
       // 保存
       Row({ space: 3 }) {
-        Text('⬇')
+        Text('⇩')
           .fontSize(15)
           .fontColor(ZhihuColors.textTertiary)
       }
