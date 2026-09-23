@@ -372,3 +372,51 @@ export function readStringParam(params: Record<string, object> | null, key: stri
   }
   return String(v);
 }
+
+/** 将解析后的 blocks 转成 Markdown 文本 */
+export function blocksToMarkdown(blocks: HtmlBlock[], title: string, author: string): string {
+  const lines: string[] = [];
+  if (title.length > 0) {
+    lines.push('# ' + title);
+    lines.push('');
+  }
+  if (author.length > 0) {
+    lines.push('> 作者：' + author);
+    lines.push('');
+  }
+  for (let i = 0; i < blocks.length; i++) {
+    const b = blocks[i];
+    if (b.type === 'heading') {
+      const lv: number = b.level ?? 2;
+      const prefix: string = Array(lv + 1).join('#');
+      lines.push(prefix + ' ' + b.text);
+      lines.push('');
+    } else if (b.type === 'quote') {
+      const qLines: string[] = b.text.split('\n');
+      for (let j = 0; j < qLines.length; j++) {
+        lines.push('> ' + qLines[j]);
+      }
+      lines.push('');
+    } else if (b.type === 'code') {
+      lines.push('```');
+      lines.push(b.text);
+      lines.push('```');
+      lines.push('');
+    } else if (b.type === 'list') {
+      lines.push('- ' + b.text);
+    } else if (b.type === 'image') {
+      if (b.url.length > 0) {
+        lines.push('');
+        lines.push('![](' + b.url + ')');
+        lines.push('');
+      }
+    } else {
+      // text
+      lines.push(b.text);
+      lines.push('');
+    }
+  }
+  lines.push('---');
+  lines.push('由 知乎Lite 导出');
+  return lines.join('\n');
+}

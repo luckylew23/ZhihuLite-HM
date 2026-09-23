@@ -17,10 +17,11 @@ import { getZhihuErrorMessage } from '../utils/zhihuError';
 import { writeDebugLog } from '../utils/debugLog';
 import { DetailNavBar } from '../components/detail/DetailNavBar';
 import { StatusView } from '../components/detail/StatusView';
-import { formatCount, guardLogin, HtmlBlock, parseContent, readStringParam } from '../components/detail/detailUtils';
+import { formatCount, guardLogin, HtmlBlock, parseContent, readStringParam, blocksToMarkdown } from '../components/detail/detailUtils';
 import { NetImage } from '../components/NetImage';
 import { RichBody } from '../components/detail/RichBody';
 import { common } from '@kit.AbilityKit';
+import { fileIo } from '@kit.CoreFileKit';
 
 interface CachedAnswer { savedAt: number; data: AnswerDetail; }
 
@@ -164,6 +165,35 @@ struct AnswerDetailPage {
     });
   }
 
+  private async saveContent(): Promise<void> {
+    if (this.bodyBlocks.length === 0) {
+      promptAction.showToast({ message: '内容为空，无法保存' });
+      return;
+    }
+    try {
+      const title: string = (this.answer?.question?.title ?? '').length > 0 ? this.answer!.question!.title : '回答_' + this.answerId;
+      const author: string = this.answer?.author?.name ?? '';
+      const md: string = blocksToMarkdown(this.bodyBlocks, title, author);
+      const actx: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+      const dir: string = actx.filesDir + '/zhihu_saves';
+      // mkdir
+      try {
+        fileIo.accessSync(dir);
+      } catch (e) {
+        fileIo.mkdirSync(dir, true);
+      }
+      const safeTitle: string = title.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, '_').substring(0, 30);
+      const fileName: string = 'answer_' + this.answerId + '_' + safeTitle + '.md';
+      const filePath: string = dir + '/' + fileName;
+      const f = fileIo.openSync(filePath, fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
+      fileIo.writeSync(f.fd, md);
+      fileIo.closeSync(f);
+      promptAction.showToast({ message: '已保存：' + fileName });
+    } catch (e) {
+      promptAction.showToast({ message: '保存失败' });
+    }
+  }
+
   private metaText(): string {
     const a = this.answer;
     if (a === null) {
@@ -304,6 +334,21 @@ struct AnswerDetailPage {
           .padding({ top: 12, bottom: 12 })
           .onClick(() => {
             this.onCollect();
+          })
+
+          Row({ space: 4 }) {
+            Text('💾')
+              .fontSize(16)
+              .fontColor(ZhihuColors.textSecondary)
+            Text('保存')
+              .fontSize(16)
+              .fontColor(ZhihuColors.textSecondary)
+          }
+          .layoutWeight(1)
+          .justifyContent(FlexAlign.Center)
+          .padding({ top: 12, bottom: 12 })
+          .onClick(() => {
+            this.saveContent();
           })
         }
         .width('100%')

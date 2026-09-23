@@ -19,9 +19,10 @@ import { writeDebugLog } from '../utils/debugLog';
 import { DetailNavBar } from '../components/detail/DetailNavBar';
 import { StatusView } from '../components/detail/StatusView';
 import { NetImage } from '../components/NetImage';
-import { formatCount, guardLogin, HtmlBlock, parseContent, readStringParam } from '../components/detail/detailUtils';
+import { formatCount, guardLogin, HtmlBlock, parseContent, readStringParam, blocksToMarkdown } from '../components/detail/detailUtils';
 import { RichBody } from '../components/detail/RichBody';
 import { common } from '@kit.AbilityKit';
+import { fileIo } from '@kit.CoreFileKit';
 
 interface CachedArticle { savedAt: number; data: ZhihuArticle; }
 
@@ -76,6 +77,34 @@ struct ArticleDetailPage {
       url: 'pages/CollectionPickerPage',
       params: { resourceType: 'article', resourceId: this.articleId },
     });
+  }
+
+  private async saveContent(): Promise<void> {
+    if (this.bodyBlocks.length === 0) {
+      promptAction.showToast({ message: '内容为空，无法保存' });
+      return;
+    }
+    try {
+      const title: string = this.article?.title ?? ('文章_' + this.articleId);
+      const author: string = this.article?.author?.name ?? '';
+      const md: string = blocksToMarkdown(this.bodyBlocks, title, author);
+      const actx: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+      const dir: string = actx.filesDir + '/zhihu_saves';
+      try {
+        fileIo.accessSync(dir);
+      } catch (e) {
+        fileIo.mkdirSync(dir, true);
+      }
+      const safeTitle: string = title.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, '_').substring(0, 30);
+      const fileName: string = 'article_' + this.articleId + '_' + safeTitle + '.md';
+      const filePath: string = dir + '/' + fileName;
+      const f = fileIo.openSync(filePath, fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
+      fileIo.writeSync(f.fd, md);
+      fileIo.closeSync(f);
+      promptAction.showToast({ message: '已保存：' + fileName });
+    } catch (e) {
+      promptAction.showToast({ message: '保存失败' });
+    }
   }
 
   private async load(): Promise<void> {
@@ -202,6 +231,19 @@ struct ArticleDetailPage {
           .layoutWeight(1).justifyContent(FlexAlign.Center).padding({ top: 12, bottom: 12 })
           .onClick(() => {
             this.onCollect();
+          })
+
+          Row({ space: 4 }) {
+            Text('💾')
+              .fontSize(16)
+              .fontColor(ZhihuColors.textSecondary)
+            Text('保存')
+              .fontSize(16)
+              .fontColor(ZhihuColors.textSecondary)
+          }
+          .layoutWeight(1).justifyContent(FlexAlign.Center).padding({ top: 12, bottom: 12 })
+          .onClick(() => {
+            this.saveContent();
           })
         }
         .width('100%')
