@@ -179,19 +179,32 @@ struct AnswerDetailPage {
       const author: string = this.answer?.author?.name ?? '';
       const md: string = blocksToMarkdown(this.bodyBlocks, title, author);
       const actx: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
-      const dir: string = actx.filesDir + '/zhihu_saves';
-      try {
-        fileIo.mkdirSync(dir, true);
-      } catch (e) {
-        // 已存在则忽略
+      const safeTitle: string = title.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, '_').substring(0, 50);
+      const fileName: string = safeTitle + '.md';
+      // 尝试保存到公共 Documents，失败则回退到沙箱
+      let savedPath: string = '';
+      const publicDirs: string[] = [
+        '/storage/media/1000/documents/zhihu_saves',
+        actx.filesDir + '/zhihu_saves',
+      ];
+      for (const dir of publicDirs) {
+        try {
+          try { fileIo.mkdirSync(dir, true); } catch (e) {}
+          const filePath: string = dir + '/' + fileName;
+          const f = fileIo.openSync(filePath, fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
+          fileIo.writeSync(f.fd, md);
+          fileIo.closeSync(f);
+          savedPath = filePath;
+          break;
+        } catch (e) {
+          continue;
+        }
       }
-      const safeTitle: string = title.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, '_').substring(0, 30);
-      const fileName: string = 'answer_' + this.answerId + '_' + safeTitle + '.md';
-      const filePath: string = dir + '/' + fileName;
-      const f = fileIo.openSync(filePath, fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
-      fileIo.writeSync(f.fd, md);
-      fileIo.closeSync(f);
-      promptAction.showToast({ message: '已保存：' + fileName });
+      if (savedPath.length > 0) {
+        promptAction.showToast({ message: '已保存: ' + savedPath });
+      } else {
+        promptAction.showToast({ message: '保存失败' });
+      }
     } catch (e) {
       const errMsg: string = e instanceof Error ? e.message : JSON.stringify(e);
       promptAction.showToast({ message: '保存失败: ' + errMsg.substring(0, 50) });
