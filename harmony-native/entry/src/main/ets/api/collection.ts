@@ -189,7 +189,7 @@ export const deleteCollection = async (id: string | number): Promise<object> => 
  */
 export const getAnswerCollectionStatus = async (
   answerId: string | number,
-  limit: number = 5,
+  limit: number = 100,
   offset: number = 0,
 ): Promise<CollectionStatusResponse> => {
   const res = await zhihuClient.get<CollectionStatusResponse>(
@@ -252,7 +252,7 @@ export const fastCollectAnswer = async (
  */
 export const getArticleCollectionStatus = async (
   articleId: string | number,
-  limit: number = 5,
+  limit: number = 100,
   offset: number = 0,
 ): Promise<CollectionStatusResponse> => {
   const res = await zhihuClient.get<CollectionStatusResponse>(
