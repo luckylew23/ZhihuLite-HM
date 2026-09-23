@@ -8,8 +8,8 @@ import { formatCount } from './detailUtils';
 
 @Component
 export struct DetailActionBar {
-  @State upvoted: boolean = false;
-  @State downvoted: boolean = false;
+  @Prop upvoted: boolean = false;
+  @Prop downvoted: boolean = false;
   @Prop upvoteCount: number = 0;
   @Prop commentCount: number = 0;
   @Prop collected: boolean = false;
