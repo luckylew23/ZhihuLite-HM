@@ -139,30 +139,10 @@ struct AnswerDetailPage {
     }
   }
 
-  private async onCollect(): Promise<void> {
+  private onCollect(): void {
     if (!guardLogin()) {
       return;
     }
-    if (this.collected) {
-      // 已收藏 → 取消收藏（对齐上游 toggleCollect）
-      if (this.collectionId.length === 0) {
-        await this.refreshCollectionStatus();
-        if (this.collectionId.length === 0) {
-          promptAction.showToast({ message: '无法获取收藏夹信息' });
-          return;
-        }
-      }
-      try {
-        await removeFromCollection(this.collectionId, this.answerId);
-        this.collected = false;
-        this.collectionId = '';
-        promptAction.showToast({ message: '已取消收藏' });
-      } catch (e) {
-        promptAction.showToast({ message: '取消收藏失败' });
-      }
-      return;
-    }
-    // 未收藏 → 选择收藏夹
     router.pushUrl({
       url: 'pages/CollectionPickerPage',
       params: { resourceType: 'answer', resourceId: this.answerId },
