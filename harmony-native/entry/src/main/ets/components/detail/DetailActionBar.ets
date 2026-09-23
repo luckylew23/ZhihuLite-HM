@@ -32,7 +32,7 @@ export struct DetailActionBar {
       }
       .layoutWeight(1)
       .justifyContent(FlexAlign.Center)
-      .padding({ vertical: 10 })
+      .padding({ top: 10, bottom: 10 })
       .onClick(() => this.onUpvote())
 
       // 反对
@@ -43,7 +43,7 @@ export struct DetailActionBar {
       }
       .layoutWeight(1)
       .justifyContent(FlexAlign.Center)
-      .padding({ vertical: 10 })
+      .padding({ top: 10, bottom: 10 })
       .onClick(() => this.onDownvote())
 
       // 评论
@@ -57,7 +57,7 @@ export struct DetailActionBar {
       }
       .layoutWeight(1)
       .justifyContent(FlexAlign.Center)
-      .padding({ vertical: 10 })
+      .padding({ top: 10, bottom: 10 })
       .onClick(() => this.onComment())
 
       // 收藏
@@ -68,7 +68,7 @@ export struct DetailActionBar {
       }
       .layoutWeight(1)
       .justifyContent(FlexAlign.Center)
-      .padding({ vertical: 10 })
+      .padding({ top: 10, bottom: 10 })
       .onClick(() => this.onCollect())
 
       // 保存
@@ -79,7 +79,7 @@ export struct DetailActionBar {
       }
       .layoutWeight(1)
       .justifyContent(FlexAlign.Center)
-      .padding({ vertical: 10 })
+      .padding({ top: 10, bottom: 10 })
       .onClick(() => this.onSave())
     }
     .width('100%')

@@ -17,6 +17,7 @@ import { ZhihuColors } from '../utils/theme';
 import { DetailNavBar } from '../components/detail/DetailNavBar';
 import { StatusView } from '../components/detail/StatusView';
 import { HtmlBlock, parseContent, readStringParam, parseInline, InlinePart, blocksToMarkdown, saveMarkdownToFile } from '../components/detail/detailUtils';
+import { DetailActionBar } from '../components/detail/DetailActionBar';
 import { NetImage } from '../components/NetImage';
 import { openZhihuUrl } from '../utils/zhihuRouter';
 
@@ -345,13 +346,13 @@ struct DailyDetailPage {
               .width('100%')
               .padding({ left: 16, right: 16, bottom: 12 })
             }
-            Text('⇩ 保存为 Markdown')
-              .fontSize(15)
-              .fontColor(ZhihuColors.textSecondary)
-              .width('100%')
-              .textAlign(TextAlign.Center)
-              .padding({ bottom: 24 })
-              .onClick(() => this.saveContent())
+            DetailActionBar({
+              upvoteCount: 0,
+              commentCount: 0,
+              collected: false,
+              onComment: () => this.openZhihuDiscussion(),
+              onSave: () => this.saveContent(),
+            })
           }
           .width('100%')
         }
