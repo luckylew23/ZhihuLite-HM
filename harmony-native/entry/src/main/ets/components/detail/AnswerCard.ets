@@ -68,6 +68,19 @@ export struct AnswerCard {
     });
   }
 
+  private onDisagree(): void {
+    if (!guardLogin()) {
+      return;
+    }
+    const prev: number = this.voted;
+    const next: number = prev === -1 ? 0 : -1;
+    this.voted = next;
+    voteAnswer(String(this.item.id), next === -1 ? 'down' : 'neutral')
+      .catch(() => {
+        this.voted = prev;
+      });
+  }
+
   private onVote(): void {
     if (!guardLogin()) {
       return;
@@ -180,6 +193,16 @@ export struct AnswerCard {
         .padding({ left: 8, right: 8, top: 4, bottom: 4 })
         .onClick(() => {
           this.onVote();
+        })
+
+        Row({ space: 4 }) {
+          Text(this.voted === -1 ? '▼' : '▽')
+            .fontSize(14)
+            .fontColor(this.voted === -1 ? ZhihuColors.danger : ZhihuColors.textTertiary)
+        }
+        .padding({ left: 8, right: 8, top: 4, bottom: 4 })
+        .onClick(() => {
+          this.onDisagree();
         })
 
         Row({ space: 4 }) {
