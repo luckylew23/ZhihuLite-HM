@@ -180,11 +180,10 @@ struct AnswerDetailPage {
       const md: string = blocksToMarkdown(this.bodyBlocks, title, author);
       const actx: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
       const dir: string = actx.filesDir + '/zhihu_saves';
-      // mkdir
       try {
-        fileIo.accessSync(dir);
-      } catch (e) {
         fileIo.mkdirSync(dir, true);
+      } catch (e) {
+        // 已存在则忽略
       }
       const safeTitle: string = title.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, '_').substring(0, 30);
       const fileName: string = 'answer_' + this.answerId + '_' + safeTitle + '.md';
@@ -194,7 +193,8 @@ struct AnswerDetailPage {
       fileIo.closeSync(f);
       promptAction.showToast({ message: '已保存：' + fileName });
     } catch (e) {
-      promptAction.showToast({ message: '保存失败' });
+      const errMsg: string = e instanceof Error ? e.message : JSON.stringify(e);
+      promptAction.showToast({ message: '保存失败: ' + errMsg.substring(0, 50) });
     }
   }
 

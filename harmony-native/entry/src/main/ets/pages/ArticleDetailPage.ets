@@ -91,9 +91,9 @@ struct ArticleDetailPage {
       const actx: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
       const dir: string = actx.filesDir + '/zhihu_saves';
       try {
-        fileIo.accessSync(dir);
-      } catch (e) {
         fileIo.mkdirSync(dir, true);
+      } catch (e) {
+        // 已存在则忽略
       }
       const safeTitle: string = title.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, '_').substring(0, 30);
       const fileName: string = 'article_' + this.articleId + '_' + safeTitle + '.md';
