@@ -134,6 +134,61 @@ export struct AnswerCard {
     });
   }
 
+  @Builder
+  actionBar() {
+    Row({ space: 20 }) {
+      Row({ space: 4 }) {
+        Text(this.voted === 1 ? '▲' : '△')
+          .fontSize(14)
+          .fontColor(this.voted === 1 ? ZhihuColors.primary : ZhihuColors.textTertiary)
+        Text(formatCount(this.voteCount))
+          .fontSize(15)
+          .fontColor(this.voted === 1 ? ZhihuColors.primary : ZhihuColors.textSecondary)
+      }
+      .padding({ left: 8, right: 8, top: 4, bottom: 4 })
+      .onClick(() => {
+        this.onVote();
+      })
+
+      Row({ space: 4 }) {
+        Text(this.voted === -1 ? '▼' : '▽')
+          .fontSize(14)
+          .fontColor(this.voted === -1 ? ZhihuColors.danger : ZhihuColors.textTertiary)
+      }
+      .padding({ left: 8, right: 8, top: 4, bottom: 4 })
+      .onClick(() => {
+        this.onDisagree();
+      })
+
+      Row({ space: 4 }) {
+        Text('○')
+          .fontSize(16)
+          .fontColor(ZhihuColors.textTertiary)
+        Text(formatCount(this.item.comment_count))
+          .fontSize(15)
+          .fontColor(ZhihuColors.textSecondary)
+      }
+      .padding({ left: 8, right: 8, top: 4, bottom: 4 })
+      .onClick(() => {
+        this.onComment();
+      })
+
+      Row({ space: 4 }) {
+        Text(this.collected ? '★' : '☆')
+          .fontSize(16)
+          .fontColor(this.collected ? ZhihuColors.warning : ZhihuColors.textTertiary)
+        Text(this.collected ? '已收藏' : '收藏')
+          .fontSize(15)
+          .fontColor(this.collected ? ZhihuColors.warning : ZhihuColors.textSecondary)
+      }
+      .padding({ left: 8, right: 8, top: 4, bottom: 4 })
+      .onClick(() => {
+        this.onCollect();
+      })
+    }
+    .width('100%')
+  }
+
   build() {
     Column({ space: 10 }) {
       // 作者行
@@ -180,58 +235,8 @@ export struct AnswerCard {
           })
       }
 
-      // 操作条
-      Row({ space: 20 }) {
-        Row({ space: 4 }) {
-          Text('▲')
-            .fontSize(14)
-            .fontColor(this.voted === 1 ? ZhihuColors.primary : ZhihuColors.textTertiary)
-          Text(formatCount(this.voteCount))
-            .fontSize(15)
-            .fontColor(this.voted === 1 ? ZhihuColors.primary : ZhihuColors.textSecondary)
-        }
-        .padding({ left: 8, right: 8, top: 4, bottom: 4 })
-        .onClick(() => {
-          this.onVote();
-        })
-
-        Row({ space: 4 }) {
-          Text(this.voted === -1 ? '▼' : '▽')
-            .fontSize(14)
-            .fontColor(this.voted === -1 ? ZhihuColors.danger : ZhihuColors.textTertiary)
-        }
-        .padding({ left: 8, right: 8, top: 4, bottom: 4 })
-        .onClick(() => {
-          this.onDisagree();
-        })
-
-        Row({ space: 4 }) {
-          Text('○')
-            .fontSize(16)
-            .fontColor(ZhihuColors.textTertiary)
-          Text(formatCount(this.item.comment_count))
-            .fontSize(15)
-            .fontColor(ZhihuColors.textSecondary)
-        }
-        .padding({ left: 8, right: 8, top: 4, bottom: 4 })
-        .onClick(() => {
-          this.onComment();
-        })
-
-        Row({ space: 4 }) {
-          Text(this.collected ? '★' : '☆')
-            .fontSize(16)
-            .fontColor(this.collected ? ZhihuColors.warning : ZhihuColors.textTertiary)
-          Text(this.collected ? '已收藏' : '收藏')
-            .fontSize(15)
-            .fontColor(this.collected ? ZhihuColors.warning : ZhihuColors.textSecondary)
-        }
-        .padding({ left: 8, right: 8, top: 4, bottom: 4 })
-        .onClick(() => {
-          this.onCollect();
-        })
-      }
-      .width('100%')
+      // 操作条（@Builder 提取）
+      this.actionBar()
     }
     .width('100%')
     .padding(14)
