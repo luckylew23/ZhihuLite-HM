@@ -199,6 +199,11 @@ export struct AnswerCard {
           .borderRadius(17)
           .objectFit(ImageFit.Cover)
           .backgroundColor(ZhihuColors.backgroundTertiary)
+          .onClick(() => {
+            if (this.item.author.id) {
+              router.pushUrl({ url: 'pages/PeoplePage', params: { urlToken: this.item.author.id } });
+            }
+          })
         Column({ space: 2 }) {
           Text(this.item.author.name)
             .fontSize(16)
