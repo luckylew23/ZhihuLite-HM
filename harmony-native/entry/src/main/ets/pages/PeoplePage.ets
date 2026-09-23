@@ -294,7 +294,12 @@ export struct PeoplePage {
   statItem(value: string, label: string) {
     Column({ space: 2 }) {
       Text(value)
+        .fontSize(18)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(ZhihuColors.text)
       Text(label)
+        .fontSize(13)
+        .fontColor(ZhihuColors.textSecondary)
     }
     .layoutWeight(1)
   }
