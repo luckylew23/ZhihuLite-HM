@@ -11,6 +11,7 @@ import { router, promptAction } from '@kit.ArkUI';
 import { fileIo, picker } from '@kit.CoreFileKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { authStore } from '../../store/authStore';
+import { preferences } from '@kit.ArkData';
 const DOMAIN: number = 0x0001;
 const TAG: string = 'ZhihuLite';
 
@@ -425,19 +426,30 @@ export function blocksToMarkdown(blocks: HtmlBlock[], title: string, author: str
 
 export async function saveMarkdownToFile(ctx: Context, title: string, md: string): Promise<void> {
   const safeTitle: string = title.replace(/[^\u4e00-\u9fa5a-zA-Z0-9\s]/g, '').replace(/\s+/g, ' ').trim().substring(0, 50);
+  // 重名自动加序号
+  const pref = preferences.getPreferencesSync(ctx, { name: 'zhihu_lite_saves' });
+  const key: string = 'save_count_' + safeTitle;
+  let count: number = pref.getSync(key, 0) as number;
+  count = count + 1;
+  let fileName: string = safeTitle + '.md';
+  if (count > 1) {
+    fileName = safeTitle + '_' + count + '.md';
+  }
+  pref.putSync(key, count);
+  pref.flush();
   const tmpPath: string = ctx.filesDir + '/tmp_save.md';
   const f = fileIo.openSync(tmpPath, fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
   fileIo.writeSync(f.fd, md);
   fileIo.closeSync(f);
   const docPicker = new picker.DocumentViewPicker();
   const saveOptions = new picker.DocumentSaveOptions();
-  saveOptions.newFileNames = [safeTitle + '.md'];
+  saveOptions.newFileNames = [fileName];
   const uris: string[] = await docPicker.save(saveOptions);
   if (uris.length > 0) {
     const destUri: string = uris[0];
     const destFile = fileIo.openSync(destUri, fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
     fileIo.writeSync(destFile.fd, md);
     fileIo.closeSync(destFile);
-    promptAction.showToast({ message: '已保存到文件管理器' });
+    promptAction.showToast({ message: '已保存: ' + fileName });
   }
 }
