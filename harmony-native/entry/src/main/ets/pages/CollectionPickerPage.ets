@@ -10,7 +10,6 @@
 
 import { router } from '@kit.ArkUI';
 import {
-  getMyCollections,
   getAnswerCollectionStatus,
   getArticleCollectionStatus,
   addToCollection,
@@ -68,33 +67,23 @@ struct CollectionPickerPage {
     this.loading = true;
     this.error = '';
     try {
-      // 1. 获取全部收藏夹
-      const allResp = await getMyCollections(100, 0);
-      const allList: CollectionSel[] = [];
-      for (const c of allResp.data) {
-        allList.push({
-          id: String(c.id ?? ''),
-          title: String(c.title ?? ''),
-          description: String(c.description ?? ''),
-          isPublic: Boolean(c.is_public),
-          isFavorited: false,
-        });
-      }
-      // 2. 获取当前内容已收藏的收藏夹ID集合
-      const statusResp = this.isArticle()
-        ? await getArticleCollectionStatus(this.resourceId)
-        : await getAnswerCollectionStatus(this.resourceId);
-      const favoritedIds: Set<string> = new Set();
-      const raw: object[] = statusResp.data === undefined ? [] : statusResp.data;
+      // 状态接口返回全部收藏夹列表，每项带 is_favorited 标记
+      const resp = this.isArticle()
+        ? await getArticleCollectionStatus(this.resourceId, 100, 0)
+        : await getAnswerCollectionStatus(this.resourceId, 100, 0);
+      const raw: object[] = resp.data === undefined ? [] : resp.data;
+      const list: CollectionSel[] = [];
       for (const r of raw) {
         const rec = r as Record<string, object>;
-        favoritedIds.add(String(rec['id'] ?? ''));
+        list.push({
+          id: String(rec['id'] ?? ''),
+          title: String(rec['title'] ?? ''),
+          description: String(rec['description'] ?? ''),
+          isPublic: Boolean(rec['is_public']),
+          isFavorited: Boolean(rec['is_favorited']),
+        });
       }
-      // 3. 合并
-      for (let i = 0; i < allList.length; i++) {
-        allList[i].isFavorited = favoritedIds.has(allList[i].id);
-      }
-      this.collections = allList;
+      this.collections = list;
     } catch (e) {
       this.error = '收藏夹加载失败';
     } finally {
