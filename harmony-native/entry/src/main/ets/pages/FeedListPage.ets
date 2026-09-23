@@ -64,6 +64,14 @@ export struct FeedListPage {
   }
 
   async loadFirst(): Promise<void> {
+    // 先读缓存即时展示
+    if (this.isHot() && this.loadHotCache()) {
+      this.loading = false;
+      this.inFlight = false;
+      // 后台静默刷新
+      this.refresh();
+      return;
+    }
     this.loading = true;
     this.error = '';
     this.inFlight = true;

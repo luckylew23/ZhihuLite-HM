@@ -32,6 +32,14 @@ export struct DailyPage {
   }
 
   async loadLatest(): Promise<void> {
+    // 先读缓存即时展示
+    if (this.loadDailyCache()) {
+      this.loading = false;
+      this.inFlight = false;
+      // 后台静默刷新
+      this.refresh();
+      return;
+    }
     this.loading = true;
     this.error = '';
     this.inFlight = true;
