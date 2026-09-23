@@ -16,7 +16,7 @@ import { readContentCache, writeContentCache } from '../utils/cacheStore';
 import { ZhihuColors } from '../utils/theme';
 import { DetailNavBar } from '../components/detail/DetailNavBar';
 import { StatusView } from '../components/detail/StatusView';
-import { HtmlBlock, parseContent, readStringParam, parseInline, InlinePart } from '../components/detail/detailUtils';
+import { HtmlBlock, parseContent, readStringParam, parseInline, InlinePart, blocksToMarkdown, saveMarkdownToFile } from '../components/detail/detailUtils';
 import { NetImage } from '../components/NetImage';
 import { openZhihuUrl } from '../utils/zhihuRouter';
 
@@ -182,6 +182,18 @@ struct DailyDetailPage {
     ctx.startAbility(w);
   }
 
+  private async saveContent(): Promise<void> {
+    if (this.bodyBlocks.length === 0) {
+      return;
+    }
+    try {
+      const title: string = this.detail?.title ?? ('日报_' + this.storyId);
+      const md: string = blocksToMarkdown(this.bodyBlocks, title, '');
+      await saveMarkdownToFile(getContext(this), title, md);
+    } catch (e) {
+    }
+  }
+
   build() {
     Column() {
       DetailNavBar({ title: this.detail ? this.detail.title : (this.fallbackTitle.length > 0 ? this.fallbackTitle : '日报') })
@@ -331,8 +343,15 @@ struct DailyDetailPage {
                 .width('100%')
                 .onClick(() => this.openZhihuDiscussion())
               .width('100%')
-              .padding({ left: 16, right: 16, bottom: 24 })
+              .padding({ left: 16, right: 16, bottom: 12 })
             }
+            Text('💾 保存为 Markdown')
+              .fontSize(15)
+              .fontColor(ZhihuColors.textSecondary)
+              .width('100%')
+              .textAlign(TextAlign.Center)
+              .padding({ bottom: 24 })
+              .onClick(() => this.saveContent())
           }
           .width('100%')
         }

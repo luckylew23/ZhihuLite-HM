@@ -19,11 +19,10 @@ import { writeDebugLog } from '../utils/debugLog';
 import { DetailNavBar } from '../components/detail/DetailNavBar';
 import { StatusView } from '../components/detail/StatusView';
 import { NetImage } from '../components/NetImage';
-import { formatCount, guardLogin, HtmlBlock, parseContent, readStringParam, blocksToMarkdown } from '../components/detail/detailUtils';
+import { formatCount, guardLogin, HtmlBlock, parseContent, readStringParam, blocksToMarkdown, saveMarkdownToFile } from '../components/detail/detailUtils';
 import { RichBody } from '../components/detail/RichBody';
 import { common } from '@kit.AbilityKit';
-import { fileIo } from '@kit.CoreFileKit';
-import { picker } from '@kit.CoreFileKit';
+
 
 interface CachedArticle { savedAt: number; data: ZhihuArticle; }
 
@@ -89,29 +88,16 @@ struct ArticleDetailPage {
       const title: string = this.article?.title ?? ('文章_' + this.articleId);
       const author: string = this.article?.author?.name ?? '';
       const md: string = blocksToMarkdown(this.bodyBlocks, title, author);
-      const actx: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
-      const dir: string = actx.filesDir + '/zhihu_saves';
-      try {
-        fileIo.mkdirSync(dir, true);
-      } catch (e) {
-        // 已存在则忽略
-      }
-      const safeTitle: string = title.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, '_').substring(0, 30);
-      const fileName: string = 'article_' + this.articleId + '_' + safeTitle + '.md';
-      const filePath: string = dir + '/' + fileName;
-      const f = fileIo.openSync(filePath, fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
-      fileIo.writeSync(f.fd, md);
-      fileIo.closeSync(f);
-      promptAction.showToast({ message: '已保存：' + fileName });
+      await saveMarkdownToFile(getContext(this), title, md);
     } catch (e) {
-      promptAction.showToast({ message: '保存失败' });
+      const errMsg: string = e instanceof Error ? e.message : JSON.stringify(e);
+      promptAction.showToast({ message: '保存失败: ' + errMsg.substring(0, 50) });
     }
   }
 
   private async load(): Promise<void> {
     this.loading = true;
     this.error = '';
-    // 先读缓存即时渲染
     let hadCache: boolean = false;
     const cached = readContentCache<CachedArticle>('article', this.articleId);
     if (cached) {
@@ -127,12 +113,8 @@ struct ArticleDetailPage {
       this.article = a;
       this.bodyBlocks = parseContent(a.content);
       writeContentCache('article', this.articleId, a as object);
-      const actx: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
-      writeDebugLog(actx, 'ARTICLE', 'id=' + this.articleId + ' len=' + a.content.length + ' preview=' + a.content.substring(0, 400));
-      writeDebugLog(actx, 'ARTICLE', 'blocks=' + JSON.stringify(this.bodyBlocks.map((b: HtmlBlock) => b.type)));
       this.refreshCollectionStatus();
     } catch (e) {
-      hilog.error(0x3100, 'ZhihuLiteDBG', 'ARTICLE load FAIL id=%{public}s err=%{public}s', this.articleId, JSON.stringify(e as object));
       if (!hadCache) {
         this.error = getZhihuErrorMessage(e as object);
       }

@@ -14,7 +14,7 @@ import { formatDateTime } from '../utils/date';
 import { getZhihuErrorMessage } from '../utils/zhihuError';
 import { DetailNavBar } from '../components/detail/DetailNavBar';
 import { StatusView } from '../components/detail/StatusView';
-import { formatCount, HtmlBlock, parseContent, readStringParam } from '../components/detail/detailUtils';
+import { formatCount, HtmlBlock, parseContent, readStringParam, blocksToMarkdown, saveMarkdownToFile } from '../components/detail/detailUtils';
 import { RichBody } from '../components/detail/RichBody';
 
 @Entry
@@ -54,6 +54,18 @@ struct PinDetailPage {
       url: 'pages/CommentsPage',
       params: { resourceType: 'pins', resourceId: this.pinId },
     });
+  }
+
+  private async saveContent(): Promise<void> {
+    if (this.bodyBlocks.length === 0) {
+      return;
+    }
+    try {
+      const title: string = this.pin?.author?.name ? ('想法_' + this.pin.author.name) : '想法';
+      const md: string = blocksToMarkdown(this.bodyBlocks, title, '');
+      await saveMarkdownToFile(getContext(this), title, md);
+    } catch (e) {
+    }
   }
 
   build() {
@@ -112,6 +124,12 @@ struct PinDetailPage {
           .onClick(() => {
             this.onComment();
           })
+
+          Row({ space: 4 }) {
+            Text('💾')
+          }
+          .layoutWeight(1).justifyContent(FlexAlign.Center).padding({ top: 12, bottom: 12 })
+          .onClick(() => this.saveContent())
         }
         .width('100%')
         .backgroundColor(ZhihuColors.backgroundSecondary)

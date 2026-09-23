@@ -8,6 +8,7 @@
  */
 
 import { router, promptAction } from '@kit.ArkUI';
+import { fileIo, picker } from '@kit.CoreFileKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { authStore } from '../../store/authStore';
 const DOMAIN: number = 0x0001;
@@ -419,4 +420,24 @@ export function blocksToMarkdown(blocks: HtmlBlock[], title: string, author: str
   lines.push('---');
   lines.push('由 知乎Lite 导出');
   return lines.join('\n');
+}
+
+
+export async function saveMarkdownToFile(ctx: Context, title: string, md: string): Promise<void> {
+  const safeTitle: string = title.replace(/[^\u4e00-\u9fa5a-zA-Z0-9\s]/g, '').replace(/\s+/g, ' ').trim().substring(0, 50);
+  const tmpPath: string = ctx.filesDir + '/tmp_save.md';
+  const f = fileIo.openSync(tmpPath, fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
+  fileIo.writeSync(f.fd, md);
+  fileIo.closeSync(f);
+  const docPicker = new picker.DocumentViewPicker();
+  const saveOptions = new picker.DocumentSaveOptions();
+  saveOptions.newFileNames = [safeTitle + '.md'];
+  const uris: string[] = await docPicker.save(saveOptions);
+  if (uris.length > 0) {
+    const destUri: string = uris[0];
+    const destFile = fileIo.openSync(destUri, fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
+    fileIo.writeSync(destFile.fd, md);
+    fileIo.closeSync(destFile);
+    promptAction.showToast({ message: '已保存到文件管理器' });
+  }
 }
