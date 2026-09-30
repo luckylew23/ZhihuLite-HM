@@ -293,23 +293,10 @@ export struct DailyPage {
     }
   }
 
-  @Builder
-  dateHeader() {
-    Row() {
-      Text(this.latestDate.length > 0 ? formatDailyDate(this.latestDate) + ' 日报' : '日报')
-        .fontSize(16)
-        .fontWeight(FontWeight.Bold)
-        .fontColor(ZhihuColors.primary)
-    }
-    .width('100%')
-    .padding({ left: 12, right: 12, top: 10, bottom: 4 })
-  }
-
   build() {
     Stack({ alignContent: Alignment.Center }) {
       Refresh({ refreshing: $$this.refreshing }) {
         Column() {
-          this.dateHeader()
           List({ space: 8, scroller: this.scroller }) {
             ForEach(this.sections, (sec: DailySection, si: number) => {
               ListItem() {
