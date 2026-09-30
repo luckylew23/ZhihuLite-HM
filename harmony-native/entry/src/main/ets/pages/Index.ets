@@ -169,7 +169,7 @@ struct Index {
     .barHeight(0)
     .barWidth(0)
     .layoutWeight(1)
-    .key('home-' + String(this.loginVersion))
+    .key('home-' + String(this.loginVersion) + '-' + String(this.themeVersion))
     .onChange((i: number) => {
       this.innerIndex = i;
     })
@@ -271,7 +271,7 @@ struct Index {
         }
           .width('100%')
           .height('100%')
-          .key('profile-' + String(this.loginVersion))
+          .key('profile-' + String(this.loginVersion) + '-' + String(this.themeVersion))
           .visibility(this.outerIndex === 1 ? Visibility.Visible : Visibility.None)
       }
       .width('100%')
