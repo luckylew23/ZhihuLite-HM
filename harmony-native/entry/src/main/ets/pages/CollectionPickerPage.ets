@@ -274,7 +274,7 @@ struct CollectionPickerPage {
               }
               .width('100%')
             }
-          }, (c: CollectionSel) => c.id)
+          }, (c: CollectionSel) => c.id + '_' + String(c.isFavorited))
         }
         .layoutWeight(1)
         .width('100%')
