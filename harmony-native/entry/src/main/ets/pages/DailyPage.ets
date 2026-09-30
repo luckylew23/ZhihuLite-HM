@@ -32,13 +32,19 @@ export struct DailyPage {
     this.loadLatest();
   }
 
+  /** 本地今天的 YYYYMMDD */
+  private todayStr(): string {
+    const d = new Date();
+    const m: string = (d.getMonth() + 1).toString().padStart(2, '0');
+    const day: string = d.getDate().toString().padStart(2, '0');
+    return String(d.getFullYear()) + m + day;
+  }
+
   async loadLatest(): Promise<void> {
-    // 先读缓存即时展示
-    if (this.loadDailyCache()) {
+    // 缓存恰好是今天的 → 秒开，无需联网
+    if (this.loadDailyCache(this.todayStr())) {
       this.loading = false;
       this.inFlight = false;
-      // 后台静默刷新
-      this.refresh().catch(() => {});
       return;
     }
     this.loading = true;
@@ -52,8 +58,8 @@ export struct DailyPage {
       this.saveDailyCache();
       this.preCacheStories();
     } catch (e) {
-      // 离线/失败：优先读两天内缓存
-      if (this.loadDailyCache()) {
+      // 离线/失败：优先读两天内缓存兜底（可能是旧日期）
+      if (this.loadDailyCache('')) {
         this.error = '';
       } else {
         let detail = '网络异常';
@@ -145,10 +151,13 @@ export struct DailyPage {
     doCache(0).catch(() => {});
   }
 
-  /** 日报离线：读两天内缓存，成功返回 true */
-  private loadDailyCache(): boolean {
+  /** 日报离线：读两天内缓存，成功返回 true；today 非空时仅接受当天缓存 */
+  private loadDailyCache(today: string): boolean {
     const cached = cacheRead<DailyCachePayload>('daily_cache_v2', CACHE_TWO_DAYS_MS);
     if (cached === null || cached.stories === undefined || cached.stories.length === 0) {
+      return false;
+    }
+    if (today.length > 0 && (cached.date ?? '') !== today) {
       return false;
     }
     const list: DailyStory[] = [];
