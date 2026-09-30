@@ -1,8 +1,7 @@
 /**
- * pages/DailyPage —— 日报流（对齐上游 components/DailyList.tsx）。
- * 仅作为 Index 首页组 "daily" 栏目的内嵌组件（非路由页）。
- * 结构：日期分隔行 + 故事卡（缩略图 / 标题 / hint）。
- * 下拉刷新加载最新一期，上拉加载更早一期。
+ * pages/DailyPage —— 日报流（按天分段显示）。
+ * 结构：最新一期 header（9月30日 日报）+ 每期独立分段 header + 故事卡。
+ * 下拉刷新加载最新一期，上拉加载更早一期（追加为新分段）。
  */
 
 import { router } from '@kit.ArkUI';
@@ -17,10 +16,15 @@ import { ZhihuColors } from '../utils/theme';
 import { cacheWrite, cacheRead, CACHE_TWO_DAYS_MS, DailyCachePayload, writeContentCache } from '../utils/cacheStore';
 import { getDailyDetail } from '../api/daily';
 
+/** 一期日报：日期 + 该期故事 */
+interface DailySection {
+  date: string; // YYYYMMDD
+  stories: DailyStory[];
+}
+
 @Component
 export struct DailyPage {
-  @State stories: DailyStory[] = [];
-  @State date: string = '';
+  @State sections: DailySection[] = [];
   @State latestDate: string = '';
   @State loading: boolean = true;
   @State error: string = '';
@@ -41,6 +45,14 @@ export struct DailyPage {
     return String(d.getFullYear()) + m + day;
   }
 
+  private totalCount(): number {
+    let n: number = 0;
+    this.sections.forEach((sec: DailySection) => {
+      n += sec.stories.length;
+    });
+    return n;
+  }
+
   async loadLatest(): Promise<void> {
     // 缓存恰好是今天的 → 秒开，无需联网
     if (this.loadDailyCache(this.todayStr())) {
@@ -53,10 +65,9 @@ export struct DailyPage {
     this.inFlight = true;
     try {
       const resp = await getDailyLatest();
-      this.date = resp.date ?? '';
-      this.latestDate = this.date;
-      this.stories = resp.stories ?? [];
-      this.error = this.stories.length === 0 ? '本期日报暂无内容' : '';
+      this.latestDate = resp.date ?? '';
+      this.sections = [{ date: this.latestDate, stories: resp.stories ?? [] }];
+      this.error = this.totalCount() === 0 ? '本期日报暂无内容' : '';
       this.saveDailyCache();
       this.preCacheStories();
     } catch (e) {
@@ -80,9 +91,8 @@ export struct DailyPage {
     this.refreshing = true;
     try {
       const resp = await getDailyLatest();
-      this.date = resp.date ?? '';
-      this.latestDate = this.date;
-      this.stories = resp.stories ?? [];
+      this.latestDate = resp.date ?? '';
+      this.sections = [{ date: this.latestDate, stories: resp.stories ?? [] }];
       this.saveDailyCache();
       this.preCacheStories();
       this.error = '';
@@ -94,28 +104,34 @@ export struct DailyPage {
   }
 
   async loadBefore(): Promise<void> {
-    if (this.inFlight || this.loadingMore || this.date.length === 0) {
+    if (this.inFlight || this.loadingMore || this.sections.length === 0) {
+      return;
+    }
+    const oldest: string = this.sections[this.sections.length - 1].date;
+    if (oldest.length === 0) {
       return;
     }
     this.loadingMore = true;
     this.inFlight = true;
     try {
-      const resp = await getDailyBefore(this.date);
+      const resp = await getDailyBefore(oldest);
       const older: DailyStory[] = resp.stories ?? [];
       const existing = new Set<number>();
-      this.stories.forEach((s: DailyStory) => {
-        existing.add(s.id);
+      this.sections.forEach((sec: DailySection) => {
+        sec.stories.forEach((s: DailyStory) => {
+          existing.add(s.id);
+        });
       });
-      const merged: DailyStory[] = this.stories.slice();
+      const fresh: DailyStory[] = [];
       older.forEach((s: DailyStory) => {
         if (!existing.has(s.id)) {
-          merged.push(s);
+          fresh.push(s);
         }
       });
-      this.stories = merged;
-      if (resp.date && resp.date.length === 8) {
-        // 分页游标推进到更早一期；header 仍显示最新一期日期
-        this.date = resp.date;
+      if (fresh.length > 0) {
+        const next: DailySection[] = this.sections.slice();
+        next.push({ date: resp.date && resp.date.length === 8 ? resp.date : oldest, stories: fresh });
+        this.sections = next;
       }
     } catch (e) {
       // 加载更早失败保留已加载内容
@@ -125,21 +141,32 @@ export struct DailyPage {
     }
   }
 
-  /** 日报成功后写两天缓存 */
+  /** 日报成功后写两天缓存（以最新一期为主） */
   private saveDailyCache(): void {
-    const stories = this.stories.slice();
-    const payload: DailyCachePayload = { savedAt: Date.now(), date: this.date, stories: stories };
+    if (this.sections.length === 0) {
+      return;
+    }
+    const payload: DailyCachePayload = {
+      savedAt: Date.now(),
+      date: this.latestDate,
+      stories: this.sections[0].stories.slice(),
+    };
     cacheWrite('daily_cache_v2', payload);
   }
 
   /** 后台预缓存日报所有文章详情 */
   private preCacheStories(): void {
-    const stories: DailyStory[] = this.stories;
+    const all: DailyStory[] = [];
+    this.sections.forEach((sec: DailySection) => {
+      sec.stories.forEach((s: DailyStory) => {
+        all.push(s);
+      });
+    });
     const doCache = async (idx: number): Promise<void> => {
-      if (idx >= stories.length) {
+      if (idx >= all.length) {
         return;
       }
-      const sid: string = String(stories[idx].id ?? '');
+      const sid: string = String(all[idx].id ?? '');
       if (sid.length === 0) {
         await doCache(idx + 1);
         return;
@@ -171,9 +198,8 @@ export struct DailyPage {
         list.push(st);
       }
     });
-    this.date = cached.date ?? '';
-    this.latestDate = this.date;
-    this.stories = list;
+    this.latestDate = cached.date ?? '';
+    this.sections = [{ date: this.latestDate, stories: list }];
     return true;
   }
 
@@ -229,6 +255,23 @@ export struct DailyPage {
   }
 
   @Builder
+  sectionHeader(sec: DailySection, isLatest: boolean) {
+    Row({ space: 8 }) {
+      Row()
+        .width(4)
+        .height(16)
+        .borderRadius(2)
+        .backgroundColor(isLatest ? ZhihuColors.primary : ZhihuColors.textTertiary)
+      Text(formatDailyDate(sec.date) + (isLatest ? ' 日报' : ' 日报'))
+        .fontSize(15)
+        .fontWeight(isLatest ? FontWeight.Bold : FontWeight.Medium)
+        .fontColor(isLatest ? ZhihuColors.primary : ZhihuColors.textSecondary)
+    }
+    .width('100%')
+    .padding({ left: 12, right: 12, top: 12, bottom: 4 })
+  }
+
+  @Builder
   footer() {
     Column() {
       if (this.loadingMore) {
@@ -239,7 +282,7 @@ export struct DailyPage {
         .justifyContent(FlexAlign.Center)
         .width('100%')
         .padding(12)
-      } else if (this.stories.length > 0) {
+      } else if (this.totalCount() > 0) {
         Text('— 已加载全部日报 —')
           .fontSize(15)
           .fontColor(ZhihuColors.textTertiary)
@@ -268,11 +311,16 @@ export struct DailyPage {
         Column() {
           this.dateHeader()
           List({ space: 8, scroller: this.scroller }) {
-            ForEach(this.stories, (item: DailyStory, idx: number) => {
+            ForEach(this.sections, (sec: DailySection, si: number) => {
               ListItem() {
-                this.storyRow(item)
+                this.sectionHeader(sec, si === 0)
               }
-            }, (item: DailyStory, idx: number) => String(idx) + '-' + String(item.id))
+              ForEach(sec.stories, (item: DailyStory) => {
+                ListItem() {
+                  this.storyRow(item)
+                }
+              }, (item: DailyStory) => String(item.id))
+            }, (sec: DailySection, si: number) => String(si) + '-' + sec.date)
             ListItem() {
               this.footer()
             }
@@ -295,7 +343,7 @@ export struct DailyPage {
       .height('100%')
 
       // 首屏加载
-      if (this.loading && this.stories.length === 0) {
+      if (this.loading && this.totalCount() === 0) {
         Column({ space: 8 }) {
           LoadingProgress().width(48).height(48).color(ZhihuColors.primary)
           Text('日报加载中…')
@@ -303,7 +351,7 @@ export struct DailyPage {
       }
 
       // 错误态（无数据时）
-      if (this.error.length > 0 && this.stories.length === 0) {
+      if (this.error.length > 0 && this.totalCount() === 0) {
         Column({ space: 16 }) {
           Text(this.error)
             .fontSize(16)
