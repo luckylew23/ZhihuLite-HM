@@ -21,6 +21,7 @@ import { getDailyDetail } from '../api/daily';
 export struct DailyPage {
   @State stories: DailyStory[] = [];
   @State date: string = '';
+  @State latestDate: string = '';
   @State loading: boolean = true;
   @State error: string = '';
   @State refreshing: boolean = false;
@@ -53,6 +54,7 @@ export struct DailyPage {
     try {
       const resp = await getDailyLatest();
       this.date = resp.date ?? '';
+      this.latestDate = this.date;
       this.stories = resp.stories ?? [];
       this.error = this.stories.length === 0 ? '本期日报暂无内容' : '';
       this.saveDailyCache();
@@ -79,6 +81,7 @@ export struct DailyPage {
     try {
       const resp = await getDailyLatest();
       this.date = resp.date ?? '';
+      this.latestDate = this.date;
       this.stories = resp.stories ?? [];
       this.saveDailyCache();
       this.preCacheStories();
@@ -111,6 +114,7 @@ export struct DailyPage {
       });
       this.stories = merged;
       if (resp.date && resp.date.length === 8) {
+        // 分页游标推进到更早一期；header 仍显示最新一期日期
         this.date = resp.date;
       }
     } catch (e) {
@@ -168,6 +172,7 @@ export struct DailyPage {
       }
     });
     this.date = cached.date ?? '';
+    this.latestDate = this.date;
     this.stories = list;
     return true;
   }
@@ -248,7 +253,7 @@ export struct DailyPage {
   @Builder
   dateHeader() {
     Row() {
-      Text(this.date.length > 0 ? formatDailyDate(this.date) + ' 日报' : '日报')
+      Text(this.latestDate.length > 0 ? formatDailyDate(this.latestDate) + ' 日报' : '日报')
         .fontSize(16)
         .fontWeight(FontWeight.Bold)
         .fontColor(ZhihuColors.primary)
