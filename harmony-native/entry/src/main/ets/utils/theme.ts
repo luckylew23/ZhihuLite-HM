@@ -8,6 +8,7 @@
  */
 
 import { settingsStore, ThemeMode } from '../store/settingsStore';
+import { applyWindowBars } from './windowBars';
 
 export interface ZhihuColorPalette {
   primary: string;
@@ -165,6 +166,7 @@ export function applyTheme(): void {
 export function applyThemeMode(mode: ThemeMode): void {
   settingsStore.setThemeMode(mode);
   applyTheme();
+  applyWindowBars();
 }
 
 // 模块加载即按已持久化模式应用一次（此时 settingsStore 可能尚未 init，回退 light）。
