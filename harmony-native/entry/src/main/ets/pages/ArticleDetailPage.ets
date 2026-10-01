@@ -21,6 +21,7 @@ import { StatusView } from '../components/detail/StatusView';
 import { NetImage } from '../components/NetImage';
 import { formatCount, guardLogin, HtmlBlock, parseContent, readStringParam, blocksToMarkdown, saveMarkdownToFile } from '../components/detail/detailUtils';
 import { RichBody } from '../components/detail/RichBody';
+import { DetailActionBar } from '../components/detail/DetailActionBar';
 import { common } from '@kit.AbilityKit';
 
 
@@ -35,6 +36,8 @@ struct ArticleDetailPage {
   @State article: ZhihuArticle | null = null;
   @State bodyBlocks: HtmlBlock[] = [];
   @State collected: boolean = false;
+  @State upCount: number = 0;
+  @State ccCount: number = 0;
   @State collectionId: string = '';
   @StorageLink('collectPicked') @Watch('onCollectPicked') collectPicked: string = '';
 
@@ -103,6 +106,8 @@ struct ArticleDetailPage {
     if (cached) {
       const a = cached.data;
       this.article = a;
+      this.upCount = a.voteup_count ?? 0;
+      this.ccCount = a.comment_count ?? 0;
       this.bodyBlocks = parseContent(a.content);
       this.loading = false;
       this.refreshCollectionStatus();
@@ -111,6 +116,8 @@ struct ArticleDetailPage {
     try {
       const a: ZhihuArticle = await getArticle(this.articleId);
       this.article = a;
+      this.upCount = a.voteup_count ?? 0;
+      this.ccCount = a.comment_count ?? 0;
       this.bodyBlocks = parseContent(a.content);
       writeContentCache('article', this.articleId, a as object);
       this.refreshCollectionStatus();
@@ -175,55 +182,14 @@ struct ArticleDetailPage {
         .scrollBar(BarState.Off)
         .backgroundColor(ZhihuColors.backgroundSecondary)
 
-        Row({ space: 4 }) {
-          Row({ space: 4 }) {
-            Text('▲')
-            Text(formatCount(this.article.voteup_count ?? 0))
-          }
-          .layoutWeight(1).justifyContent(FlexAlign.Center).padding({ top: 12, bottom: 12 })
-
-          Row({ space: 4 }) {
-            Text('○')
-              .fontSize(16)
-              .fontColor(ZhihuColors.textTertiary)
-            Text(formatCount(this.article.comment_count))
-              .fontSize(15)
-              .fontColor(ZhihuColors.textSecondary)
-          }
-          .layoutWeight(1).justifyContent(FlexAlign.Center).padding({ top: 12, bottom: 12 })
-          .onClick(() => {
-            this.onComment();
-          })
-
-          Row({ space: 4 }) {
-            Text(this.collected ? '★' : '☆')
-              .fontSize(17)
-              .fontColor(this.collected ? ZhihuColors.warning : ZhihuColors.textSecondary)
-            Text(this.collected ? '已收藏' : '收藏')
-              .fontSize(16)
-              .fontColor(this.collected ? ZhihuColors.warning : ZhihuColors.textSecondary)
-          }
-          .layoutWeight(1).justifyContent(FlexAlign.Center).padding({ top: 12, bottom: 12 })
-          .onClick(() => {
-            this.onCollect();
-          })
-
-          Row({ space: 4 }) {
-            Text('⇩')
-              .fontSize(16)
-              .fontColor(ZhihuColors.textSecondary)
-            Text('保存')
-              .fontSize(16)
-              .fontColor(ZhihuColors.textSecondary)
-          }
-          .layoutWeight(1).justifyContent(FlexAlign.Center).padding({ top: 12, bottom: 12 })
-          .onClick(() => {
-            this.saveContent();
-          })
-        }
-        .width('100%')
-        .backgroundColor(ZhihuColors.backgroundSecondary)
-        .border({ width: { top: 0.5 }, color: ZhihuColors.border })
+        DetailActionBar({
+          upvoteCount: this.upCount,
+          commentCount: this.ccCount,
+          collected: this.collected,
+          onComment: () => this.onComment(),
+          onCollect: () => this.onCollect(),
+          onSave: () => this.saveContent(),
+        })
       }
     }
     .width('100%')
