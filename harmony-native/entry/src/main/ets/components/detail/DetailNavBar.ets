@@ -4,6 +4,7 @@
 
 import { router } from '@kit.ArkUI';
 import { ZhihuColors } from '../../utils/theme';
+import { statusBarHeight } from '../../utils/windowBars';
 
 @Component
 export struct DetailNavBar {
@@ -28,8 +29,8 @@ export struct DetailNavBar {
       Blank()
     }
     .width('100%')
-    .height(52)
-    .padding({ left: 8, right: 12 })
+    .height(52 + px2vp(statusBarHeight))
+    .padding({ left: 8, right: 12, top: px2vp(statusBarHeight) })
     .backgroundColor(ZhihuColors.backgroundSecondary)
   }
 }

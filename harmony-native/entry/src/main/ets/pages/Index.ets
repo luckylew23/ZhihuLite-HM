@@ -16,6 +16,7 @@
 
 import { router } from '@kit.ArkUI';
 import { ZhihuColors } from '../utils/theme';
+import { statusBarHeight, navBarHeight } from '../utils/windowBars';
 import { settingsStore } from '../store/settingsStore';
 import { FeedListPage } from './FeedListPage';
 import { FollowingPage } from './FollowingPage';
@@ -146,8 +147,8 @@ struct Index {
         })
     }
     .width('100%')
-    .height(50)
-    .padding({ left: 12, right: 8 })
+    .height(50 + px2vp(statusBarHeight))
+    .padding({ left: 12, right: 8, top: px2vp(statusBarHeight) })
     .backgroundColor(ZhihuColors.backgroundSecondary)
   }
 
@@ -248,7 +249,8 @@ struct Index {
       this.bottomItem('👤', '我的', 1)
     }
     .width('100%')
-    .height(64)
+    .height(64 + px2vp(navBarHeight))
+    .padding({ bottom: px2vp(navBarHeight) })
     .backgroundColor(ZhihuColors.backgroundSecondary)
     .border({ width: { top: 0.5 }, color: ZhihuColors.border })
   }
@@ -282,5 +284,6 @@ struct Index {
     .width('100%')
     .height('100%')
     .backgroundColor(ZhihuColors.background)
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
   }
 }
