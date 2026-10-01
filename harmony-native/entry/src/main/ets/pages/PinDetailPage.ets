@@ -16,6 +16,7 @@ import { DetailNavBar } from '../components/detail/DetailNavBar';
 import { StatusView } from '../components/detail/StatusView';
 import { formatCount, HtmlBlock, parseContent, readStringParam, blocksToMarkdown, saveMarkdownToFile } from '../components/detail/detailUtils';
 import { RichBody } from '../components/detail/RichBody';
+import { DetailActionBar } from '../components/detail/DetailActionBar';
 
 @Entry
 @Component
@@ -25,6 +26,8 @@ struct PinDetailPage {
   @State error: string = '';
   @State pin: ZhihuPinDetail | null = null;
   @State bodyBlocks: HtmlBlock[] = [];
+  @State likeCount: number = 0;
+  @State commentCount: number = 0;
 
   aboutToAppear(): void {
     const p = router.getParams() as Record<string, object>;
@@ -40,6 +43,8 @@ struct PinDetailPage {
       const pin: ZhihuPinDetail = await getPin(this.pinId);
       this.pin = pin;
       const html: string = pin.content_html ?? pin.content ?? '';
+      this.likeCount = this.pin.like_count ?? 0;
+      this.commentCount = this.pin.comment_count ?? 0;
       this.bodyBlocks = parseContent(html);
     } catch (e) {
       hilog.error(0x3100, 'ZhihuLiteDBG', 'PIN load FAIL id=%{public}s err=%{public}s', this.pinId, JSON.stringify(e as object));
@@ -109,31 +114,21 @@ struct PinDetailPage {
         .scrollBar(BarState.Off)
         .backgroundColor(ZhihuColors.backgroundSecondary)
 
-        Row({ space: 4 }) {
-          Row({ space: 4 }) {
-            Text('▲')
-            Text(formatCount(this.pin.like_count ?? 0))
-          }
-          .layoutWeight(1).justifyContent(FlexAlign.Center).padding({ top: 12, bottom: 12 })
-
-          Row({ space: 4 }) {
-            Text('○')
-            Text(formatCount(this.pin.comment_count ?? 0))
-          }
-          .layoutWeight(1).justifyContent(FlexAlign.Center).padding({ top: 12, bottom: 12 })
-          .onClick(() => {
-            this.onComment();
-          })
-
-          Row({ space: 4 }) {
-            Text('⇩')
-          }
-          .layoutWeight(1).justifyContent(FlexAlign.Center).padding({ top: 12, bottom: 12 })
-          .onClick(() => this.saveContent())
-        }
-        .width('100%')
-        .backgroundColor(ZhihuColors.backgroundSecondary)
-        .border({ width: { top: 0.5 }, color: ZhihuColors.border })
+        // 操作条（公共组件，想法无反对/收藏）
+        DetailActionBar({
+          upvoted: false,
+          downvoted: false,
+          upvoteCount: this.likeCount,
+          commentCount: this.commentCount,
+          collected: false,
+          showDownvote: false,
+          showCollect: false,
+          onUpvote: () => {},
+          onDownvote: () => {},
+          onComment: () => this.onComment(),
+          onCollect: () => {},
+          onSave: () => this.saveContent(),
+        })
       }
     }
     .width('100%')

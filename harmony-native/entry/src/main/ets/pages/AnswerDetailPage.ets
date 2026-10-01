@@ -20,6 +20,7 @@ import { StatusView } from '../components/detail/StatusView';
 import { formatCount, guardLogin, HtmlBlock, parseContent, readStringParam, blocksToMarkdown, saveMarkdownToFile } from '../components/detail/detailUtils';
 import { NetImage } from '../components/NetImage';
 import { RichBody } from '../components/detail/RichBody';
+import { DetailActionBar } from '../components/detail/DetailActionBar';
 import { common } from '@kit.AbilityKit';
 
 
@@ -33,7 +34,10 @@ struct AnswerDetailPage {
   @State error: string = '';
   @State answer: AnswerDetail | null = null;
   @State voting: number = 0;
+  @State upvoted: boolean = false;
+  @State downvoted: boolean = false;
   @State voteCount: number = 0;
+  @State commentCount: number = 0;
   @State collected: boolean = false;
   @State collectionId: string = '';
   @StorageLink('collectPicked') @Watch('onCollectPicked') collectPicked: string = '';
@@ -73,7 +77,10 @@ struct AnswerDetailPage {
       const a = cached.data;
       this.answer = a;
       this.voting = a.relationship?.voting ?? 0;
+      this.upvoted = this.voting === 1;
+      this.downvoted = this.voting === -1;
       this.voteCount = a.voteup_count ?? 0;
+      this.commentCount = a.comment_count ?? 0;
       this.bodyBlocks = parseContent(a.content);
       this.loading = false;
       hadCache = true;
@@ -82,7 +89,10 @@ struct AnswerDetailPage {
       const a: AnswerDetail = await getAnswer(this.answerId);
       this.answer = a;
       this.voting = a.relationship?.voting ?? 0;
+      this.upvoted = this.voting === 1;
+      this.downvoted = this.voting === -1;
       this.voteCount = a.voteup_count ?? 0;
+      this.commentCount = a.comment_count ?? 0;
       this.bodyBlocks = parseContent(a.content);
       writeContentCache('answer', this.answerId, a as object);
       const actx: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
@@ -107,6 +117,8 @@ struct AnswerDetailPage {
     // 再点一次取消；赞同 ↔ 反对互切。
     const next: number = prev === target ? 0 : target;
     this.voting = next;
+    this.upvoted = next === 1;
+    this.downvoted = next === -1;
     if (next === 1) {
       this.voteCount = prev === 1 ? prevCount : prevCount + 1;
     } else if (next === 0 && prev === 1) {
@@ -271,89 +283,19 @@ struct AnswerDetailPage {
         .scrollBar(BarState.Off)
         .backgroundColor(ZhihuColors.backgroundSecondary)
 
-        // 操作条
-        Row({ space: 4 }) {
-          Row({ space: 4 }) {
-            Text(this.voting === 1 ? '▲' : '△')
-              .fontSize(16)
-              .fontColor(this.voting === 1 ? ZhihuColors.primary : ZhihuColors.textSecondary)
-            Text(formatCount(this.voteCount))
-              .fontSize(16)
-              .fontColor(this.voting === 1 ? ZhihuColors.primary : ZhihuColors.textSecondary)
-              .onClick(() => {
-                this.openVoters();
-              })
-          }
-          .layoutWeight(1)
-          .justifyContent(FlexAlign.Center)
-          .padding({ top: 12, bottom: 12 })
-          .onClick(() => {
-            this.onVote(1);
-          })
-
-          Row({ space: 4 }) {
-            Text(this.voting === -1 ? '▼' : '▽')
-              .fontSize(16)
-              .fontColor(this.voting === -1 ? ZhihuColors.danger : ZhihuColors.textSecondary)
-            Text('反对')
-              .fontSize(16)
-              .fontColor(this.voting === -1 ? ZhihuColors.danger : ZhihuColors.textSecondary)
-          }
-          .layoutWeight(1)
-          .justifyContent(FlexAlign.Center)
-          .padding({ top: 12, bottom: 12 })
-          .onClick(() => {
-            this.onVote(-1);
-          })
-
-          Row({ space: 4 }) {
-            Text('○')
-              .fontSize(16)
-              .fontColor(ZhihuColors.textTertiary)
-            Text(formatCount(this.answer.comment_count))
-              .fontSize(15)
-              .fontColor(ZhihuColors.textSecondary)
-          }
-          .layoutWeight(1)
-          .justifyContent(FlexAlign.Center)
-          .padding({ top: 12, bottom: 12 })
-          .onClick(() => {
-            this.onComment();
-          })
-
-          Row({ space: 4 }) {
-            Text(this.collected ? '★' : '☆')
-              .fontSize(17)
-              .fontColor(this.collected ? ZhihuColors.warning : ZhihuColors.textSecondary)
-            Text(this.collected ? '已收藏' : '收藏')
-              .fontSize(16)
-              .fontColor(this.collected ? ZhihuColors.warning : ZhihuColors.textSecondary)
-          }
-          .layoutWeight(1)
-          .justifyContent(FlexAlign.Center)
-          .padding({ top: 12, bottom: 12 })
-          .onClick(() => {
-            this.onCollect();
-          })
-
-          Row({ space: 4 }) {
-            Text('⇩')
-              .fontSize(16)
-              .fontColor(ZhihuColors.textSecondary)
-            Text('保存')
-              .fontSize(16)
-              .fontColor(ZhihuColors.textSecondary)
-          }
-          .layoutWeight(1)
-          .justifyContent(FlexAlign.Center)
-          .padding({ top: 12, bottom: 12 })
-          .onClick(() => {
-            this.saveContent();
-          })
-        }
-        .width('100%')
-        .backgroundColor(ZhihuColors.backgroundSecondary)
-        .border({ width: { top: 0.5 }, color: ZhihuColors.border })
+        // 操作条（公共组件）
+        DetailActionBar({
+          upvoted: this.upvoted,
+          downvoted: this.downvoted,
+          upvoteCount: this.voteCount,
+          commentCount: this.commentCount,
+          collected: this.collected,
+          onUpvote: () => this.onVote(1),
+          onDownvote: () => this.onVote(-1),
+          onComment: () => this.onComment(),
+          onCollect: () => this.onCollect(),
+          onSave: () => this.saveContent(),
+        })
       }
     }
     .width('100%')

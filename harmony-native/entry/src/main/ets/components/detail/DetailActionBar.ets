@@ -13,6 +13,8 @@ export struct DetailActionBar {
   @Prop upvoteCount: number = 0;
   @Prop commentCount: number = 0;
   @Prop collected: boolean = false;
+  @Prop showDownvote: boolean = true;
+  @Prop showCollect: boolean = true;
   onUpvote: () => void = () => {};
   onDownvote: () => void = () => {};
   onComment: () => void = () => {};
@@ -35,16 +37,18 @@ export struct DetailActionBar {
       .padding({ top: 10, bottom: 10 })
       .onClick(() => this.onUpvote())
 
-      // 反对
-      Row({ space: 3 }) {
-        Text(this.downvoted ? '▼' : '▽')
-          .fontSize(15)
-          .fontColor(this.downvoted ? ZhihuColors.danger : ZhihuColors.textTertiary)
+      // 反对（可隐藏）
+      if (this.showDownvote) {
+        Row({ space: 3 }) {
+          Text(this.downvoted ? '▼' : '▽')
+            .fontSize(15)
+            .fontColor(this.downvoted ? ZhihuColors.danger : ZhihuColors.textTertiary)
+        }
+        .layoutWeight(1)
+        .justifyContent(FlexAlign.Center)
+        .padding({ top: 10, bottom: 10 })
+        .onClick(() => this.onDownvote())
       }
-      .layoutWeight(1)
-      .justifyContent(FlexAlign.Center)
-      .padding({ top: 10, bottom: 10 })
-      .onClick(() => this.onDownvote())
 
       // 评论
       Row({ space: 3 }) {
@@ -60,16 +64,18 @@ export struct DetailActionBar {
       .padding({ top: 10, bottom: 10 })
       .onClick(() => this.onComment())
 
-      // 收藏
-      Row({ space: 3 }) {
-        Text(this.collected ? '★' : '☆')
-          .fontSize(15)
-          .fontColor(this.collected ? ZhihuColors.primary : ZhihuColors.textTertiary)
+      // 收藏（可隐藏）
+      if (this.showCollect) {
+        Row({ space: 3 }) {
+          Text(this.collected ? '★' : '☆')
+            .fontSize(15)
+            .fontColor(this.collected ? ZhihuColors.primary : ZhihuColors.textTertiary)
+        }
+        .layoutWeight(1)
+        .justifyContent(FlexAlign.Center)
+        .padding({ top: 10, bottom: 10 })
+        .onClick(() => this.onCollect())
       }
-      .layoutWeight(1)
-      .justifyContent(FlexAlign.Center)
-      .padding({ top: 10, bottom: 10 })
-      .onClick(() => this.onCollect())
 
       // 保存
       Row({ space: 3 }) {
