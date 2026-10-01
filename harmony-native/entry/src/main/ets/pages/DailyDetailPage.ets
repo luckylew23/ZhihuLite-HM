@@ -403,6 +403,7 @@ struct DailyDetailPage {
         .layoutWeight(1)
         .scrollBar(BarState.Off)
         .align(Alignment.Top)
+        .backgroundColor(ZhihuColors.backgroundSecondary)
       }
     }
     .width('100%')
