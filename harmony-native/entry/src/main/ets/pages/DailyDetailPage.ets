@@ -18,6 +18,7 @@ import { DetailNavBar } from '../components/detail/DetailNavBar';
 import { StatusView } from '../components/detail/StatusView';
 import { HtmlBlock, parseContent, readStringParam, parseInline, InlinePart, blocksToMarkdown, saveMarkdownToFile } from '../components/detail/detailUtils';
 import { DetailActionBar } from '../components/detail/DetailActionBar';
+import { RichBody } from '../components/detail/RichBody';
 import { NetImage } from '../components/NetImage';
 import { openZhihuUrl } from '../utils/zhihuRouter';
 import { getArticleCollectionStatus, getAnswerCollectionStatus } from '../api/collection';
@@ -33,6 +34,7 @@ struct DailyDetailPage {
   @State error: string = '';
   @State detail: DailyDetailResponse | null = null;
   @State bodyBlocks: HtmlBlock[] = [];
+  @State bodyBlocksMain: HtmlBlock[] = [];
   @State originUrl: string = '';
   @State discussionUrl: string = '';
   @State collected: boolean = false;
@@ -168,6 +170,19 @@ struct DailyDetailPage {
       this.discussionUrl = vm[1];
     }
     this.bodyBlocks = blocks;
+    // 剔除作者头像块与作者介绍文本块，正文统一走公共 RichBody 渲染
+    const main: HtmlBlock[] = [];
+    for (let i = 0; i < blocks.length; i++) {
+      const b: HtmlBlock = blocks[i];
+      if (b.type === 'image' && b.text === '__avatar__') {
+        continue;
+      }
+      if (i > 0 && blocks[i - 1].type === 'image' && blocks[i - 1].text === '__avatar__') {
+        continue;
+      }
+      main.push(b);
+    }
+    this.bodyBlocksMain = main;
   }
 
   /** 把正文文本里的 [图片] 字面占位，按顺序替换为正文图片块（对应 images[1..]）。
@@ -214,6 +229,26 @@ struct DailyDetailPage {
   private getAuthorText(idx: number): string {
     if (idx + 1 < this.bodyBlocks.length && this.bodyBlocks[idx + 1].type === 'text') {
       return this.bodyBlocks[idx + 1].text;
+    }
+    return '';
+  }
+
+  private avatarUrl(): string {
+    for (let i = 0; i < this.bodyBlocks.length; i++) {
+      const b: HtmlBlock = this.bodyBlocks[i];
+      if (b.type === 'image' && b.text === '__avatar__') {
+        return b.url;
+      }
+    }
+    return '';
+  }
+
+  private authorText(): string {
+    for (let i = 0; i < this.bodyBlocks.length - 1; i++) {
+      const b: HtmlBlock = this.bodyBlocks[i];
+      if (b.type === 'image' && b.text === '__avatar__' && this.bodyBlocks[i + 1].type === 'text') {
+        return this.bodyBlocks[i + 1].text;
+      }
     }
     return '';
   }
@@ -308,104 +343,29 @@ struct DailyDetailPage {
               }
               if (this.bodyBlocks.length > 0) {
                 Divider().strokeWidth(0.5).color(ZhihuColors.divider).margin({ top: 4, bottom: 4 })
-                ForEach(this.bodyBlocks, (b: HtmlBlock, idx: number) => {
-                  if (b.type === 'image' && b.text === '__avatar__') {
-                    Row({ space: 10 }) {
-                      NetImage({ url: b.url, w: 48, h: 48, r: 24 })
-                      Column() {
-                        Text(this.getAuthorText(idx))
-                          .fontSize(15)
-                          .fontColor(ZhihuColors.textSecondary)
-                          .maxLines(2)
-                          .textOverflow({ overflow: TextOverflow.Ellipsis })
-                      }
-                      .layoutWeight(1)
-                      if (this.originUrl.length > 0) {
-                        Text('查看知乎原文 ›')
-                          .fontSize(14)
-                          .fontColor(ZhihuColors.primary)
-                          .onClick(() => this.openOriginArticle())
-                      }
+                // 作者行：头像 + 介绍 + 查看知乎原文（头像块已从正文剔除）
+                if (this.avatarUrl().length > 0) {
+                  Row({ space: 10 }) {
+                    NetImage({ url: this.avatarUrl(), w: 48, h: 48, r: 24 })
+                    Column() {
+                      Text(this.authorText())
+                        .fontSize(15)
+                        .fontColor(ZhihuColors.textSecondary)
+                        .maxLines(2)
+                        .textOverflow({ overflow: TextOverflow.Ellipsis })
                     }
-                    .width('100%')
-                  } else if (b.type === 'image') {
-                    NetImage({ url: b.url, w: 0, h: 260, r: 8, fit: ImageFit.Contain, mt: 4, tapView: true, bg: ZhihuColors.backgroundSecondary })
-                  } else if (b.type === 'heading') {
-                    Text() {
-                      ForEach(parseInline(b.text), (p: InlinePart) => {
-                        Span(p.text)
-                          .fontSize(22)
-                          .fontWeight(FontWeight.Bold)
-                          .fontColor(ZhihuColors.text)
-                      })
+                    .layoutWeight(1)
+                    if (this.originUrl.length > 0) {
+                      Text('查看知乎原文 ›')
+                        .fontSize(14)
+                        .fontColor(ZhihuColors.primary)
+                        .onClick(() => this.openOriginArticle())
                     }
-                    .width('100%')
-                    .margin({ top: 8, bottom: 4 })
-                    .copyOption(CopyOptions.LocalDevice)
-                  } else if (b.type === 'quote') {
-                    Text() {
-                      ForEach(parseInline(b.text), (p: InlinePart) => {
-                        Span(p.text)
-                          .fontSize(18)
-                          .fontStyle(FontStyle.Italic)
-                          .fontColor(ZhihuColors.textSecondary)
-                      })
-                    }
-                    .lineHeight(26)
-                    .width('100%')
-                    .padding({ left: 12, top: 4, bottom: 4 })
-                    .borderWidth({ left: 3 })
-                    .borderColor({ left: ZhihuColors.primary })
-                    .copyOption(CopyOptions.LocalDevice)
-                  } else if (b.type === 'code') {
-                    Text(b.text)
-                      .fontSize(16)
-                      .lineHeight(24)
-                      .fontColor(ZhihuColors.text)
-                      .width('100%')
-                      .padding(10)
-                      .backgroundColor(ZhihuColors.backgroundSecondary)
-                      .copyOption(CopyOptions.LocalDevice)
-                  } else if (b.type === 'list') {
-                    Text() {
-                      ForEach(parseInline(b.text), (p: InlinePart) => {
-                        Span((p.text.length > 0 ? '· ' + p.text : p.text))
-                          .fontSize(19)
-                          .fontWeight(p.bold ? FontWeight.Bold : FontWeight.Normal)
-                          .fontStyle(p.italic ? FontStyle.Italic : FontStyle.Normal)
-                          .fontColor(ZhihuColors.text)
-                      })
-                    }
-                    .lineHeight(28)
-                    .width('100%')
-                    .copyOption(CopyOptions.LocalDevice)
-                  } else if (!this.isAuthorText(idx)) {
-                    // 作者名/介绍文本块已在头像行显示，这里跳过避免正文第一行重复
-                    Text() {
-                      ForEach(parseInline(b.text), (p: InlinePart) => {
-                        Span(p.text)
-                          .fontSize(19)
-                          .lineHeight(28)
-                          .fontWeight(p.bold ? FontWeight.Bold : FontWeight.Normal)
-                          .fontStyle(p.italic ? FontStyle.Italic : FontStyle.Normal)
-                          .fontColor(p.code || p.link ? ZhihuColors.primary : ZhihuColors.text)
-                      })
-                    }
-                    .fontSize(19)
-                    .lineHeight(28)
-                    .width('100%')
-                    .copyOption(CopyOptions.LocalDevice)
-                    .onClick(() => {
-                      const parts = parseInline(b.text);
-                      for (let i = 0; i < parts.length; i++) {
-                        if (parts[i].link && parts[i].url && parts[i].url!.length > 0) {
-                          this.openLink(parts[i].url!);
-                          return;
-                        }
-                      }
-                    })
                   }
-                }, (b: HtmlBlock, i: number) => i.toString() + b.url + b.text.substring(0, 8))
+                  .width('100%')
+                }
+                // 正文（公共富文本组件）
+                RichBody({ blocks: this.bodyBlocksMain })
               } else {
                 Text('正文暂无法展示')
                   .fontSize(16)
