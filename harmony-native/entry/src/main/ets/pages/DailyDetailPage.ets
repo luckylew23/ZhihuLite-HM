@@ -329,7 +329,7 @@ struct DailyDetailPage {
                     }
                     .width('100%')
                   } else if (b.type === 'image') {
-                    NetImage({ url: b.url, w: 0, h: 260, r: 8, fit: ImageFit.Contain, mt: 4, tapView: true })
+                    NetImage({ url: b.url, w: 0, h: 260, r: 8, fit: ImageFit.Contain, mt: 4, tapView: true, bg: ZhihuColors.backgroundSecondary })
                   } else if (b.type === 'heading') {
                     Text() {
                       ForEach(parseInline(b.text), (p: InlinePart) => {

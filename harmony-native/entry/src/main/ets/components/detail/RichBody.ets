@@ -115,7 +115,7 @@ export struct RichBody {
     Column() {
       ForEach(this.getItems(), (item: RenderItem, idx: number) => {
         if (item.isImage) {
-          NetImage({ url: item.imageUrl, w: 0, h: 260, r: 8, fit: ImageFit.Contain, mt: 4, tapView: true })
+          NetImage({ url: item.imageUrl, w: 0, h: 260, r: 8, fit: ImageFit.Contain, mt: 4, tapView: true, bg: ZhihuColors.backgroundSecondary })
         } else if (item.linkUrl.length > 0) {
           Text() {
             ForEach(item.spans, (s: FlattenedSpan, si: number) => {

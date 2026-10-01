@@ -90,6 +90,8 @@ export struct NetImage {
   @Prop ml: number = 0;
   /** true=可交互：单击全屏看图，长按出操作菜单；false=仅长按保存，不拦截父级点击 */
   @Prop tapView: boolean = false;
+  /** 图片背景色（contain 留白区域）；空串时用面板灰 tertiary */
+  @Prop bg: string = '';
 
   @State src: string = '';
   @State fallbackTried: boolean = false;
@@ -130,7 +132,7 @@ export struct NetImage {
         .width('100%')
         .height('100%')
         .objectFit(this.fit)
-        .backgroundColor(ZhihuColors.backgroundTertiary)
+        .backgroundColor(this.bg.length > 0 ? this.bg : ZhihuColors.backgroundTertiary)
         .onError(() => {
           hilog.warn(DOMAIN, TAG, 'img direct error url=%{public}s', this.url);
           this.tryFallback();

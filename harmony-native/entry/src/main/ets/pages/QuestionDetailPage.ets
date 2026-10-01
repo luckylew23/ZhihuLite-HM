@@ -283,7 +283,7 @@ struct QuestionDetailPage {
         if (this.detailImages().length > 0) {
           Column({ space: 8 }) {
             ForEach(this.detailImages(), (src: string) => {
-              NetImage({ url: src, w: 0, h: 220, r: 8, fit: ImageFit.Contain, mb: 4, tapView: true })
+              NetImage({ url: src, w: 0, h: 220, r: 8, fit: ImageFit.Contain, mb: 4, tapView: true, bg: ZhihuColors.backgroundSecondary })
             }, (src: string) => src)
           }
           .width('100%')
