@@ -1,7 +1,7 @@
 /**
  * pages/ImageViewerPage —— 全屏看图（去水印原图）。
  * 参数：url（内容图 URL）；进入后自动转原图（无水印），单击关闭。
- * 支持双指捏合缩放（1x~4x）+ 双指拖动平移。
+ * 支持双指捏合缩放（1x~4x）；放大后单指按住拖动平移（缩放≤1 时不拖动，保留单击关闭）。
  * 右上角：系统 SaveButton（保存到相册，无需危险权限）+ 复制链接。
  */
 
@@ -152,7 +152,7 @@ struct ImageViewerPage {
               this.ty = 0;
             }
           }),
-        PanGesture({ fingers: 2, distance: 5 })
+        PanGesture({ fingers: 1, distance: 5 })
           .onActionStart(() => {
             this.pinchStartTx = this.tx;
             this.pinchStartTy = this.ty;
@@ -161,6 +161,12 @@ struct ImageViewerPage {
             if (this.zoomScale > 1.05) {
               this.tx = this.pinchStartTx + e.offsetX;
               this.ty = this.pinchStartTy + e.offsetY;
+            }
+          })
+          .onActionEnd(() => {
+            if (this.zoomScale <= 1.05) {
+              this.tx = 0;
+              this.ty = 0;
             }
           })
       )
