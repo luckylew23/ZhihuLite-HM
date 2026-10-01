@@ -219,6 +219,31 @@ ZhihuLite 的四类内容对象与两种展现形态，收敛为一套「对象�
 - **数据一致**：详情页计数用 `@State` 字段承接后传入组件（避免 @Prop 传表达式触发 ArkTS 限制），
   投票/收藏状态在加载与操作后同步刷新。
 
+#### 3.5.6 一致性核查结论（v0.3.61 全面检查）
+
+**正文富文本渲染核查表**
+
+| 对象 | 页面 | 渲染组件 | 状态 |
+|---|---|---|---|
+| 回答 | AnswerDetailPage | `RichBody` | ✅ 公共 |
+| 文章 | ArticleDetailPage | `RichBody` | ✅ 公共 |
+| 想法 | PinDetailPage | `RichBody` | ✅ 公共 |
+| 问题 | QuestionDetailPage | 纯文本 `stripHtml` | ⚠️ 问题正文短、无富文本需求，与原版一致（有意保留） |
+| 日报 | DailyDetailPage | `RichBody` | ✅ 公共 |
+
+**底部操作栏核查表（修复前后）**
+
+| 对象 | 修复前 | 修复后 |
+|---|---|---|
+| 回答 | ❌ 内联五格（▲▼○☆⇩） | ✅ `DetailActionBar`（投票状态、收藏状态联动） |
+| 文章 | ✅ `DetailActionBar` | ✅ 不变 |
+| 想法 | ❌ 内联三格（▲○⇩） | ✅ `DetailActionBar`（`showDownvote=false, showCollect=false`，仅 ▲○⇩） |
+| 日报 | ✅ `DetailActionBar` | ✅ 不变 |
+| 回答卡片 | ❌ 内联四格（▲▼○☆） | ✅ `AnswerActionBar`（此前提取的组件为孤儿未接入，本轮真正启用） |
+
+> 核查结论：正文渲染与底部操作栏已全部收敛到公共组件，唯一有意保留的差异为问题页正文纯文本（无富文本需求）。
+> 后续新增内容对象/展现形态，需按 3.5.4 映射表选用组件并保持本节核查结论不回归。
+
 ---
 
 ## 4. 设计
