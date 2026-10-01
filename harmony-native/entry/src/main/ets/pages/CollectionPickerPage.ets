@@ -12,6 +12,7 @@ import { router } from '@kit.ArkUI';
 import {
   getAnswerCollectionStatus,
   getArticleCollectionStatus,
+  getMyCollections,
   addToCollection,
   removeFromCollection,
   addArticleToCollection,
@@ -85,7 +86,26 @@ struct CollectionPickerPage {
       }
       this.collections = list;
     } catch (e) {
-      this.error = '收藏夹加载失败';
+      // 降级：状态接口失败（内容不可收藏/404）时，仍拉取我的收藏夹列表，
+      // 保证页面可用；勾选状态未知时视为未收藏。
+      try {
+        const mine = await getMyCollections(50, 0);
+        const raw: object[] = mine.data === undefined ? [] : mine.data;
+        const list: CollectionSel[] = [];
+        for (const r of raw) {
+          const rec = r as Record<string, object>;
+          list.push({
+            id: String(rec['id'] ?? ''),
+            title: String(rec['title'] ?? ''),
+            description: String(rec['description'] ?? ''),
+            isPublic: Boolean(rec['is_public']),
+            isFavorited: false,
+          });
+        }
+        this.collections = list;
+      } catch (e2) {
+        this.error = '收藏夹加载失败';
+      }
     } finally {
       this.loading = false;
     }

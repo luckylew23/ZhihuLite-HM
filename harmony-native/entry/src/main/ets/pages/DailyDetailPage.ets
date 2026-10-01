@@ -71,16 +71,23 @@ struct DailyDetailPage {
       this.collectResourceId = '';
       return;
     }
+    // 优先级：回答（含 question/{qid}/answer/{aid} 组合链接）→ 专栏文章 → 问题
+    const a: RegExpExecArray | null = /\/answer\/(\d+)/.exec(u);
+    if (a !== null) {
+      this.collectType = 'answer';
+      this.collectResourceId = a[1];
+      return;
+    }
     const m: RegExpExecArray | null = /zhuanlan\.zhihu\.com\/p\/(\d+)/.exec(u);
     if (m !== null) {
       this.collectType = 'article';
       this.collectResourceId = m[1];
       return;
     }
-    const a: RegExpExecArray | null = /zhihu\.com\/answer\/(\d+)/.exec(u);
-    if (a !== null) {
-      this.collectType = 'answer';
-      this.collectResourceId = a[1];
+    const q: RegExpExecArray | null = /\/question\/(\d+)/.exec(u);
+    if (q !== null) {
+      this.collectType = 'question';
+      this.collectResourceId = q[1];
       return;
     }
     this.collectType = '';
@@ -96,6 +103,8 @@ struct DailyDetailPage {
         url: 'pages/CollectionPickerPage',
         params: { resourceType: this.collectType, resourceId: this.collectResourceId },
       });
+    } else if (this.collectType === 'question') {
+      promptAction.showToast({ message: '知乎问题暂不支持收藏到收藏夹' });
     } else {
       promptAction.showToast({ message: '该日报内容暂无对应知乎条目，无法收藏' });
     }
