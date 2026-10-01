@@ -4,7 +4,7 @@
  * 结构：DetailNavBar + 头图 + 标题 + hint + 正文（HTML 剥标签纯文本降级）。
  */
 
-import { router } from '@kit.ArkUI';
+import { router, promptAction } from '@kit.ArkUI';
 import { common, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import {
@@ -20,6 +20,8 @@ import { HtmlBlock, parseContent, readStringParam, parseInline, InlinePart, bloc
 import { DetailActionBar } from '../components/detail/DetailActionBar';
 import { NetImage } from '../components/NetImage';
 import { openZhihuUrl } from '../utils/zhihuRouter';
+import { getArticleCollectionStatus } from '../api/collection';
+import { guardLogin } from '../components/detail/detailUtils';
 
 interface CachedDaily { savedAt: number; data: DailyDetailResponse; }
 
@@ -33,7 +35,38 @@ struct DailyDetailPage {
   @State bodyBlocks: HtmlBlock[] = [];
   @State originUrl: string = '';
   @State discussionUrl: string = '';
+  @State collected: boolean = false;
+  @StorageLink('collectPicked') @Watch('onCollectPicked') collectPicked: string = '';
   private fallbackTitle: string = '';
+
+  onCollectPicked(): void {
+    if (this.collectPicked === this.storyId) {
+      this.collected = true;
+      this.collectPicked = '';
+    }
+  }
+
+  private async refreshCollectionStatus(): Promise<void> {
+    if (this.storyId.length === 0) {
+      return;
+    }
+    try {
+      const st = await getArticleCollectionStatus(this.storyId, 1);
+      this.collected = st.collected === true;
+    } catch (e) {
+      this.collected = false;
+    }
+  }
+
+  private onCollect(): void {
+    if (!guardLogin()) {
+      return;
+    }
+    router.pushUrl({
+      url: 'pages/CollectionPickerPage',
+      params: { resourceType: 'article', resourceId: this.storyId },
+    });
+  }
 
   aboutToAppear(): void {
     const p = router.getParams() as Record<string, object>;
@@ -181,6 +214,10 @@ struct DailyDetailPage {
       uri: url,
     };
     ctx.startAbility(w);
+  }
+
+  private toastUnsupported(): void {
+    promptAction.showToast({ message: '日报文章暂不支持点赞' });
   }
 
   private async saveContent(): Promise<void> {
@@ -349,8 +386,12 @@ struct DailyDetailPage {
             DetailActionBar({
               upvoteCount: 0,
               commentCount: 0,
-              collected: false,
+              collected: this.collected,
+              showDownvote: false,
+              onUpvote: () => this.toastUnsupported(),
+              onDownvote: () => {},
               onComment: () => this.openZhihuDiscussion(),
+              onCollect: () => this.onCollect(),
               onSave: () => this.saveContent(),
             })
           }
