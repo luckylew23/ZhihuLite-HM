@@ -135,7 +135,8 @@ zhihuLite-HM/
 |---|---|---|
 | 主框架 | 底栏 + Tabs + 登录重建 | `pages/Index.ets` |
 | 详情页族 | 问题/回答/文章/想法/视频/专栏/话题 | `*DetailPage.ets` |
-| **公共操作栏** | 赞成▲/反对▼/评论○/收藏☆/保存⇩ 五项 | `components/detail/DetailActionBar.ets` |
+| **公共操作栏（详情页）** | 赞成▲/反对▼/评论○/收藏☆/保存⇩ 五项，可隐藏反对/收藏 | `components/detail/DetailActionBar.ets` |
+| **公共操作栏（卡片）** | 赞成/反对/评论/收藏 四格轻量版（无保存、收藏带文字） | `components/detail/AnswerActionBar.ets` |
 | 富文本渲染 | HTML→Blocks→结构化渲染 | `components/detail/RichBody.ets` |
 | 图片组件 | 网络图片 + 长按下载 + 全屏查看 | `components/NetImage.ets` |
 | 发布页族 | 四类创作 | `Publish*Page.ets` |
@@ -149,7 +150,8 @@ entry/src/main/ets/
 ├── entryability/EntryAbility.ets
 ├── pages/                    37 个页面
 ├── components/detail/
-│   ├── DetailActionBar.ets    ★ 公共五项操作栏
+│   ├── DetailActionBar.ets    ★ 公共五项操作栏（详情页）
+│   ├── AnswerActionBar.ets    ★ 公共四格操作栏（卡片）
 │   ├── AnswerCard.ets        回答卡片
 │   ├── DetailNavBar.ets      导航栏
 │   ├── detailUtils.ets       工具函数（blocksToMarkdown / saveMarkdownToFile / parseInline / stripHtml）
@@ -163,6 +165,59 @@ entry/src/main/ets/
     ├── cacheStore.ts        ★ 缓存读写（列表 + 内容级）
     └── ...
 ```
+
+### 3.5 内容对象 × 展现形态 的公共组件架构（整体设计）
+
+ZhihuLite 的四类内容对象与两种展现形态，收敛为一套「对象—形态—组件」映射矩阵，
+所有详情页与卡片复用同一批公共组件，保证渲染、交互、风格、深浅主题完全一致。
+
+#### 3.5.1 四类内容对象（Data Model）
+
+| 对象 | 英文 | 典型来源 | 正文数据结构 | 互动能力 |
+|---|---|---|---|---|
+| 文章 | Article | 专栏/日报 | HTML 富文本（标题/粗体/列表/引用/代码/图/链接） | 赞同 / 反对 / 评论 / 收藏 / 保存 |
+| 问题 | Question | 搜索/话题 | 纯文本（问题描述短，无富文本需求） | 关注 / 评论（无底部操作栏，与知乎原版一致） |
+| 回答 | Answer | 问题页/推荐/热榜 | HTML 富文本（同文章） | 赞同 / 反对 / 评论 / 收藏 / 保存 |
+| 想法 | Pin | 关注流 | HTML 富文本（短内容） | 点赞 / 评论 / 保存（无反对、无收藏） |
+
+#### 3.5.2 两种展现形态（Presentation）
+
+| 形态 | 场景 | 特征 | 代表 |
+|---|---|---|---|
+| **卡片 Card** | 列表/信息流，内容摘要 + 快捷操作 | 紧凑、无保存、收藏带文字标签、禁止正文选择（性能） | `AnswerCard`（问题/搜索/话题页回答列表） |
+| **详情页 Detail** | 单条内容完整阅读 + 全部操作 | 可滚动正文、可长按选择、底部五项操作栏 | `AnswerDetailPage` / `ArticleDetailPage` / `PinDetailPage` / `DailyDetailPage` |
+
+#### 3.5.3 公共组件矩阵（Component Matrix）
+
+| 公共组件 | 职责 | 使用方 | 关键差异参数 |
+|---|---|---|---|
+| `RichBody` | HTML→Blocks→结构化富文本渲染；markdown 语义保留；链接可点击（知乎站内 app 内打开，外部走系统浏览器）；跨段选择 | 四类对象详情页正文（文章/回答/想法/日报） | 无（统一） |
+| `DetailActionBar` | 详情页底部五项操作栏 △▲/▽▼/○/☆★/⇩，图标+数字，深浅主题自适应 | Answer / Article / Pin / Daily 四个详情页 | `showDownvote`、`showCollect`（想法页隐藏） |
+| `AnswerActionBar` | 卡片四格操作条（赞成/反对/评论/收藏），收藏带"收藏/已收藏"文字 | `AnswerCard`（所有回答列表卡片） | 无（卡片场景专用） |
+| `DetailNavBar` | 详情页顶部导航（返回 + 标题 + 右侧操作） | 全部详情页 | 无 |
+| `StatusView` | 加载中 / 错误 / 空态统一视图 | 全部页面 | 无 |
+| `NetImage` | 网络图片：加载态、点击全屏（双指缩放）、长按保存到相册、复制链接、去水印 | 全部图片场景 | 无 |
+
+#### 3.5.4 对象 → 展现 → 组件 映射表（选用规则）
+
+| 对象 | 卡片（列表） | 详情页正文 | 详情页底部栏 |
+|---|---|---|---|
+| 文章 Article | —（专栏卡片走通用卡片） | `RichBody` | `DetailActionBar`（五项全显） |
+| 问题 Question | `AnswerCard`（回答列表） | 纯文本（无富文本） | 无（原版一致） |
+| 回答 Answer | `AnswerActionBar` 内嵌于 `AnswerCard` | `RichBody` | `DetailActionBar`（五项全显，投票/收藏状态联动） |
+| 想法 Pin | 关注流卡片 | `RichBody` | `DetailActionBar`（`showDownvote=false, showCollect=false`） |
+| 日报 Daily | 日报分段卡片 | `RichBody` | `DetailActionBar`（讨论链接跳转 / 保存） |
+
+#### 3.5.5 统一性约束（不变量）
+
+- **单一实现**：任一能力（富文本、操作栏）只有一份公共组件，页面内禁止内联重复实现；
+  新页面必须走组件矩阵，不得复制粘贴。
+- **视觉一致**：图标统一极简线条字符（△▲/▽▼/○/☆★/⇩），字号、数字格式（`formatCount`）、
+  深浅主题色均来自同一套 `ZhihuColors`；禁止在页面内硬编码颜色/字号。
+- **交互一致**：收藏状态实心圆/★、投票选中变色、评论跳转、保存走 `saveMarkdownToFile`，
+  四类对象行为一致。
+- **数据一致**：详情页计数用 `@State` 字段承接后传入组件（避免 @Prop 传表达式触发 ArkTS 限制），
+  投票/收藏状态在加载与操作后同步刷新。
 
 ---
 
