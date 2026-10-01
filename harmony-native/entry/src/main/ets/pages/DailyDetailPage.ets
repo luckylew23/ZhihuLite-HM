@@ -20,7 +20,7 @@ import { HtmlBlock, parseContent, readStringParam, parseInline, InlinePart, bloc
 import { DetailActionBar } from '../components/detail/DetailActionBar';
 import { NetImage } from '../components/NetImage';
 import { openZhihuUrl } from '../utils/zhihuRouter';
-import { getArticleCollectionStatus } from '../api/collection';
+import { getArticleCollectionStatus, getAnswerCollectionStatus } from '../api/collection';
 import { guardLogin } from '../components/detail/detailUtils';
 
 interface CachedDaily { savedAt: number; data: DailyDetailResponse; }
@@ -36,36 +36,69 @@ struct DailyDetailPage {
   @State originUrl: string = '';
   @State discussionUrl: string = '';
   @State collected: boolean = false;
+  @State collectType: string = '';
+  @State collectResourceId: string = '';
   @StorageLink('collectPicked') @Watch('onCollectPicked') collectPicked: string = '';
   private fallbackTitle: string = '';
 
   onCollectPicked(): void {
-    if (this.collectPicked === this.storyId) {
+    if (this.collectPicked === this.collectResourceId) {
       this.collected = true;
       this.collectPicked = '';
     }
   }
 
   private async refreshCollectionStatus(): Promise<void> {
-    if (this.storyId.length === 0) {
+    if (this.collectResourceId.length === 0) {
+      this.collected = false;
       return;
     }
     try {
-      const st = await getArticleCollectionStatus(this.storyId, 1);
+      const st = this.collectType === 'answer'
+        ? await getAnswerCollectionStatus(this.collectResourceId, 1)
+        : await getArticleCollectionStatus(this.collectResourceId, 1);
       this.collected = st.collected === true;
     } catch (e) {
       this.collected = false;
     }
   }
 
+  /** 从「查看知乎原文」链接解析知乎站内条目（专栏文章/回答），供收藏夹使用。 */
+  private parseZhihuTarget(): void {
+    const u: string = this.originUrl;
+    if (u.length === 0) {
+      this.collectType = '';
+      this.collectResourceId = '';
+      return;
+    }
+    const m: RegExpExecArray | null = /zhuanlan\.zhihu\.com\/p\/(\d+)/.exec(u);
+    if (m !== null) {
+      this.collectType = 'article';
+      this.collectResourceId = m[1];
+      return;
+    }
+    const a: RegExpExecArray | null = /zhihu\.com\/answer\/(\d+)/.exec(u);
+    if (a !== null) {
+      this.collectType = 'answer';
+      this.collectResourceId = a[1];
+      return;
+    }
+    this.collectType = '';
+    this.collectResourceId = '';
+  }
+
   private onCollect(): void {
     if (!guardLogin()) {
       return;
     }
-    router.pushUrl({
-      url: 'pages/CollectionPickerPage',
-      params: { resourceType: 'article', resourceId: this.storyId },
-    });
+    if (this.collectType === 'article' || this.collectType === 'answer') {
+      router.pushUrl({
+        url: 'pages/CollectionPickerPage',
+        params: { resourceType: this.collectType, resourceId: this.collectResourceId },
+      });
+    } else {
+      promptAction.showToast({ message: '该日报内容暂无对应知乎条目，无法收藏' });
+    }
   }
 
   aboutToAppear(): void {
@@ -120,6 +153,7 @@ struct DailyDetailPage {
     if (ou !== null) {
       this.originUrl = ou[1];
     }
+    this.parseZhihuTarget();
     const vm: RegExpExecArray | null = /<div[^>]*class="[^"]*view-more[^"]*"[^>]*>\s*<a[^>]*href="([^"]+)"/i.exec(d.body);
     if (vm !== null) {
       this.discussionUrl = vm[1];
