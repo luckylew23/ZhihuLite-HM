@@ -100,6 +100,17 @@ export struct NetImage {
   @Builder
   imageMenu() {
     Column({ space: 4 }) {
+      Text('保存图片')
+        .width('100%')
+        .height(52)
+        .textAlign(TextAlign.Center)
+        .fontSize(17)
+        .fontColor(ZhihuColors.text)
+        .onClick(() => {
+          this.showMenu = false;
+          this.save();
+        })
+      Divider().color(ZhihuColors.backgroundTertiary)
       Text('复制图片链接')
         .width('100%')
         .height(52)
