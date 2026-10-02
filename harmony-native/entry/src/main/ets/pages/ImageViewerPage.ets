@@ -97,7 +97,7 @@ struct ImageViewerPage {
           .translate({ x: this.tx, y: this.ty })
       }
 
-      Stack({ alignContent: Alignment.TopEnd }) {
+      Stack({ alignContent: Alignment.BottomEnd }) {
         Row({ space: 8 }) {
           Text('⧉')
             .width(32)
@@ -120,7 +120,7 @@ struct ImageViewerPage {
               this.saveToGallery();
             })
         }
-        .margin({ top: 8, right: 12 })
+        .margin({ bottom: 24, right: 12 })
       }
       .width('100%')
       .height('100%')
