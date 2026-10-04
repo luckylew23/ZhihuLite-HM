@@ -16,6 +16,7 @@
 
 import { router } from '@kit.ArkUI';
 import { ZhihuColors } from '../utils/theme';
+import { handleDeepLinkIfAny } from '../utils/deepLink';
 import { statusBarHeight, navBarHeight } from '../utils/windowBars';
 import { settingsStore } from '../store/settingsStore';
 import { FeedListPage } from './FeedListPage';
@@ -41,6 +42,11 @@ struct Index {
 
   /** 顶栏允许出现的栏目（固定顺序；publish/profile 不在其中） */
   private topTabOrder: string[] = ['following', 'recommend', 'hot', 'daily'];
+
+  onPageShow(): void {
+    // 系统深链：打开知乎链接时路由到对应内容页
+    handleDeepLinkIfAny();
+  }
 
   aboutToAppear(): void {
     const all: string[] = settingsStore.getVisibleTabs();

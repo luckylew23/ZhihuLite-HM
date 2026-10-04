@@ -7,6 +7,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { setAppContext } from '../store/authStore';
 import { bindWindow } from '../utils/windowBars';
+import { setPendingDeepLink } from '../utils/deepLink';
 
 const DOMAIN: number = 0x0000;
 const TAG: string = 'ZhihuNativeEntry';
@@ -15,7 +16,18 @@ export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     // 注入 Context：authStore（preferences 持久化）需要
     setAppContext(this.context);
+    if (want && want.uri && (want.uri as string).length > 0) {
+      setPendingDeepLink(want.uri as string);
+    }
     hilog.info(DOMAIN, TAG, 'Ability onCreate');
+  }
+
+  onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+    // 应用已运行：系统再次拉起知乎链接时接管
+    if (want && want.uri && (want.uri as string).length > 0) {
+      setPendingDeepLink(want.uri as string);
+    }
+    hilog.info(DOMAIN, TAG, 'Ability onNewWant');
   }
 
   onDestroy(): void {
