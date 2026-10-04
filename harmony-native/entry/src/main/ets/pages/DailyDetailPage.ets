@@ -397,6 +397,7 @@ struct DailyDetailPage {
               onCollect: () => this.onCollect(),
               onSave: () => this.saveContent(),
               shareLink: this.originUrl.length > 0 ? this.originUrl : (this.detail?.share_url ?? ''),
+              shareTitle: this.detail?.title ?? '知乎日报',
             })
           }
           .width('100%')

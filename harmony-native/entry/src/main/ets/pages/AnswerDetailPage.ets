@@ -296,6 +296,7 @@ struct AnswerDetailPage {
           onCollect: () => this.onCollect(),
           onSave: () => this.saveContent(),
           shareLink: 'https://www.zhihu.com/answer/' + this.answerId,
+          shareTitle: (this.answer?.question?.title ?? '').length > 0 ? this.answer!.question!.title : '知乎回答',
         })
       }
     }

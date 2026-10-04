@@ -20,6 +20,7 @@ export struct DetailActionBar {
   @Prop showCollect: boolean = true;
   @Prop showShare: boolean = true;
   @Prop shareLink: string = '';
+  @Prop shareTitle: string = '';
   onUpvote: () => void = () => {};
   onDownvote: () => void = () => {};
   onComment: () => void = () => {};
@@ -30,7 +31,8 @@ export struct DetailActionBar {
   private share(): void {
     if (this.shareLink.length > 0) {
       const pb = pasteboard.getSystemPasteboard();
-      const data = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, this.shareLink);
+      const text: string = this.shareTitle.length > 0 ? this.shareTitle + '\n' + this.shareLink : this.shareLink;
+      const data = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, text);
       pb.setData(data).then(() => {
         promptAction.showToast({ message: '链接已复制，快去分享吧', duration: 1500 });
       }).catch(() => {

@@ -61,6 +61,14 @@ struct PinDetailPage {
     });
   }
 
+  private pinShareTitle(): string {
+    const c: string = this.pin?.content ?? '';
+    if (c.length > 50) {
+      return c.substring(0, 50) + '…';
+    }
+    return c.length > 0 ? c : '知乎想法';
+  }
+
   private async saveContent(): Promise<void> {
     if (this.bodyBlocks.length === 0) {
       return;
@@ -129,6 +137,7 @@ struct PinDetailPage {
           onCollect: () => {},
           onSave: () => this.saveContent(),
           shareLink: 'https://www.zhihu.com/pin/' + this.pinId,
+          shareTitle: this.pinShareTitle(),
         })
       }
     }

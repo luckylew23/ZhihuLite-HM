@@ -190,6 +190,7 @@ struct ArticleDetailPage {
           onCollect: () => this.onCollect(),
           onSave: () => this.saveContent(),
           shareLink: 'https://zhuanlan.zhihu.com/p/' + this.articleId,
+          shareTitle: this.article?.title ?? '知乎文章',
         })
       }
     }
