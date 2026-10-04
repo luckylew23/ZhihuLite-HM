@@ -6,6 +6,8 @@
 import { ZhihuColors } from '../../utils/theme';
 import { navBarHeight } from '../../utils/windowBars';
 import { formatCount } from './detailUtils';
+import { pasteboard } from '@kit.BasicServicesKit';
+import { promptAction } from '@kit.ArkUI';
 
 @Component
 export struct DetailActionBar {
@@ -16,11 +18,28 @@ export struct DetailActionBar {
   @Prop collected: boolean = false;
   @Prop showDownvote: boolean = true;
   @Prop showCollect: boolean = true;
+  @Prop showShare: boolean = true;
+  @Prop shareLink: string = '';
   onUpvote: () => void = () => {};
   onDownvote: () => void = () => {};
   onComment: () => void = () => {};
   onCollect: () => void = () => {};
   onSave: () => void = () => {};
+  onShare: () => void = () => {};
+
+  private share(): void {
+    if (this.shareLink.length > 0) {
+      const pb = pasteboard.getSystemPasteboard();
+      const data = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, this.shareLink);
+      pb.setData(data).then(() => {
+        promptAction.showToast({ message: '链接已复制，快去分享吧', duration: 1500 });
+      }).catch(() => {
+        promptAction.showToast({ message: '复制失败', duration: 1500 });
+      });
+    } else {
+      this.onShare();
+    }
+  }
 
   build() {
     Row({ space: 2 }) {
@@ -76,6 +95,19 @@ export struct DetailActionBar {
         .justifyContent(FlexAlign.Center)
         .padding({ top: 10, bottom: 10 })
         .onClick(() => this.onCollect())
+      }
+
+      // 转发（可隐藏）
+      if (this.showShare) {
+        Row({ space: 3 }) {
+          Text('↪')
+            .fontSize(15)
+            .fontColor(ZhihuColors.textTertiary)
+        }
+        .layoutWeight(1)
+        .justifyContent(FlexAlign.Center)
+        .padding({ top: 10, bottom: 10 })
+        .onClick(() => this.share())
       }
 
       // 保存

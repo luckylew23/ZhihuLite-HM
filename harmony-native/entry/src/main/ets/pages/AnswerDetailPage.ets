@@ -295,6 +295,7 @@ struct AnswerDetailPage {
           onComment: () => this.onComment(),
           onCollect: () => this.onCollect(),
           onSave: () => this.saveContent(),
+          shareLink: 'https://www.zhihu.com/answer/' + this.answerId,
         })
       }
     }

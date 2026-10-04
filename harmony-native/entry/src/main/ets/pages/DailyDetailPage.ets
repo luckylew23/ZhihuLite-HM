@@ -396,6 +396,7 @@ struct DailyDetailPage {
               onComment: () => this.openZhihuDiscussion(),
               onCollect: () => this.onCollect(),
               onSave: () => this.saveContent(),
+              shareLink: this.originUrl.length > 0 ? this.originUrl : (this.detail?.share_url ?? ''),
             })
           }
           .width('100%')

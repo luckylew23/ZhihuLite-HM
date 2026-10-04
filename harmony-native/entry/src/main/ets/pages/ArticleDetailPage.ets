@@ -189,6 +189,7 @@ struct ArticleDetailPage {
           onComment: () => this.onComment(),
           onCollect: () => this.onCollect(),
           onSave: () => this.saveContent(),
+          shareLink: 'https://zhuanlan.zhihu.com/p/' + this.articleId,
         })
       }
     }

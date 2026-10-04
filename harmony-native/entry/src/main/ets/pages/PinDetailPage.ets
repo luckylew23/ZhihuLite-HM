@@ -128,6 +128,7 @@ struct PinDetailPage {
           onComment: () => this.onComment(),
           onCollect: () => {},
           onSave: () => this.saveContent(),
+          shareLink: 'https://www.zhihu.com/pin/' + this.pinId,
         })
       }
     }
