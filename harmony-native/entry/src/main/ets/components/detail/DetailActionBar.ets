@@ -100,7 +100,7 @@ export struct DetailActionBar {
       // 转发（可隐藏）
       if (this.showShare) {
         Row({ space: 3 }) {
-          Text('↪')
+          Text('↗')
             .fontSize(15)
             .fontColor(ZhihuColors.textTertiary)
         }
