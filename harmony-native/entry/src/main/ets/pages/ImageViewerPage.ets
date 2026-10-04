@@ -129,10 +129,24 @@ struct ImageViewerPage {
     .height('100%')
     .backgroundColor(Color.Black)
     .gesture(
-      TapGesture({ count: 1 })
-        .onAction(() => {
-          router.back();
-        })
+      GestureGroup(
+        GestureMode.Exclusive,
+        TapGesture({ count: 2 })
+          .onAction(() => {
+            // 双击：≤1x 放大到 2x；已放大则回到 1x 并归零偏移
+            if (this.zoomScale <= 1.05) {
+              this.zoomScale = 2;
+            } else {
+              this.zoomScale = 1;
+              this.tx = 0;
+              this.ty = 0;
+            }
+          }),
+        TapGesture({ count: 1 })
+          .onAction(() => {
+            router.back();
+          })
+      )
     )
     .gesture(
       GestureGroup(
