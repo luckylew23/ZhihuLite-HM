@@ -528,6 +528,5 @@ struct QuestionDetailPage {
     .width('100%')
     .height('100%')
     .backgroundColor(ZhihuColors.background)
-    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
   }
 }

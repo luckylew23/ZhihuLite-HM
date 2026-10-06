@@ -30,7 +30,7 @@ function isDarkNow(): boolean {
 export function bindWindow(win: window.Window): void {
   mainWin = win;
   try {
-    win.setWindowLayoutFullScreen(true);
+    win.setWindowLayoutFullScreen(false);
   } catch (e) {
     // 忽略
   }
@@ -57,8 +57,8 @@ export function applyWindowBars(): void {
   }
   try {
     mainWin.setWindowSystemBarProperties({
-      statusBarColor: '#00000000',
-      navigationBarColor: '#00000000',
+      statusBarColor: dark ? '#121212' : '#f6f6f6',
+      navigationBarColor: dark ? '#121212' : '#f6f6f6',
       statusBarContentColor: dark ? '#FFFFFFFF' : '#FF000000',
       navigationBarContentColor: dark ? '#FFFFFFFF' : '#FF000000',
     } as window.SystemBarProperties);

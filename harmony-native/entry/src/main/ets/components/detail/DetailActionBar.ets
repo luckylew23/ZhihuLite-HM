@@ -4,7 +4,6 @@
  * 所有图标、数字统一字号，颜色随深浅主题自适应。
  */
 import { ZhihuColors } from '../../utils/theme';
-import { navBarHeight } from '../../utils/windowBars';
 import { formatCount } from './detailUtils';
 import { pasteboard } from '@kit.BasicServicesKit';
 import { promptAction } from '@kit.ArkUI';
@@ -124,7 +123,6 @@ export struct DetailActionBar {
       .onClick(() => this.onSave())
     }
     .width('100%')
-    .padding({ bottom: px2vp(navBarHeight) })
     .backgroundColor(ZhihuColors.backgroundSecondary)
     .border({ width: { top: 0.5 }, color: ZhihuColors.border })
   }
