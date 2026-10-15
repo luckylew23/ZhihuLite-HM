@@ -14,6 +14,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import {
   CommentItem,
   CommentResourceType,
+  CreateCommentResponse,
   ZhihuCommentResponse,
   getAnswerCommentsV5,
   getQuestionCommentsV5,
@@ -289,15 +290,75 @@ struct CommentsPage {
     }
     this.submitting = true;
     try {
-      if (this.replyToId.length > 0) {
-        await createCommentV5(this.typedResourceType(), this.resourceId, text, this.replyToId);
-      } else {
-        await createCommentV5(this.typedResourceType(), this.resourceId, text);
-      }
+      const resp: CreateCommentResponse = await createCommentV5(
+        this.typedResourceType(), this.resourceId, text,
+        this.replyToId.length > 0 ? this.replyToId : undefined,
+      );
       this.showToast('发布成功');
       this.inputText = '';
       this.cancelReply();
-      await this.loadFirst();
+      // 本地即时插入，避免等待重新拉取
+      const cid: string | number = resp.id !== undefined ? resp.id : Date.now();
+      if (this.replyToId.length === 0) {
+        // 一级评论：插入列表顶部
+        const self: CommentItem = {
+          id: cid,
+          type: 'comment',
+          content: text,
+          created_time: Math.floor(Date.now() / 1000),
+          child_comment_count: 0,
+          child_comments: [],
+          author: {
+            member: {
+              id: '0',
+              url_token: '',
+              name: authStore.userName,
+              avatar_url: '',
+            },
+          },
+          relationship: { voting: 0 },
+          vote_count: 0,
+        };
+        this.comments = [self, ...this.comments];
+        this.commentTotal = this.commentTotal + 1;
+      } else {
+        // 二级回复：更新对应根评论的回复数；已展开则重拉二级列表
+        const rootId: string | number =
+          resp.reply_root_comment_id !== undefined && resp.reply_root_comment_id !== null
+            ? resp.reply_root_comment_id
+            : this.replyToId;
+        const next: CommentItem[] = [];
+        for (const c of this.comments) {
+          if (String(c.id) === String(rootId)) {
+            next.push({
+              id: c.id,
+              type: c.type,
+              content: c.content,
+              created_time: c.created_time,
+              child_comment_count: (c.child_comment_count === undefined ? 0 : c.child_comment_count) + 1,
+              child_comments: c.child_comments,
+              author: c.author,
+              relationship: c.relationship,
+              vote_count: c.vote_count,
+            });
+          } else {
+            next.push(c);
+          }
+        }
+        this.comments = next;
+        this.commentTotal = this.commentTotal + 1;
+        const rootKeyStr: string = String(rootId);
+        if (this.expandedRootKey.startsWith(rootKeyStr + '_')) {
+          this.childLoading = true;
+          try {
+            const cr = await getChildCommentsV5(rootId, 30, '');
+            this.childList = cr.data;
+          } catch (e) {
+          } finally {
+            this.childLoading = false;
+          }
+        }
+      }
     } catch (e) {
       this.showToast('发布失败，请稍后重试');
     } finally {
