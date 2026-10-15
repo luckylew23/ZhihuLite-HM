@@ -27,6 +27,7 @@ import {
 import { authStore } from '../store/authStore';
 import { ZhihuColors } from '../utils/theme';
 import { formatRelativeTime } from '../utils/date';
+import { isDarkNow } from '../utils/theme';
 import { stripHtml } from '../components/interaction/textUtil';
 
 interface RootChildState {
@@ -557,8 +558,9 @@ struct CommentsPage {
           TextInput({ placeholder: '既然来了，就留下点什么吧...', text: this.inputText })
             .layoutWeight(1)
             .height(42)
-            .backgroundColor(ZhihuColors.backgroundTertiary)
+            .backgroundColor(isDarkNow() ? '#3a3a44' : '#f5f6f7')
             .borderRadius(21)
+            .border({ width: 1, color: isDarkNow() ? '#4a4a55' : '#d8d9de' })
             .padding({ left: 16, right: 16 })
             .fontSize(16)
             .fontColor(ZhihuColors.text)
