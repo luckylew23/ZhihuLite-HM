@@ -151,7 +151,11 @@ struct CommentsPage {
   }
 
   private rootKey(item: CommentItem): string {
-    return String(item.id);
+    // key 含点赞态：点赞/取消后状态变化 → ForEach 重建该项（同 id 不重绘是 ArkUI diff 行为）
+    const v: number = item.relationship === undefined || item.relationship === null
+      ? 0
+      : item.relationship.voting;
+    return String(item.id) + '_' + String(v);
   }
 
   private memberName(item: CommentItem): string {
