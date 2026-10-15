@@ -234,6 +234,12 @@ struct AnswerDetailPage {
                 .fontColor(ZhihuColors.text)
                 .width('100%')
                 .textAlign(TextAlign.Start)
+                .onClick(() => {
+                  const q = this.answer?.question;
+                  if (q !== undefined && String(q.id).length > 0) {
+                    router.pushUrl({ url: 'pages/QuestionDetailPage', params: { id: String(q.id) } });
+                  }
+                })
             }
 
             // 作者行
