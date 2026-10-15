@@ -23,6 +23,7 @@ import {
   getChildCommentsV5,
   createCommentV5,
   voteComment,
+  dislikeComment,
 } from '../api/comment';
 import { authStore } from '../store/authStore';
 import { ZhihuColors } from '../utils/theme';
@@ -153,11 +154,12 @@ struct CommentsPage {
   }
 
   private rootKey(item: CommentItem): string {
-    // key 含点赞态：点赞/取消后状态变化 → ForEach 重建该项（同 id 不重绘是 ArkUI diff 行为）
+    // key 含点赞/点踩态：状态变化 → ForEach 重建该项（同 id 不重绘是 ArkUI diff 行为）
     const v: number = item.relationship === undefined || item.relationship === null
       ? 0
       : item.relationship.voting;
-    return String(item.id) + '_' + String(v);
+    const d: number = item.disliked === true ? 1 : 0;
+    return String(item.id) + '_' + String(v) + '_' + String(d);
   }
 
   private memberName(item: CommentItem): string {
@@ -179,6 +181,54 @@ struct CommentsPage {
   private liked(item: CommentItem): boolean {
     const rel = item.relationship;
     return rel !== undefined && rel !== null && rel.voting === 1;
+  }
+
+  private disliked(item: CommentItem): boolean {
+    return item.disliked === true;
+  }
+
+  private cloneComment(c: CommentItem): CommentItem {
+    return {
+      id: c.id,
+      type: c.type,
+      content: c.content,
+      created_time: c.created_time,
+      child_comment_count: c.child_comment_count,
+      child_comments: c.child_comments,
+      author: c.author,
+      relationship: c.relationship,
+      vote_count: c.vote_count,
+      disliked: c.disliked,
+      address_text: c.address_text,
+      reply_comment_id: c.reply_comment_id,
+      reply_root_comment_id: c.reply_root_comment_id,
+    };
+  }
+
+  private patchItem(item: CommentItem, patch: (c: CommentItem) => CommentItem): void {
+    let hit: boolean = false;
+    const nc: CommentItem[] = [];
+    for (const c of this.comments) {
+      if (String(c.id) === String(item.id)) {
+        nc.push(patch(c));
+        hit = true;
+      } else {
+        nc.push(c);
+      }
+    }
+    if (hit) {
+      this.comments = nc;
+      return;
+    }
+    const nl: CommentItem[] = [];
+    for (const c of this.childList) {
+      if (String(c.id) === String(item.id)) {
+        nl.push(patch(c));
+      } else {
+        nl.push(c);
+      }
+    }
+    this.childList = nl;
   }
 
   private voteCount(item: CommentItem): number {
@@ -210,32 +260,53 @@ struct CommentsPage {
     const action: string = currentlyLiked ? 'neutral' : 'up';
     try {
       await voteComment(item.id, action);
-      // 本地更新点赞态
-      const next: CommentItem[] = [];
-      for (const c of this.comments) {
-        if (String(c.id) === String(item.id)) {
-          const cloned: CommentItem = {
-            id: c.id,
-            type: c.type,
-            content: c.content,
-            created_time: c.created_time,
-            child_comment_count: c.child_comment_count,
-            child_comments: c.child_comments,
-            author: c.author,
-          };
-          cloned.relationship = { voting: currentlyLiked ? 0 : 1 };
-          const base = c.vote_count === undefined ? 0 : c.vote_count;
-          cloned.vote_count = currentlyLiked ? Math.max(0, base - 1) : base + 1;
-          next.push(cloned);
-        } else {
-          next.push(c);
+      this.patchItem(item, (c: CommentItem) => {
+        const cloned: CommentItem = this.cloneComment(c);
+        cloned.relationship = { voting: currentlyLiked ? 0 : 1 };
+        const base = c.vote_count === undefined ? 0 : c.vote_count;
+        cloned.vote_count = currentlyLiked ? Math.max(0, base - 1) : base + 1;
+        if (!currentlyLiked) {
+          cloned.disliked = false;
         }
-      }
-      this.comments = next;
+        return cloned;
+      });
       hilog.info(0x3100, 'ZhihuLiteDBG', 'COMMENT like OK id=%{public}s action=%{public}s', String(item.id), action);
     } catch (e) {
       const err: Error = e as Error;
       hilog.info(0x3100, 'ZhihuLiteDBG', 'COMMENT like FAIL id=%{public}s err=%{public}s', String(item.id), err.message);
+      this.showToast('操作失败');
+    }
+  }
+
+  // ---------------- 点踩 ----------------
+  async handleDislike(item: CommentItem): Promise<void> {
+    hilog.info(0x3100, 'ZhihuLiteDBG', 'COMMENT dislike CLICK id=%{public}s login=%{public}s',
+      String(item.id), String(authStore.isLoggedIn));
+    if (!authStore.isLoggedIn) {
+      this.gotoLogin();
+      return;
+    }
+    const currently: boolean = this.disliked(item);
+    const action: 'down' | 'neutral' = currently ? 'neutral' : 'down';
+    try {
+      await dislikeComment(item.id, action);
+      this.patchItem(item, (c: CommentItem) => {
+        const cloned: CommentItem = this.cloneComment(c);
+        cloned.disliked = !currently;
+        if (!currently) {
+          // 踩与赞互斥：清除点赞态并回退计数
+          if (this.liked(c)) {
+            cloned.relationship = { voting: 0 };
+            const base = c.vote_count === undefined ? 0 : c.vote_count;
+            cloned.vote_count = Math.max(0, base - 1);
+          }
+        }
+        return cloned;
+      });
+      hilog.info(0x3100, 'ZhihuLiteDBG', 'COMMENT dislike OK id=%{public}s action=%{public}s', String(item.id), action);
+    } catch (e) {
+      const err: Error = e as Error;
+      hilog.info(0x3100, 'ZhihuLiteDBG', 'COMMENT dislike FAIL id=%{public}s err=%{public}s', String(item.id), err.message);
       this.showToast('操作失败');
     }
   }
@@ -390,13 +461,34 @@ struct CommentsPage {
         .borderRadius(10)
         .objectFit(ImageFit.Cover)
         .backgroundColor(ZhihuColors.backgroundTertiary)
-      Column({ space: 2 }) {
+      Column({ space: 4 }) {
         Text(this.memberName(child) + '：' + stripHtml(child.content))
           .fontSize(15)
           .fontColor(ZhihuColors.text)
           .width('100%')
           .textAlign(TextAlign.Start)
           .lineHeight(19)
+        Row({ space: 10 }) {
+          Row({ space: 2 }) {
+            Text('▲')
+              .fontSize(12)
+              .fontColor(this.liked(child) ? ZhihuColors.primary : ZhihuColors.textTertiary)
+            Text(String(this.voteCount(child)))
+              .fontSize(12)
+              .fontColor(ZhihuColors.textTertiary)
+          }
+          .padding({ top: 2, bottom: 2 })
+          .onClick(() => {
+            this.handleLike(child);
+          })
+          Text('▽')
+            .fontSize(12)
+            .fontColor(this.disliked(child) ? ZhihuColors.primary : ZhihuColors.textTertiary)
+            .padding({ top: 2, bottom: 2 })
+            .onClick(() => {
+              this.handleDislike(child);
+            })
+        }
       }
       .alignItems(HorizontalAlign.Start)
       .layoutWeight(1)
@@ -491,17 +583,27 @@ struct CommentsPage {
         }
 
         Row({ space: 4 }) {
-          Text('▲')
+          Row({ space: 2 }) {
+            Text('▲')
+              .fontSize(14)
+              .fontColor(this.liked(item) ? ZhihuColors.primary : ZhihuColors.textTertiary)
+            Text(String(this.voteCount(item)))
+              .fontSize(14)
+              .fontColor(ZhihuColors.textTertiary)
+          }
+          .padding({ left: 8, right: 8 })
+          .onClick(() => {
+            this.handleLike(item);
+          })
+
+          Text('▽')
             .fontSize(14)
-            .fontColor(this.liked(item) ? ZhihuColors.primary : ZhihuColors.textTertiary)
-          Text(String(this.voteCount(item)))
-            .fontSize(14)
-            .fontColor(ZhihuColors.textTertiary)
+            .fontColor(this.disliked(item) ? ZhihuColors.primary : ZhihuColors.textTertiary)
+            .padding({ left: 8, right: 8 })
+            .onClick(() => {
+              this.handleDislike(item);
+            })
         }
-        .padding({ left: 8, right: 8 })
-        .onClick(() => {
-          this.handleLike(item);
-        })
 
         Text('回复')
           .fontSize(14)

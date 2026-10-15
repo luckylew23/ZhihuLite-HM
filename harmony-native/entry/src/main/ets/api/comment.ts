@@ -361,6 +361,20 @@ export const voteComment = async (
   return res.data;
 };
 
+export const dislikeComment = async (
+  id: string | number,
+  action: 'down' | 'neutral',
+): Promise<ZhihuVoteResponse> => {
+  const endpoint =
+    '/comments/' + encodeURIComponent(String(id)) + '/dislike';
+  if (action === 'down') {
+    const res = await zhihuClient.post<ZhihuVoteResponse>(API_V4 + endpoint);
+    return res.data;
+  }
+  const res = await zhihuClient.delete<ZhihuVoteResponse>(API_V4 + endpoint);
+  return res.data;
+};
+
 export const getQuestionComments = async (
   id: string | number,
   limit: number = 20,
