@@ -556,11 +556,14 @@ struct CommentsPage {
         Row({ space: 10 }) {
           TextInput({ placeholder: '既然来了，就留下点什么吧...', text: this.inputText })
             .layoutWeight(1)
-            .height(40)
+            .height(42)
             .backgroundColor(ZhihuColors.backgroundTertiary)
-            .borderRadius(20)
-            .padding({ left: 14, right: 14 })
+            .borderRadius(21)
+            .padding({ left: 16, right: 16 })
             .fontSize(16)
+            .fontColor(ZhihuColors.text)
+            .placeholderColor(ZhihuColors.textTertiary)
+            .caretColor(ZhihuColors.primary)
             .onChange((v: string) => {
               this.inputText = v;
             })
