@@ -10,6 +10,7 @@
  */
 
 import { router } from '@kit.ArkUI';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 import {
   CommentItem,
   CommentResourceType,
@@ -193,6 +194,8 @@ struct CommentsPage {
 
   // ---------------- 点赞 ----------------
   async handleLike(item: CommentItem): Promise<void> {
+    hilog.info(0x3100, 'ZhihuLiteDBG', 'COMMENT like CLICK id=%{public}s login=%{public}s',
+      String(item.id), String(authStore.isLoggedIn));
     if (!authStore.isLoggedIn) {
       this.gotoLogin();
       return;
@@ -223,13 +226,18 @@ struct CommentsPage {
         }
       }
       this.comments = next;
+      hilog.info(0x3100, 'ZhihuLiteDBG', 'COMMENT like OK id=%{public}s action=%{public}s', String(item.id), action);
     } catch (e) {
+      const err: Error = e as Error;
+      hilog.info(0x3100, 'ZhihuLiteDBG', 'COMMENT like FAIL id=%{public}s err=%{public}s', String(item.id), err.message);
       this.showToast('操作失败');
     }
   }
 
   // ---------------- 回复 ----------------
   handleReply(item: CommentItem): void {
+    hilog.info(0x3100, 'ZhihuLiteDBG', 'COMMENT reply CLICK id=%{public}s login=%{public}s',
+      String(item.id), String(authStore.isLoggedIn));
     if (!authStore.isLoggedIn) {
       this.gotoLogin();
       return;
