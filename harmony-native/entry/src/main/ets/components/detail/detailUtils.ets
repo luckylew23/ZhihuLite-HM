@@ -379,8 +379,7 @@ export function readStringParam(params: Record<string, object> | null, key: stri
 function isoNow(): string {
   const d = new Date();
   const p = (n: number): string => (n < 10 ? '0' + String(n) : String(n));
-  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + 'T' +
-    p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds()) + '+08:00';
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
 }
 
 /** 将解析后的 blocks 转成 Markdown 文本（头部带 YAML front matter：created/tags/source） */
