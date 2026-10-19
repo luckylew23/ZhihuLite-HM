@@ -75,7 +75,7 @@ struct PinDetailPage {
     }
     try {
       const title: string = this.pin?.author?.name ? ('想法_' + this.pin.author.name) : '想法';
-      const md: string = blocksToMarkdown(this.bodyBlocks, title, '');
+      const md: string = blocksToMarkdown(this.bodyBlocks, title, '', 'https://www.zhihu.com/pin/' + this.pinId);
       await saveMarkdownToFile(getContext(this), title, md);
     } catch (e) {
     }

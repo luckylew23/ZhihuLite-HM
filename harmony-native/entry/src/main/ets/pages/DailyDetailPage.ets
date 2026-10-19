@@ -304,7 +304,7 @@ struct DailyDetailPage {
     }
     try {
       const title: string = this.detail?.title ?? ('日报_' + this.storyId);
-      const md: string = blocksToMarkdown(this.bodyBlocks, title, '');
+      const md: string = blocksToMarkdown(this.bodyBlocks, title, '', this.originUrl);
       await saveMarkdownToFile(getContext(this), title, md);
     } catch (e) {
     }

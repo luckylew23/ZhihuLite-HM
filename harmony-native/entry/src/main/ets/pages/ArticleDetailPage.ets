@@ -90,7 +90,7 @@ struct ArticleDetailPage {
     try {
       const title: string = this.article?.title ?? ('文章_' + this.articleId);
       const author: string = this.article?.author?.name ?? '';
-      const md: string = blocksToMarkdown(this.bodyBlocks, title, author);
+      const md: string = blocksToMarkdown(this.bodyBlocks, title, author, 'https://zhuanlan.zhihu.com/p/' + this.articleId);
       await saveMarkdownToFile(getContext(this), title, md);
     } catch (e) {
       const errMsg: string = e instanceof Error ? e.message : JSON.stringify(e);

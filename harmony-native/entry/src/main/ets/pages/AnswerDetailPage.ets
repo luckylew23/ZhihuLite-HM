@@ -189,7 +189,7 @@ struct AnswerDetailPage {
     try {
       const title: string = (this.answer?.question?.title ?? '').length > 0 ? this.answer!.question!.title : '回答_' + this.answerId;
       const author: string = this.answer?.author?.name ?? '';
-      const md: string = blocksToMarkdown(this.bodyBlocks, title, author);
+      const md: string = blocksToMarkdown(this.bodyBlocks, title, author, 'https://www.zhihu.com/answer/' + this.answerId);
       await saveMarkdownToFile(getContext(this), title, md);
     } catch (e) {
       const errMsg: string = e instanceof Error ? e.message : JSON.stringify(e);

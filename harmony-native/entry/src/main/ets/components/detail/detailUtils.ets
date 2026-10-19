@@ -375,9 +375,25 @@ export function readStringParam(params: Record<string, object> | null, key: stri
   return String(v);
 }
 
-/** 将解析后的 blocks 转成 Markdown 文本 */
-export function blocksToMarkdown(blocks: HtmlBlock[], title: string, author: string): string {
+/** 当前本地时间 ISO（东八区） */
+function isoNow(): string {
+  const d = new Date();
+  const p = (n: number): string => (n < 10 ? '0' + String(n) : String(n));
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + 'T' +
+    p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds()) + '+08:00';
+}
+
+/** 将解析后的 blocks 转成 Markdown 文本（头部带 YAML front matter：created/tags/source） */
+export function blocksToMarkdown(blocks: HtmlBlock[], title: string, author: string, sourceUrl: string = ''): string {
   const lines: string[] = [];
+  // YAML front matter
+  lines.push('---');
+  lines.push('created: ' + isoNow());
+  lines.push('tags:');
+  lines.push('  - clippings');
+  lines.push('source: ' + sourceUrl);
+  lines.push('---');
+  lines.push('');
   if (title.length > 0) {
     lines.push('# ' + title);
     lines.push('');
