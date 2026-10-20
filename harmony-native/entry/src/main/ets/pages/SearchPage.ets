@@ -798,20 +798,34 @@ struct SearchPage {
       Row({ space: 18 }) {
         Row({ space: 4 }) {
           Text('▲')
+            .fontSize(14)
+            .fontColor(ZhihuColors.textTertiary)
           Text(formatCount(item.voteCount))
+            .fontSize(14)
+            .fontColor(ZhihuColors.textTertiary)
         }
         Row({ space: 4 }) {
           Text('○')
+            .fontSize(14)
+            .fontColor(ZhihuColors.textTertiary)
           Text(formatCount(item.commentCount))
+            .fontSize(14)
+            .fontColor(ZhihuColors.textTertiary)
         }
         if (item.favlistsCount !== undefined && item.favlistsCount > 0) {
           Row({ space: 4 }) {
             Text('☆')
+              .fontSize(14)
+              .fontColor(ZhihuColors.textTertiary)
             Text(formatCount(item.favlistsCount))
+              .fontSize(14)
+              .fontColor(ZhihuColors.textTertiary)
           }
         }
         Blank()
         Text('···')
+          .fontSize(16)
+          .fontColor(ZhihuColors.textTertiary)
       }
       .width('100%')
     }
@@ -824,7 +838,7 @@ struct SearchPage {
 
   @Builder
   resultList() {
-    List({ scroller: this.scroller }) {
+    List({ scroller: this.scroller, space: 10 }) {
       if (this.tabIsPeople()) {
         ForEach(this.peopleResults, (p: PeopleHit, index: number) => {
           ListItem() {
