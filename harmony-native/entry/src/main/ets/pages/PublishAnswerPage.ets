@@ -11,6 +11,7 @@ import { router } from '@kit.ArkUI';
 import { createAnswer } from '../api/answer';
 import { authStore } from '../store/authStore';
 import { ZhihuColors } from '../utils/theme';
+import { isDarkNow } from '../utils/theme';
 import { getZhihuErrorMessage } from '../utils/zhihuError';
 import { readStringParam } from '../components/detail/detailUtils';
 
@@ -81,10 +82,10 @@ struct PublishAnswerPage {
   @Builder
   topBar() {
     Row() {
-      Text('←')
-        .fontSize(22)
+      Text('‹')
+        .fontSize(26)
         .fontColor(ZhihuColors.text)
-        .width(40)
+        .padding({ left: 6, right: 10 })
         .onClick(() => {
           router.back();
         })
@@ -143,7 +144,10 @@ struct PublishAnswerPage {
           .height(52)
           .fontSize(18)
           .placeholderColor(ZhihuColors.textTertiary)
-          .backgroundColor(ZhihuColors.backgroundSecondary)
+          .fontColor(ZhihuColors.text)
+          .caretColor(ZhihuColors.primary)
+          .backgroundColor(isDarkNow() ? '#3a3a44' : '#f5f6f7')
+          .border({ width: 1, color: isDarkNow() ? '#4a4a55' : '#d8d9de' })
           .type(InputType.Number)
           .margin({ top: 8 })
 
@@ -154,7 +158,10 @@ struct PublishAnswerPage {
           .height(360)
           .fontSize(17)
           .placeholderColor(ZhihuColors.textTertiary)
-          .backgroundColor(ZhihuColors.backgroundSecondary)
+          .fontColor(ZhihuColors.text)
+          .caretColor(ZhihuColors.primary)
+          .backgroundColor(isDarkNow() ? '#3a3a44' : '#f5f6f7')
+          .border({ width: 1, color: isDarkNow() ? '#4a4a55' : '#d8d9de' })
 
         if (this.error.length > 0) {
           Text(this.error)

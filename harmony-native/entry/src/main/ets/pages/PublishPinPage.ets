@@ -14,6 +14,7 @@ import { photoAccessHelper } from '@kit.MediaLibraryKit';
 import { createPin } from '../api/pin';
 import { authStore } from '../store/authStore';
 import { ZhihuColors } from '../utils/theme';
+import { isDarkNow } from '../utils/theme';
 import { getZhihuErrorMessage } from '../utils/zhihuError';
 
 interface PickedImage {
@@ -234,6 +235,8 @@ struct PublishPinPage {
           .fontSize(19)
           .fontWeight(FontWeight.Medium)
           .placeholderColor(ZhihuColors.textTertiary)
+          .fontColor(ZhihuColors.text)
+          .caretColor(ZhihuColors.primary)
           .backgroundColor(Color.Transparent)
           .margin({ top: 8 })
 
@@ -244,6 +247,8 @@ struct PublishPinPage {
           .height(220)
           .fontSize(18)
           .placeholderColor(ZhihuColors.textTertiary)
+          .fontColor(ZhihuColors.text)
+          .caretColor(ZhihuColors.primary)
           .backgroundColor(Color.Transparent)
 
         this.imageGrid()

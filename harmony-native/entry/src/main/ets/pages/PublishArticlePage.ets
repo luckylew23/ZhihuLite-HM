@@ -17,6 +17,7 @@ import {
 } from '../api/article';
 import { authStore } from '../store/authStore';
 import { ZhihuColors } from '../utils/theme';
+import { isDarkNow } from '../utils/theme';
 import { getZhihuErrorMessage } from '../utils/zhihuError';
 
 function toParagraphHtml(text: string): string {
@@ -92,9 +93,10 @@ struct PublishArticlePage {
   @Builder
   topBar() {
     Row() {
-      Text('←')
-        .fontSize(22)
+      Text('‹')
+        .fontSize(26)
         .fontColor(ZhihuColors.text)
+        .padding({ left: 6, right: 10 })
         .width(40)
         .onClick(() => {
           router.back();
@@ -163,7 +165,10 @@ struct PublishArticlePage {
           .fontSize(22)
           .fontWeight(FontWeight.Bold)
           .placeholderColor(ZhihuColors.textTertiary)
-          .backgroundColor(ZhihuColors.backgroundSecondary)
+          .fontColor(ZhihuColors.text)
+          .caretColor(ZhihuColors.primary)
+          .backgroundColor(isDarkNow() ? '#3a3a44' : '#f5f6f7')
+          .border({ width: 1, color: isDarkNow() ? '#4a4a55' : '#d8d9de' })
           .margin({ top: 8 })
 
         Divider().color(ZhihuColors.border)
@@ -173,7 +178,10 @@ struct PublishArticlePage {
           .height(400)
           .fontSize(17)
           .placeholderColor(ZhihuColors.textTertiary)
-          .backgroundColor(ZhihuColors.backgroundSecondary)
+          .fontColor(ZhihuColors.text)
+          .caretColor(ZhihuColors.primary)
+          .backgroundColor(isDarkNow() ? '#3a3a44' : '#f5f6f7')
+          .border({ width: 1, color: isDarkNow() ? '#4a4a55' : '#d8d9de' })
 
         if (this.notice.length > 0) {
           Text(this.notice)
