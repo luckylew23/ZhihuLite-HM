@@ -14,6 +14,7 @@ import { photoAccessHelper } from '@kit.MediaLibraryKit';
 import { createPin } from '../api/pin';
 import { authStore } from '../store/authStore';
 import { ZhihuColors } from '../utils/theme';
+import { savePublishDraft, loadPublishDraft, clearPublishDraft } from '../utils/publishDraft';
 import { isDarkNow } from '../utils/theme';
 import { getZhihuErrorMessage } from '../utils/zhihuError';
 
@@ -47,6 +48,7 @@ struct PublishPinPage {
   @State content: string = '';
   @State submitting: boolean = false;
   @State error: string = '';
+  @State draftNotice: string = '';
   @State images: PickedImage[] = [];
 
   private async pickImages(): Promise<void> {
@@ -85,6 +87,19 @@ struct PublishPinPage {
     this.images = next;
   }
 
+  private canPublish(): boolean {
+    return (this.content.trim().length > 0 || this.images.length > 0) && !this.submitting;
+  }
+
+  aboutToAppear(): void {
+    const d = loadPublishDraft(getContext(this), 'pin');
+    if (d.title.length > 0 || d.content.length > 0) {
+      this.title = d.title;
+      this.content = d.content;
+      this.draftNotice = '已恢复上次草稿';
+    }
+  }
+
   private async submit(): Promise<void> {
     if (this.submitting) {
       return;
@@ -103,6 +118,7 @@ struct PublishPinPage {
       await createPin(toParagraphHtml(this.content), {
         title: this.title.trim(),
       });
+      clearPublishDraft(getContext(this), 'pin');
       router.back();
     } catch (e) {
       this.error = getZhihuErrorMessage(e as object);
@@ -119,7 +135,8 @@ struct PublishPinPage {
         .fontColor(ZhihuColors.text)
         .width(44)
         .onClick(() => {
-          router.back();
+          clearPublishDraft(getContext(this), 'pin');
+      router.back();
         })
       Blank()
       Text('发想法')
@@ -134,13 +151,15 @@ struct PublishPinPage {
           Text('发布')
             .fontSize(17)
             .fontWeight(FontWeight.Medium)
-            .fontColor(ZhihuColors.textInverse)
+            .fontColor(this.canPublish() ? ZhihuColors.textInverse : ZhihuColors.textTertiary)
             .height(36)
             .padding({ left: 20, right: 20 })
-            .backgroundColor(ZhihuColors.primary)
+            .backgroundColor(this.canPublish() ? ZhihuColors.primary : ZhihuColors.border)
             .borderRadius(18)
             .onClick(() => {
-              this.submit();
+              if (this.canPublish()) {
+                this.submit();
+              }
             })
         }
       }
@@ -229,7 +248,11 @@ struct PublishPinPage {
   form() {
     Scroll() {
       Column({ space: 12 }) {
-        TextInput({ text: $$this.title, placeholder: '标题（可选）' })
+        TextInput({ text: this.title, placeholder: '标题（可选）' })
+          .onChange((v: string) => {
+            this.title = v;
+            savePublishDraft(getContext(this), 'pin', this.title, this.content);
+          })
           .width('100%')
           .height(50)
           .fontSize(19)
@@ -242,7 +265,11 @@ struct PublishPinPage {
 
         Divider().color(ZhihuColors.border)
 
-        TextArea({ text: $$this.content, placeholder: '这一刻的想法…' })
+        TextArea({ text: this.content, placeholder: '这一刻的想法…' })
+          .onChange((v: string) => {
+            this.content = v;
+            savePublishDraft(getContext(this), 'pin', this.title, this.content);
+          })
           .width('100%')
           .height(220)
           .fontSize(18)
@@ -255,6 +282,13 @@ struct PublishPinPage {
 
         this.addImageButton()
 
+        if (this.draftNotice.length > 0) {
+          Text(this.draftNotice)
+            .fontSize(15)
+            .fontColor(ZhihuColors.primary)
+            .width('100%')
+            .textAlign(TextAlign.Start)
+        }
         if (this.error.length > 0) {
           Text(this.error)
             .fontSize(15)

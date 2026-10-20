@@ -9,7 +9,7 @@ import { router } from '@kit.ArkUI';
 import { createQuestion } from '../api/question';
 import { authStore } from '../store/authStore';
 import { ZhihuColors } from '../utils/theme';
-import { isDarkNow } from '../utils/theme';
+import { savePublishDraft, loadPublishDraft, clearPublishDraft } from '../utils/publishDraft';
 import { getZhihuErrorMessage } from '../utils/zhihuError';
 
 /** 纯文本 → 极简 HTML：每行一个 <p>。 */
@@ -37,6 +37,20 @@ struct PublishQuestionPage {
   @State content: string = '';
   @State submitting: boolean = false;
   @State error: string = '';
+  @State draftNotice: string = '';
+
+  private canPublish(): boolean {
+    return this.title.trim().length > 5 && !this.submitting;
+  }
+
+  aboutToAppear(): void {
+    const d = loadPublishDraft(getContext(this), 'question');
+    if (d.title.length > 0 || d.content.length > 0) {
+      this.title = d.title;
+      this.content = d.content;
+      this.draftNotice = '已恢复上次草稿';
+    }
+  }
 
   private async submit(): Promise<void> {
     if (this.submitting) {
@@ -51,6 +65,7 @@ struct PublishQuestionPage {
     this.error = '';
     try {
       await createQuestion(t, toParagraphHtml(this.content));
+      clearPublishDraft(getContext(this), 'question');
       router.back();
     } catch (e) {
       this.error = getZhihuErrorMessage(e as object);
@@ -62,10 +77,9 @@ struct PublishQuestionPage {
   @Builder
   topBar() {
     Row() {
-      Text('‹')
-        .fontSize(26)
+      Text('←')
+        .fontSize(22)
         .fontColor(ZhihuColors.text)
-        .padding({ left: 6, right: 10 })
         .width(40)
         .onClick(() => {
           router.back();
@@ -82,9 +96,11 @@ struct PublishQuestionPage {
         Text('发布')
           .fontSize(17)
           .fontWeight(FontWeight.Medium)
-          .fontColor(ZhihuColors.primary)
+          .fontColor(this.canPublish() ? ZhihuColors.primary : ZhihuColors.textTertiary)
           .onClick(() => {
-            this.submit();
+            if (this.canPublish()) {
+              this.submit();
+            }
           })
       }
     }
@@ -120,30 +136,39 @@ struct PublishQuestionPage {
   form() {
     Scroll() {
       Column({ space: 12 }) {
-        TextInput({ text: $$this.title, placeholder: '输入问题并以问号结尾' })
+        TextInput({ text: this.title, placeholder: '输入问题并以问号结尾' })
+          .onChange((v: string) => {
+            this.title = v;
+            savePublishDraft(getContext(this), 'question', this.title, this.content);
+          })
           .width('100%')
           .height(56)
           .fontSize(20)
           .fontWeight(FontWeight.Bold)
           .placeholderColor(ZhihuColors.textTertiary)
-          .fontColor(ZhihuColors.text)
-          .caretColor(ZhihuColors.primary)
-          .backgroundColor(isDarkNow() ? '#3a3a44' : '#f5f6f7')
-          .border({ width: 1, color: isDarkNow() ? '#4a4a55' : '#d8d9de' })
+          .backgroundColor(ZhihuColors.backgroundSecondary)
           .margin({ top: 8 })
 
         Divider().color(ZhihuColors.border)
 
-        TextArea({ text: $$this.content, placeholder: '补充问题背景和细节（可选）' })
+        TextArea({ text: this.content, placeholder: '补充问题背景和细节（可选）' })
+          .onChange((v: string) => {
+            this.content = v;
+            savePublishDraft(getContext(this), 'question', this.title, this.content);
+          })
           .width('100%')
           .height(320)
           .fontSize(17)
           .placeholderColor(ZhihuColors.textTertiary)
-          .fontColor(ZhihuColors.text)
-          .caretColor(ZhihuColors.primary)
-          .backgroundColor(isDarkNow() ? '#3a3a44' : '#f5f6f7')
-          .border({ width: 1, color: isDarkNow() ? '#4a4a55' : '#d8d9de' })
+          .backgroundColor(ZhihuColors.backgroundSecondary)
 
+        if (this.draftNotice.length > 0) {
+          Text(this.draftNotice)
+            .fontSize(15)
+            .fontColor(ZhihuColors.primary)
+            .width('100%')
+            .textAlign(TextAlign.Start)
+        }
         if (this.error.length > 0) {
           Text(this.error)
             .fontSize(15)

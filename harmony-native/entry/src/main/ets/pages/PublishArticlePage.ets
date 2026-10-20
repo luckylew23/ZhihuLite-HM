@@ -17,6 +17,7 @@ import {
 } from '../api/article';
 import { authStore } from '../store/authStore';
 import { ZhihuColors } from '../utils/theme';
+import { savePublishDraft, loadPublishDraft, clearPublishDraft } from '../utils/publishDraft';
 import { isDarkNow } from '../utils/theme';
 import { getZhihuErrorMessage } from '../utils/zhihuError';
 
@@ -45,7 +46,21 @@ struct PublishArticlePage {
   @State submitting: boolean = false;
   @State error: string = '';
   @State notice: string = '';
+  @State draftNotice: string = '';
   private draftId: string = '';
+
+  private canPublish(): boolean {
+    return this.title.trim().length > 0 && this.content.trim().length > 0 && !this.submitting;
+  }
+
+  aboutToAppear(): void {
+    const d = loadPublishDraft(getContext(this), 'article');
+    if (d.title.length > 0 || d.content.length > 0) {
+      this.title = d.title;
+      this.content = d.content;
+      this.draftNotice = '已恢复上次草稿';
+    }
+  }
 
   private async run(andPublish: boolean): Promise<void> {
     if (this.submitting) {
@@ -79,7 +94,8 @@ struct PublishArticlePage {
       });
       if (andPublish) {
         await publishArticleDraft(did, {}, false);
-        router.back();
+        clearPublishDraft(getContext(this), 'article');
+      router.back();
       } else {
         this.notice = '草稿已保存';
       }
@@ -99,7 +115,8 @@ struct PublishArticlePage {
         .padding({ left: 6, right: 10 })
         .width(40)
         .onClick(() => {
-          router.back();
+          clearPublishDraft(getContext(this), 'article');
+      router.back();
         })
       Blank()
       Text('写文章')
@@ -120,9 +137,11 @@ struct PublishArticlePage {
           Text('发布')
             .fontSize(17)
             .fontWeight(FontWeight.Medium)
-            .fontColor(ZhihuColors.primary)
+            .fontColor(this.canPublish() ? ZhihuColors.primary : ZhihuColors.textTertiary)
             .onClick(() => {
-              this.run(true);
+              if (this.canPublish()) {
+                this.run(true);
+              }
             })
         }
       }
@@ -159,7 +178,11 @@ struct PublishArticlePage {
   form() {
     Scroll() {
       Column({ space: 12 }) {
-        TextInput({ text: $$this.title, placeholder: '请输入标题' })
+        TextInput({ text: this.title, placeholder: '请输入标题' })
+          .onChange((v: string) => {
+            this.title = v;
+            savePublishDraft(getContext(this), 'article', this.title, this.content);
+          })
           .width('100%')
           .height(64)
           .fontSize(22)
@@ -173,7 +196,11 @@ struct PublishArticlePage {
 
         Divider().color(ZhihuColors.border)
 
-        TextArea({ text: $$this.content, placeholder: '正文内容' })
+        TextArea({ text: this.content, placeholder: '正文内容' })
+          .onChange((v: string) => {
+            this.content = v;
+            savePublishDraft(getContext(this), 'article', this.title, this.content);
+          })
           .width('100%')
           .height(400)
           .fontSize(17)
@@ -188,6 +215,13 @@ struct PublishArticlePage {
             .fontSize(15)
             .fontColor(ZhihuColors.success)
             .width('100%')
+        }
+        if (this.draftNotice.length > 0) {
+          Text(this.draftNotice)
+            .fontSize(15)
+            .fontColor(ZhihuColors.primary)
+            .width('100%')
+            .textAlign(TextAlign.Start)
         }
         if (this.error.length > 0) {
           Text(this.error)

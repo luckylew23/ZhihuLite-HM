@@ -11,6 +11,7 @@ import { router } from '@kit.ArkUI';
 import { createAnswer } from '../api/answer';
 import { authStore } from '../store/authStore';
 import { ZhihuColors } from '../utils/theme';
+import { savePublishDraft, loadPublishDraft, clearPublishDraft } from '../utils/publishDraft';
 import { isDarkNow } from '../utils/theme';
 import { getZhihuErrorMessage } from '../utils/zhihuError';
 import { readStringParam } from '../components/detail/detailUtils';
@@ -39,18 +40,31 @@ struct PublishAnswerPage {
   @State content: string = '';
   @State submitting: boolean = false;
   @State error: string = '';
+  @State draftNotice: string = '';
 
   aboutToAppear(): void {
     const p = router.getParams() as Record<string, object>;
     const qid = readStringParam(p, 'questionId');
     if (qid.length > 0) {
       this.questionId = qid;
-      return;
+    } else {
+      const id = readStringParam(p, 'id');
+      if (id.length > 0) {
+        this.questionId = id;
+      }
     }
-    const id = readStringParam(p, 'id');
-    if (id.length > 0) {
-      this.questionId = id;
+    const d = loadPublishDraft(getContext(this), 'answer');
+    if (d.title.length > 0 || d.content.length > 0) {
+      if (this.questionId.length === 0) {
+        this.questionId = d.title;
+      }
+      this.content = d.content;
+      this.draftNotice = '已恢复上次草稿';
     }
+  }
+
+  private canPublish(): boolean {
+    return this.questionId.trim().length > 0 && this.content.trim().length > 0 && !this.submitting;
   }
 
   private async submit(): Promise<void> {
@@ -71,6 +85,7 @@ struct PublishAnswerPage {
     this.error = '';
     try {
       await createAnswer(qid, toParagraphHtml(this.content), {});
+      clearPublishDraft(getContext(this), 'answer');
       router.back();
     } catch (e) {
       this.error = getZhihuErrorMessage(e as object);
@@ -101,9 +116,11 @@ struct PublishAnswerPage {
         Text('发布')
           .fontSize(17)
           .fontWeight(FontWeight.Medium)
-          .fontColor(ZhihuColors.primary)
+          .fontColor(this.canPublish() ? ZhihuColors.primary : ZhihuColors.textTertiary)
           .onClick(() => {
-            this.submit();
+            if (this.canPublish()) {
+              this.submit();
+            }
           })
       }
     }
@@ -139,7 +156,11 @@ struct PublishAnswerPage {
   form() {
     Scroll() {
       Column({ space: 12 }) {
-        TextInput({ text: $$this.questionId, placeholder: '问题 ID（如 123456789）' })
+        TextInput({ text: this.questionId, placeholder: '问题 ID（如 123456789）' })
+          .onChange((v: string) => {
+            this.questionId = v;
+            savePublishDraft(getContext(this), 'answer', this.questionId, this.content);
+          })
           .width('100%')
           .height(52)
           .fontSize(18)
@@ -153,7 +174,11 @@ struct PublishAnswerPage {
 
         Divider().color(ZhihuColors.border)
 
-        TextArea({ text: $$this.content, placeholder: '写下你的回答…' })
+        TextArea({ text: this.content, placeholder: '写下你的回答…' })
+          .onChange((v: string) => {
+            this.content = v;
+            savePublishDraft(getContext(this), 'answer', this.questionId, this.content);
+          })
           .width('100%')
           .height(360)
           .fontSize(17)
@@ -163,6 +188,13 @@ struct PublishAnswerPage {
           .backgroundColor(isDarkNow() ? '#3a3a44' : '#f5f6f7')
           .border({ width: 1, color: isDarkNow() ? '#4a4a55' : '#d8d9de' })
 
+        if (this.draftNotice.length > 0) {
+          Text(this.draftNotice)
+            .fontSize(15)
+            .fontColor(ZhihuColors.primary)
+            .width('100%')
+            .textAlign(TextAlign.Start)
+        }
         if (this.error.length > 0) {
           Text(this.error)
             .fontSize(15)
