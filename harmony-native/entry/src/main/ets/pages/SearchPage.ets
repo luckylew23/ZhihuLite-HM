@@ -425,19 +425,20 @@ struct SearchPage {
             this.startSearch(this.query);
           })
         if (this.query.length > 0) {
-          Stack() {
-            Text('✕')
-          }
-          .width(18)
-          .height(18)
-          .borderRadius(9)
-          .backgroundColor(ZhihuColors.textTertiary)
-          .margin({ right: 4 })
-          .onClick(() => {
-            this.query = '';
-            this.suggestions = [];
-            this.showSuggest = false;
-          })
+          Text('✕')
+            .fontSize(15)
+            .fontColor(ZhihuColors.textTertiary)
+            .width(20)
+            .height(20)
+            .textAlign(TextAlign.Center)
+            .border({ width: 1, color: ZhihuColors.border })
+            .borderRadius(10)
+            .margin({ right: 4 })
+            .onClick(() => {
+              this.query = '';
+              this.suggestions = [];
+              this.showSuggest = false;
+            })
         }
       }
       .layoutWeight(1)
@@ -450,7 +451,7 @@ struct SearchPage {
         .fontSize(17)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.primary)
-        .padding({ left: 6, right: 6 })
+        .padding({ left: 12, right: 8, top: 8, bottom: 8 })
         .onClick(() => {
           this.startSearch(this.query);
         })
@@ -459,6 +460,7 @@ struct SearchPage {
     .height(52)
     .padding({ left: 8, right: 8 })
     .backgroundColor(ZhihuColors.backgroundSecondary)
+    .border({ width: { bottom: 0.5 }, color: ZhihuColors.border })
   }
 
   @Builder
