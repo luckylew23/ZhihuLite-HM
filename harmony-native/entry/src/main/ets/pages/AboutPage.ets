@@ -5,12 +5,20 @@
  */
 
 import { router } from '@kit.ArkUI';
+import { common } from '@kit.AbilityKit';
 import { ZhihuColors } from '../utils/theme';
 import { APP_NAME, APP_VERSION, APP_DESC, APP_AUTHOR, APP_SOURCE, APP_HOMEPAGE } from '../utils/appInfo';
 
 @Entry
 @Component
 struct AboutPage {
+  private openLink(url: string): void {
+    const ctx = getContext(this) as common.UIAbilityContext;
+    ctx.openLink(url).catch((e: object) => {
+      console.error('openLink fail ' + String(e));
+    });
+  }
+
   @Builder
   topBar() {
     Row() {
@@ -74,17 +82,23 @@ struct AboutPage {
             .width('100%')
             .margin({ top: 4 })
 
-          Text('GitHub 主页：' + APP_HOMEPAGE)
+          Text('GitHub 主页：' + APP_HOMEPAGE.replace('https://', ''))
             .fontSize(15)
             .fontColor(ZhihuColors.primary)
             .width('100%')
             .margin({ top: 2 })
+            .onClick(() => {
+              this.openLink(APP_HOMEPAGE);
+            })
 
-          Text(APP_SOURCE)
+          Text(APP_SOURCE.replace('https://', ''))
             .fontSize(14)
-            .fontColor(ZhihuColors.textTertiary)
+            .fontColor(ZhihuColors.primary)
             .width('100%')
             .margin({ top: 16 })
+            .onClick(() => {
+              this.openLink(APP_SOURCE);
+            })
 
           Blank()
         }
