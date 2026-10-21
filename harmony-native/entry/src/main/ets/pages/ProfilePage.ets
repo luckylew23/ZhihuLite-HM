@@ -23,6 +23,7 @@ interface MenuItem {
 
 @Component
 export struct ProfilePage {
+  @Prop @Watch('onLoginChange') loginVersion: number = 0;
   @State me: ZhihuMeInfo | null = null;
   @State loggedIn: boolean = false;
   @State themeMode: ThemeMode = 'auto';
@@ -33,6 +34,11 @@ export struct ProfilePage {
     applyTheme();
     this.themeMode = settingsStore.getThemeMode();
     this.themeTick = settingsStore.getVersion();
+    this.loadMe();
+  }
+
+  /** 切换账号：重新拉取个人信息 */
+  onLoginChange(): void {
     this.loadMe();
   }
 

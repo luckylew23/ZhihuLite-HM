@@ -83,15 +83,15 @@ struct Index {
   @Builder
   pageForKey(key: string) {
     if (key === 'following') {
-      FollowingPage()
+      FollowingPage({ loginVersion: this.loginVersion })
     } else if (key === 'recommend') {
-      FeedListPage({ feedMode: 'recommend' })
+      FeedListPage({ feedMode: 'recommend', loginVersion: this.loginVersion })
     } else if (key === 'hot') {
-      FeedListPage({ feedMode: 'hot' })
+      FeedListPage({ feedMode: 'hot', loginVersion: this.loginVersion })
     } else if (key === 'daily') {
-      DailyPage()
+      DailyPage({ loginVersion: this.loginVersion })
     } else {
-      FollowingPage()
+      FollowingPage({ loginVersion: this.loginVersion })
     }
   }
 
@@ -274,11 +274,10 @@ struct Index {
         .visibility(this.outerIndex === 0 ? Visibility.Visible : Visibility.None)
 
         Column() {
-          ProfilePage()
+          ProfilePage({ loginVersion: this.loginVersion })
         }
           .width('100%')
           .height('100%')
-          .key('profile-' + String(this.loginVersion) + '-' + String(this.themeVersion))
           .visibility(this.outerIndex === 1 ? Visibility.Visible : Visibility.None)
       }
       .width('100%')

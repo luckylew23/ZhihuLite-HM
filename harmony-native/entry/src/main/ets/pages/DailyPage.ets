@@ -24,6 +24,7 @@ interface DailySection {
 
 @Component
 export struct DailyPage {
+  @Prop @Watch('onLoginChange') loginVersion: number = 0;
   @State sections: DailySection[] = [];
   @State latestDate: string = '';
   @State loading: boolean = true;
@@ -34,6 +35,14 @@ export struct DailyPage {
   private scroller: Scroller = new Scroller();
 
   aboutToAppear(): void {
+    this.loadLatest();
+  }
+
+  /** 切换账号：清空旧数据重新加载 */
+  onLoginChange(): void {
+    this.sections = [];
+    this.latestDate = '';
+    this.inFlight = false;
     this.loadLatest();
   }
 

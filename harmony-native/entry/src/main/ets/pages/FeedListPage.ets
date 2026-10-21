@@ -27,6 +27,7 @@ import { HotCard } from '../components/HotCard';
 @Component
 export struct FeedListPage {
   @Prop feedMode: string = 'recommend';
+  @Prop @Watch('onLoginChange') loginVersion: number = 0;
   @State items: FeedItem[] = [];
   @State hotItems: HotItem[] = [];
   @State loading: boolean = true;
@@ -39,6 +40,16 @@ export struct FeedListPage {
   private scroller: Scroller = new Scroller();
 
   aboutToAppear(): void {
+    this.loadFirst();
+  }
+
+  /** 登录/登出切换账号：清空旧数据并重新加载（带新 cookie） */
+  onLoginChange(): void {
+    this.items = [];
+    this.hotItems = [];
+    this.nextUrl = '';
+    this.isEnd = false;
+    this.inFlight = false;
     this.loadFirst();
   }
 

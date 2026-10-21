@@ -40,6 +40,7 @@ function formatCount(count: number): string {
 @Entry
 @Component
 export struct FollowingPage {
+  @Prop @Watch('onLoginChange') loginVersion: number = 0;
   @State recentItems: RecentMomentItem[] = [];
   @State items: FeedItem[] = [];
   @State loading: boolean = true;
@@ -53,6 +54,17 @@ export struct FollowingPage {
   private railScroller: Scroller = new Scroller();
 
   aboutToAppear(): void {
+    this.loadRecent();
+    this.loadFirst();
+  }
+
+  /** 切换账号：清空旧数据重新加载 */
+  onLoginChange(): void {
+    this.recentItems = [];
+    this.items = [];
+    this.nextUrl = '';
+    this.isEnd = false;
+    this.inFlight = false;
     this.loadRecent();
     this.loadFirst();
   }
