@@ -29,6 +29,7 @@
     "pages/ChatPage",
     "pages/SettingsAppearancePage",
     "pages/SettingsFilterPage",
+    "pages/AboutPage",
     "pages/FeedbackPage",
     "pages/FollowingPage",
     "pages/FollowManagePage",
