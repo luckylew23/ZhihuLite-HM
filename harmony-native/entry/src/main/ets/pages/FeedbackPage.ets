@@ -53,7 +53,7 @@ struct FeedbackPage {
           router.back();
         })
       Blank()
-      Text('反馈与建议')
+      Text('关于')
         .fontSize(19)
         .fontWeight(FontWeight.Medium)
         .fontColor(ZhihuColors.text)

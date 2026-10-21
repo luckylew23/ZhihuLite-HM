@@ -299,7 +299,7 @@ export struct ProfilePage {
             this.switchAccount();
           })
           Divider().strokeWidth(0.5).color(ZhihuColors.divider).margin({ left: 64 })
-          this.menuRow({ glyph: '馈', label: '反馈与建议', route: 'pages/FeedbackPage', badge: '' })
+          this.menuRow({ glyph: '关', label: '关于', route: 'pages/FeedbackPage', badge: '' })
         }
         .width('100%')
         .backgroundColor(ZhihuColors.backgroundSecondary)
