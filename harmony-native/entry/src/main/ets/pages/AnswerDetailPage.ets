@@ -158,7 +158,8 @@ struct AnswerDetailPage {
     }
     try {
       const st = await getAnswerCollectionStatus(this.answerId, 1);
-      if (st.collected === true) {
+      // 知乎状态接口：已收藏时返回的收藏夹列表(data)非空；collected 兼容字段一并判断
+      if (st.collected === true || (st.data !== undefined && st.data.length > 0)) {
         this.collected = true;
         const list = st.data ?? [];
         if (list.length > 0) {

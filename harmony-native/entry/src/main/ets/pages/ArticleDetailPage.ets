@@ -60,7 +60,7 @@ struct ArticleDetailPage {
     }
     try {
       const st = await getArticleCollectionStatus(this.articleId, 1);
-      if (st.collected === true) {
+      if (st.collected === true || (st.data !== undefined && st.data.length > 0)) {
         this.collected = true;
         const list = st.data ?? [];
         if (list.length > 0) {

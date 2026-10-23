@@ -59,7 +59,7 @@ struct DailyDetailPage {
       const st = this.collectType === 'answer'
         ? await getAnswerCollectionStatus(this.collectResourceId, 1)
         : await getArticleCollectionStatus(this.collectResourceId, 1);
-      this.collected = st.collected === true;
+      this.collected = st.collected === true || (st.data !== undefined && st.data.length > 0);
     } catch (e) {
       this.collected = false;
     }
