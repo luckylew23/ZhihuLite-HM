@@ -158,10 +158,19 @@ struct AnswerDetailPage {
     }
     try {
       const st = await getAnswerCollectionStatus(this.answerId, 1);
-      // 知乎状态接口：已收藏时返回的收藏夹列表(data)非空；collected 兼容字段一并判断
-      if (st.collected === true || (st.data !== undefined && st.data.length > 0)) {
+      // 知乎状态接口返回全部收藏夹列表；已收藏 = 顶层 collected 为 true 或列表中任一项 is_favorited
+      const list = st.data ?? [];
+      let fav = false;
+      for (const it of list) {
+        const rec = it as Record<string, object>;
+        const favStr: string = String(rec['is_favorited']);
+        if (favStr === 'true' || favStr === '1') {
+          fav = true;
+          break;
+        }
+      }
+      if (st.collected === true || fav) {
         this.collected = true;
-        const list = st.data ?? [];
         if (list.length > 0) {
           const first = list[0] as Record<string, object>;
           this.collectionId = String(first['id'] ?? '');

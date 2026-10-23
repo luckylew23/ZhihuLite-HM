@@ -59,7 +59,17 @@ struct DailyDetailPage {
       const st = this.collectType === 'answer'
         ? await getAnswerCollectionStatus(this.collectResourceId, 1)
         : await getArticleCollectionStatus(this.collectResourceId, 1);
-      this.collected = st.collected === true || (st.data !== undefined && st.data.length > 0);
+      const list = st.data ?? [];
+      let fav = false;
+      for (const it of list) {
+        const rec = it as Record<string, object>;
+        const favStr: string = String(rec['is_favorited']);
+        if (favStr === 'true' || favStr === '1') {
+          fav = true;
+          break;
+        }
+      }
+      this.collected = st.collected === true || fav;
     } catch (e) {
       this.collected = false;
     }
