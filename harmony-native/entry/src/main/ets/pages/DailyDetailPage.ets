@@ -44,8 +44,10 @@ struct DailyDetailPage {
   private fallbackTitle: string = '';
 
   onCollectPicked(): void {
-    if (this.collectPicked === this.collectResourceId) {
-      this.collected = true;
+    const prefix: string = this.collectResourceId + ':';
+    if (this.collectPicked.startsWith(prefix)) {
+      const flag: string = this.collectPicked.substring(prefix.length);
+      this.collected = flag === 'true';
       this.collectPicked = '';
     }
   }

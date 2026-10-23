@@ -48,9 +48,9 @@ export struct CollectionRow {
       if (this.pending) {
         LoadingProgress().width(20).height(20).color(ZhihuColors.primary)
       } else {
-        Text(this.isFavorited ? '●' : '○')
+        Text(this.isFavorited ? '★' : '☆')
           .fontSize(20)
-          .fontColor(this.isFavorited ? ZhihuColors.primary : ZhihuColors.textTertiary)
+          .fontColor(this.isFavorited ? ZhihuColors.warning : ZhihuColors.textTertiary)
       }
     }
     .width('100%')

@@ -42,8 +42,10 @@ struct ArticleDetailPage {
   @StorageLink('collectPicked') @Watch('onCollectPicked') collectPicked: string = '';
 
   onCollectPicked(): void {
-    if (this.collectPicked === this.articleId) {
-      this.collected = true;
+    const prefix: string = this.articleId + ':';
+    if (this.collectPicked.startsWith(prefix)) {
+      const flag: string = this.collectPicked.substring(prefix.length);
+      this.collected = flag === 'true';
       this.collectPicked = '';
     }
   }

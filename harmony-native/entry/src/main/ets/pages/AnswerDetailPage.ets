@@ -44,8 +44,10 @@ struct AnswerDetailPage {
   @State bodyBlocks: HtmlBlock[] = [];
 
   onCollectPicked(): void {
-    if (this.collectPicked === this.answerId) {
-      this.collected = true;
+    const prefix: string = this.answerId + ':';
+    if (this.collectPicked.startsWith(prefix)) {
+      const flag: string = this.collectPicked.substring(prefix.length);
+      this.collected = flag === 'true';
       this.collectPicked = '';
     }
   }
