@@ -228,7 +228,7 @@ export const createQuestion = async (
   };
   const res = await zhihuClient.post<object>(
     API_V4 + '/content/publish',
-    { data: JSON.stringify(payload), headers: { 'Content-Type': JSON_CONTENT_TYPE } },
+    { data: payload as object, headers: { 'Content-Type': JSON_CONTENT_TYPE } },
   );
   return parsePublishedContentResult(res.data);
 };

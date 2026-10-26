@@ -11,6 +11,7 @@
  */
 
 import { http } from '@kit.NetworkKit';
+import { util } from '@kit.ArkTS';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { signRequest96, hmacSha1Hex, encryptZseV4, ZSE_VERSION } from './zse96/index';
@@ -22,8 +23,8 @@ const TAG: string = 'ZhihuHttp';
 const ZHIHU_BASE: string = 'https://www.zhihu.com';
 const BOOTSTRAP_URL: string = ZHIHU_BASE + '/';
 const DESKTOP_UA: string =
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
-  '(KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36';
+  'Mozilla/5.0 (Linux; Android 14; HarmonyOS) AppleWebKit/537.36 ' +
+  '(KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36';
 
 // 知乎 oauth 固定参数（与上游 client.ts 一致）
 const OAUTH_CLIENT_ID: string = 'c3cef7c66a1843f8b3a9e6a1e3160e20';
@@ -38,7 +39,7 @@ export interface ApiResponse<T> {
 export interface RequestOptions {
   headers?: Record<string, string>;
   /** 请求体（raw string） */
-  data?: string;
+  data?: string | object;
   /** 401 时是否自动刷新会话并重试（默认 true） */
   retryOnUnauthorized?: boolean;
 }
@@ -272,9 +273,11 @@ class ZhihuHttpClient {
     }
 
     const cookie = this.jar.cookieStringFor(url);
-    const headers = await this.buildHeaders(url, options?.headers, options?.data, cookie);
+    const rawBody = options?.data ?? '';
+    const body: string = typeof rawBody === 'string' ? rawBody : JSON.stringify(rawBody);
+    const headers = await this.buildHeaders(url, options?.headers, body, cookie);
 
-    let resp = await this.doSignedRequest(method, url, headers, options?.data ?? '');
+    let resp = await this.doSignedRequest(method, url, headers, body);
     if (
       resp.status === 401 &&
       hasAuthenticationCookie(authStore.cookies) &&
@@ -283,8 +286,8 @@ class ZhihuHttpClient {
       const refreshed = await this.refreshSession();
       if (refreshed) {
         const cookie2 = this.jar.cookieStringFor(url);
-        const headers2 = await this.buildHeaders(url, options?.headers, options?.data, cookie2);
-        resp = await this.doSignedRequest(method, url, headers2, options?.data ?? '');
+        const headers2 = await this.buildHeaders(url, options?.headers, body, cookie2);
+        resp = await this.doSignedRequest(method, url, headers2, body);
       }
     }
 
@@ -305,6 +308,10 @@ class ZhihuHttpClient {
     }
     hilog.info(DOMAIN, TAG, 'req %{public}s %{public}s status=%{public}d len=%{public}d',
       method, url, resp.status, resp.body.length);
+    if (url.indexOf('content/publish') >= 0) {
+      hilog.info(DOMAIN, TAG, 'publish body=%{public}s',
+        resp.body.substring(0, 400));
+    }
     return {
       status: resp.status,
       headers: resp.headers,
@@ -340,6 +347,7 @@ class ZhihuHttpClient {
       for (const k of keys) {
         lower[k.toLowerCase()] = headers[k];
       }
+      const ct: string = (lower['content-type'] ?? '').toLowerCase();
       const options: http.HttpRequestOptions = {
         method: this.toMethod(method),
         header: headers,
@@ -350,6 +358,9 @@ class ZhihuHttpClient {
       };
       if (body && body.length > 0) {
         options.extraData = body;
+        if (url.indexOf('content/publish') >= 0) {
+          hilog.info(DOMAIN, TAG, 'send %{public}s %{public}s bodyFull=%{public}s', method, ct, body.substring(0, 200));
+        }
       }
       let resp;
       try {
@@ -435,6 +446,12 @@ class ZhihuHttpClient {
       }
     }
     headers['User-Agent'] = DESKTOP_UA;
+    headers['Accept'] = 'application/json, text/plain, */*';
+    headers['Accept-Language'] = 'zh-CN,zh;q=0.9';
+    const oriHost: string = hostOf(url);
+    headers['Origin'] = oriHost === 'zhuanlan.zhihu.com'
+      ? 'https://zhuanlan.zhihu.com'
+      : 'https://www.zhihu.com';
     if (extra) {
       const extraKeys = Object.keys(extra);
       for (const k of extraKeys) {
