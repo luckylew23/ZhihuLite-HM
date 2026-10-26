@@ -74,3 +74,4 @@ harmony/signing/verify-*
 
 # 本地备份目录
 .hmos-backup/
+zl3.log
