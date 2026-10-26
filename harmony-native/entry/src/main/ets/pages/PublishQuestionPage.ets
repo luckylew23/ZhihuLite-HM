@@ -8,7 +8,7 @@
 import { router } from '@kit.ArkUI';
 import { createQuestion } from '../api/question';
 import { authStore } from '../store/authStore';
-import { ZhihuColors } from '../utils/theme';
+import { ZhihuColors, isDarkNow } from '../utils/theme';
 import { savePublishDraft, loadPublishDraft, clearPublishDraft } from '../utils/publishDraft';
 import { getZhihuErrorMessage } from '../utils/zhihuError';
 
@@ -145,8 +145,11 @@ struct PublishQuestionPage {
           .height(56)
           .fontSize(20)
           .fontWeight(FontWeight.Bold)
+          .fontColor(ZhihuColors.text)
+          .caretColor(ZhihuColors.primary)
           .placeholderColor(ZhihuColors.textTertiary)
-          .backgroundColor(ZhihuColors.backgroundSecondary)
+          .backgroundColor(isDarkNow() ? '#3a3a44' : '#f5f6f7')
+          .border({ width: 1, color: isDarkNow() ? '#4a4a55' : '#d8d9de' })
           .margin({ top: 8 })
 
         Divider().color(ZhihuColors.border)
@@ -159,8 +162,11 @@ struct PublishQuestionPage {
           .width('100%')
           .height(320)
           .fontSize(17)
+          .fontColor(ZhihuColors.text)
+          .caretColor(ZhihuColors.primary)
           .placeholderColor(ZhihuColors.textTertiary)
-          .backgroundColor(ZhihuColors.backgroundSecondary)
+          .backgroundColor(isDarkNow() ? '#3a3a44' : '#f5f6f7')
+          .border({ width: 1, color: isDarkNow() ? '#4a4a55' : '#d8d9de' })
 
         if (this.draftNotice.length > 0) {
           Text(this.draftNotice)

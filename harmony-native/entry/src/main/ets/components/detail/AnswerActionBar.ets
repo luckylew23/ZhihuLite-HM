@@ -8,10 +8,10 @@ import { formatCount } from './detailUtils';
 
 @Component
 export struct AnswerActionBar {
-  voted: number = 0;        // 0=未投, 1=赞成, -1=反对
-  voteCount: number = 0;
-  commentCount: number = 0;
-  collected: boolean = false;
+  @Prop voted: number = 0;        // 0=未投, 1=赞成, -1=反对
+  @Prop voteCount: number = 0;
+  @Prop commentCount: number = 0;
+  @Prop collected: boolean = false;
   onVote: () => void = () => {};
   onDisagree: () => void = () => {};
   onComment: () => void = () => {};
