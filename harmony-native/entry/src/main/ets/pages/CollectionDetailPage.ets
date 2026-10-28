@@ -30,6 +30,10 @@ export struct CollectionDetailPage {
   private inFlight: boolean = false;
   private scroller: Scroller = new Scroller();
 
+  // 收藏操作事件：{resourceId}:{true|false}。取消收藏时把对应条目从当前列表移除，
+  // 不清空重建、不重置滚动位置（返回后仍停留在原清单同一位置）。
+  @StorageLink('collectPicked') @Watch('onCollectPicked') collectPicked: string = '';
+
   aboutToAppear(): void {
     const p = router.getParams() as Record<string, object>;
     if (p && p['id']) {
@@ -43,13 +47,23 @@ export struct CollectionDetailPage {
     this.loadAll();
   }
 
-  // 从详情页/收藏操作返回时刷新（首次由 aboutToAppear 加载）
-  private shownOnce: boolean = false;
+  // 从详情页返回时不再重置列表（保持滚动位置与条目），仅处理收藏状态局部变化
   onPageShow(): void {
-    if (this.shownOnce) {
-      this.fetchPage(true);
+  }
+
+  onCollectPicked(): void {
+    if (this.collectPicked.length === 0) {
+      return;
     }
-    this.shownOnce = true;
+    const sep: number = this.collectPicked.indexOf(':');
+    if (sep <= 0) {
+      return;
+    }
+    const id = this.collectPicked.substring(0, sep);
+    const flag = this.collectPicked.substring(sep + 1);
+    if (flag === 'false') {
+      this.items = this.items.filter((it: FeedItem) => it.id !== id);
+    }
   }
 
   async loadAll(): Promise<void> {
