@@ -13,3 +13,5 @@ harmony/entry/build/
 harmony/local.properties
 harmony/node_modules/
 harmony/oh_modules/
+harmony/signing/
+harmony/entry/src/main/resources/rawfile/
