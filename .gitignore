@@ -8,3 +8,8 @@ pin*.jpeg
 *.hap
 harmony-native/node_modules/
 harmony-native/signing/
+harmony/.hvigor/
+harmony/entry/build/
+harmony/local.properties
+harmony/node_modules/
+harmony/oh_modules/
