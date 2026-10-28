@@ -6,3 +6,5 @@ pin*.jpeg
 !README.md
 .DS_Store
 *.hap
+harmony-native/node_modules/
+harmony-native/signing/
