@@ -4,3 +4,5 @@ selftest*.jpeg
 pin*.jpeg
 !projectdesign.md
 !README.md
+.DS_Store
+*.hap
