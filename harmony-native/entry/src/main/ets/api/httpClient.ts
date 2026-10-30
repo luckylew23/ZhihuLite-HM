@@ -357,7 +357,19 @@ class ZhihuHttpClient {
         usingCache: false,
       };
       if (body && body.length > 0) {
-        options.extraData = body;
+        // 表单正文必须用 UTF-8 ArrayBuffer 原样发送：鸿蒙 http 对 string extraData 会按表单
+        // 字段编码（wire 变成 body=type%3Dup，知乎解析失败 → 点赞/反对/关注类请求失败）。
+        // JSON 正文 string 原样发送已被评论/收藏等接口验证可用。
+        if (ct.indexOf('application/x-www-form-urlencoded') >= 0) {
+          const enc = new util.TextEncoder();
+          const bytes = enc.encodeInto(body);
+          const buf: ArrayBuffer = bytes.buffer.slice(0, bytes.byteLength) as ArrayBuffer;
+          options.extraData = buf;
+          hilog.info(DOMAIN, TAG, 'send %{public}s form buf=%{public}d %{public}s',
+            method, bytes.byteLength, body.substring(0, 80));
+        } else {
+          options.extraData = body;
+        }
         if (url.indexOf('content/publish') >= 0) {
           hilog.info(DOMAIN, TAG, 'send %{public}s %{public}s bodyFull=%{public}s', method, ct, body.substring(0, 200));
         }
