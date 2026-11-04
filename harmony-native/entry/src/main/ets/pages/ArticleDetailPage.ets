@@ -2,12 +2,12 @@
  * pages/ArticleDetailPage —— 专栏文章详情。
  * 上游：app/article/[id].tsx。
  * 结构：自绘导航栏 + 标题 + 作者 + 正文(纯文本降级) + 点赞/评论。
- * 降级：HTML 正文剥标签用 Text 渲染，不做 WebView；文章点赞仅展示计数（本期无 voteArticle 接口）。
+ * 降级：HTML 正文剥标签用 Text 渲染，不做 WebView；文章点赞走 POST /articles/{id}/voters {voting:1}。
  */
 
 import hilog from '@ohos.hilog';
 import { router, promptAction } from '@kit.ArkUI';
-import { getArticle } from '../api/article';
+import { getArticle, voteArticle } from '../api/article';
 import { readContentCache, writeContentCache } from '../utils/cacheStore';
 
 import { getArticleCollectionStatus, removeArticleFromCollection } from '../api/collection';
@@ -36,6 +36,7 @@ struct ArticleDetailPage {
   @State article: ZhihuArticle | null = null;
   @State bodyBlocks: HtmlBlock[] = [];
   @State collected: boolean = false;
+  @State upvoted: boolean = false;
   @State upCount: number = 0;
   @State ccCount: number = 0;
   @State collectionId: string = '';
@@ -119,6 +120,7 @@ struct ArticleDetailPage {
       const a = cached.data;
       this.article = a;
       this.upCount = a.voteup_count ?? 0;
+      this.upvoted = (a.relationship?.voting ?? 0) === 1;
       this.ccCount = a.comment_count ?? 0;
       this.bodyBlocks = parseContent(a.content);
       this.loading = false;
@@ -129,6 +131,7 @@ struct ArticleDetailPage {
       const a: ZhihuArticle = await getArticle(this.articleId);
       this.article = a;
       this.upCount = a.voteup_count ?? 0;
+      this.upvoted = (a.relationship?.voting ?? 0) === 1;
       this.ccCount = a.comment_count ?? 0;
       this.bodyBlocks = parseContent(a.content);
       writeContentCache('article', this.articleId, a as object);
@@ -139,6 +142,25 @@ struct ArticleDetailPage {
       }
     } finally {
       this.loading = false;
+    }
+  }
+
+  /** 文章点赞：再点一次取消。失败时回滚并 toast 具体原因。 */
+  private async onVote(): Promise<void> {
+    if (!guardLogin()) {
+      return;
+    }
+    const prevUp: boolean = this.upvoted;
+    const prevCount: number = this.upCount;
+    this.upvoted = !prevUp;
+    this.upCount = this.upvoted ? prevCount + 1 : Math.max(0, prevCount - 1);
+    const next: 1 | 0 = this.upvoted ? 1 : 0;
+    try {
+      await voteArticle(this.articleId, next);
+    } catch (e) {
+      this.upvoted = prevUp;
+      this.upCount = prevCount;
+      promptAction.showToast({ message: '点赞失败：' + getZhihuErrorMessage(e as object), duration: 2000 });
     }
   }
 
@@ -195,9 +217,12 @@ struct ArticleDetailPage {
         .backgroundColor(ZhihuColors.backgroundSecondary)
 
         DetailActionBar({
+          upvoted: this.upvoted,
           upvoteCount: this.upCount,
           commentCount: this.ccCount,
           collected: this.collected,
+          showDownvote: false,
+          onUpvote: () => this.onVote(),
           onComment: () => this.onComment(),
           onCollect: () => this.onCollect(),
           onSave: () => this.saveContent(),

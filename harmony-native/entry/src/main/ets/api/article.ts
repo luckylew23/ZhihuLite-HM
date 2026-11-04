@@ -49,6 +49,25 @@ export const getArticle = async (
   return res.data;
 };
 
+/**
+ * 文章赞同/取消赞同（上游 zhihu--/api/zhihu/voters.ts voteContent('articles')）。
+ * 文章端点与回答不同：POST /articles/{id}/voters，body 为 {voting: 1|0}。
+ * voting: 1=赞同, 0=取消赞同。
+ */
+export const voteArticle = async (
+  id: string | number,
+  voting: 1 | 0,
+): Promise<object> => {
+  const res = await zhihuClient.post<object>(
+    API_V4 + '/articles/' + String(id) + '/voters',
+    {
+      data: JSON.stringify({ voting: voting }),
+      headers: { 'Content-Type': JSON_CONTENT_TYPE },
+    },
+  );
+  return res.data;
+};
+
 export async function createArticleDraft(title: string): Promise<ArticleDraft> {
   const payload: Record<string, ESObject> = {
     title: title,

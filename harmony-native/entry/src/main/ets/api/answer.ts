@@ -3,7 +3,7 @@
  * 改动：
  *   · axios(baseURL=https://www.zhihu.com/api/v4) → zhihuClient（全 URL）
  *   · POST/DELETE JSON body → JSON.stringify(raw string) + Content-Type
- *   · voteAnswer 表单体 encodeURIComponent 拼 raw string
+ *   · voteAnswer JSON body（与上游一致；曾改成 form-urlencoded 导致点赞失败回滚）
  *   · 上游 publishing → 本目录 ./publishing
  *   · 对象展开 → 显式构造；.map/.flatMap → 显式循环
  *   · 注：deleteAnswer/unreactAnswerSegment 走 zhihuClient.delete（与上游 DELETE 一致）。
@@ -174,18 +174,18 @@ export const getAnswer = async (
 /**
  * 赞同/反对/取消赞同。
  * type: 'up'=赞同, 'down'=反对, 'neutral'=取消赞同。
- * 表单体为 form-urlencoded：type=up。
+ * 与上游 zhihu--/api/zhihu/answer.ts 对齐：JSON body {type}。
+ * （此前用 form-urlencoded `type=up`，知乎端点会拒绝 → 点赞数 +1 后回滚。）
  */
 export const voteAnswer = async (
   id: string | number,
   type: 'up' | 'neutral' | 'down',
 ): Promise<object> => {
-  const body: string = 'type=' + encodeURIComponent(type);
   const res = await zhihuClient.post<object>(
     API_V4 + '/answers/' + String(id) + '/voters',
     {
-      data: body,
-      headers: { 'Content-Type': FORM_CONTENT_TYPE },
+      data: JSON.stringify({ type: type }),
+      headers: { 'Content-Type': JSON_CONTENT_TYPE },
     },
   );
   return res.data;

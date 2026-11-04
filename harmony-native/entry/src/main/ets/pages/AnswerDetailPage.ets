@@ -131,7 +131,10 @@ struct AnswerDetailPage {
       await voteAnswer(this.answerId, type);
     } catch (e) {
       this.voting = prev;
+      this.upvoted = prev === 1;
+      this.downvoted = prev === -1;
       this.voteCount = prevCount;
+      promptAction.showToast({ message: '点赞失败：' + getZhihuErrorMessage(e as object), duration: 2000 });
     }
   }
 
