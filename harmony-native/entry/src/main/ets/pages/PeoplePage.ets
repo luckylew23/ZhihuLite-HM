@@ -501,23 +501,38 @@ export struct PeoplePage {
         .alignItems(VerticalAlign.Top)
       }
 
+      // 计数行：与 SearchPage/FeedCard 卡片工具栏统一风格
       Row({ space: 18 }) {
         Row({ space: 4 }) {
           Text('▲')
+            .fontSize(14)
+            .fontColor(ZhihuColors.textTertiary)
           Text(formatCount(item.voteCount))
+            .fontSize(14)
+            .fontColor(ZhihuColors.textTertiary)
         }
         Row({ space: 4 }) {
           Text('○')
+            .fontSize(14)
+            .fontColor(ZhihuColors.textTertiary)
           Text(formatCount(item.commentCount))
+            .fontSize(14)
+            .fontColor(ZhihuColors.textTertiary)
         }
         if (item.favlistsCount !== undefined && item.favlistsCount > 0) {
           Row({ space: 4 }) {
             Text('☆')
+              .fontSize(14)
+              .fontColor(ZhihuColors.textTertiary)
             Text(formatCount(item.favlistsCount))
+              .fontSize(14)
+              .fontColor(ZhihuColors.textTertiary)
           }
         }
         Blank()
         Text('···')
+          .fontSize(16)
+          .fontColor(ZhihuColors.textTertiary)
       }
       .width('100%')
     }
