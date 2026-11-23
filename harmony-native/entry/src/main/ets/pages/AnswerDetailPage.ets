@@ -8,6 +8,7 @@
 import hilog from '@ohos.hilog';
 import { router, promptAction } from '@kit.ArkUI';
 import { getAnswer, voteAnswer, AnswerDetail } from '../api/answer';
+import { splitBack, openContentById } from '../utils/contentOpener';
 import { readContentCache, writeContentCache } from '../utils/cacheStore';
 
 import { getAnswerCollectionStatus, removeFromCollection } from '../api/collection';
@@ -21,15 +22,19 @@ import { formatCount, guardLogin, HtmlBlock, parseContent, readStringParam, bloc
 import { NetImage } from '../components/NetImage';
 import { RichBody } from '../components/detail/RichBody';
 import { DetailActionBar } from '../components/detail/DetailActionBar';
+import { contentVotingOf } from '../utils/voteState';
 import { common } from '@kit.AbilityKit';
 
 
 interface CachedAnswer { savedAt: number; data: AnswerDetail; }
 
-@Entry
+/** 回答详情视图（全屏页与宽屏右栏共用同一框架）。
+ *  inSplit=true 时返回按钮逐层出栈（splitBack），否则 router.back。 */
 @Component
-struct AnswerDetailPage {
-  @State answerId: string = '';
+export struct AnswerDetailView {
+  @Prop @Watch('onIdChanged') answerId: string = '';
+  @Prop inSplit: boolean = false;
+  @Prop @Watch('onRefreshTick') refreshTick: number = 0;
   @State loading: boolean = true;
   @State error: string = '';
   @State answer: AnswerDetail | null = null;
@@ -53,19 +58,26 @@ struct AnswerDetailPage {
   }
 
   aboutToAppear(): void {
-    const p = router.getParams() as Record<string, object>;
-    this.answerId = readStringParam(p, 'id');
     this.load();
   }
 
-  // 从写操作/评论返回时刷新（首次由 aboutToAppear 加载）
-  onPageShow(): void {
-    if (this.shownOnce) {
-      this.load();
-    }
-    this.shownOnce = true;
+  /** 右栏内切换到别的回答时重载 */
+  onIdChanged(): void {
+    this.load();
   }
-  private shownOnce: boolean = false;
+
+  /** 全屏壳页 onPageShow 时 bump（从写操作/评论返回刷新） */
+  onRefreshTick(): void {
+    this.load();
+  }
+
+  private goBack(): void {
+    if (this.inSplit) {
+      splitBack();
+    } else {
+      router.back();
+    }
+  }
 
   private async load(): Promise<void> {
     this.loading = true;
@@ -78,7 +90,7 @@ struct AnswerDetailPage {
     if (cached) {
       const a = cached.data;
       this.answer = a;
-      this.voting = a.relationship?.voting ?? 0;
+      this.voting = contentVotingOf(a);
       this.upvoted = this.voting === 1;
       this.downvoted = this.voting === -1;
       this.voteCount = a.voteup_count ?? 0;
@@ -90,7 +102,7 @@ struct AnswerDetailPage {
     try {
       const a: AnswerDetail = await getAnswer(this.answerId);
       this.answer = a;
-      this.voting = a.relationship?.voting ?? 0;
+      this.voting = contentVotingOf(a);
       this.upvoted = this.voting === 1;
       this.downvoted = this.voting === -1;
       this.voteCount = a.voteup_count ?? 0;
@@ -232,7 +244,7 @@ struct AnswerDetailPage {
 
   build() {
     Column() {
-      DetailNavBar({ title: '回答' })
+      DetailNavBar({ title: '回答', onBack: (): void => { this.goBack(); } })
 
       if (this.loading) {
         StatusView({ loading: true })
@@ -252,7 +264,7 @@ struct AnswerDetailPage {
                 .onClick(() => {
                   const q = this.answer?.question;
                   if (q !== undefined && String(q.id).length > 0) {
-                    router.pushUrl({ url: 'pages/QuestionDetailPage', params: { id: String(q.id) } });
+                    openContentById('questions', String(q.id), '', '', '', '', 'push');
                   }
                 })
             }
@@ -324,5 +336,49 @@ struct AnswerDetailPage {
     .width('100%')
     .height('100%')
     .backgroundColor(ZhihuColors.background)
+    // 右滑返回：全屏 = router.back()；右栏 = splitBack() 逐层出栈。
+    // PanGesture + 位移判断（SwipeGesture 有速度阈值，慢速拖动无法触发）：
+    // 水平右移超过 60vp 且水平位移大于垂直位移才算右滑，避免与正文垂直滚动冲突。
+    .gesture(
+      PanGesture({ fingers: 1 })
+        .onActionEnd((e: GestureEvent) => {
+          if (e.offsetX > 60 && Math.abs(e.offsetX) > Math.abs(e.offsetY)) {
+            this.goBack();
+          }
+        })
+    )
+  }
+}
+
+
+// ---------------------------------------------------------------------------
+// 全屏壳页（路由 pages/AnswerDetailPage）：读路由参数 + onPageShow 刷新
+// ---------------------------------------------------------------------------
+
+@Entry
+@Component
+struct AnswerDetailPage {
+  @State answerIdParam: string = '';
+  @State refreshTick: number = 0;
+  private shownOnce: boolean = false;
+
+  aboutToAppear(): void {
+    const p = router.getParams() as Record<string, object>;
+    this.answerIdParam = readStringParam(p, 'id');
+  }
+
+  onPageShow(): void {
+    if (this.shownOnce) {
+      this.refreshTick++;
+    }
+    this.shownOnce = true;
+  }
+
+  build() {
+    Column() {
+      AnswerDetailView({ answerId: this.answerIdParam, inSplit: false, refreshTick: this.refreshTick })
+    }
+    .width('100%')
+    .height('100%')
   }
 }

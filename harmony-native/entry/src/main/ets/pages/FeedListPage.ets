@@ -23,6 +23,7 @@ import { cacheWrite, cacheRead, CACHE_TWO_DAYS_MS, HotCachePayload, writeContent
 import { getQuestion } from '../api/question';
 import { FeedCard } from '../components/FeedCard';
 import { HotCard } from '../components/HotCard';
+import { openFeedItem, openContentById } from '../utils/contentOpener';
 
 @Component
 export struct FeedListPage {
@@ -227,60 +228,13 @@ export struct FeedListPage {
   }
 
   private openDetail(item: FeedItem): void {
-    // 按 feed 类型分发到新详情页
-    const t: string = item.type;
-    if (t === 'questions') {
-      router.pushUrl({
-        url: 'pages/QuestionDetailPage',
-        params: { id: item.questionId ?? item.id },
-      });
-    } else if (t === 'answers') {
-      router.pushUrl({
-        url: 'pages/AnswerDetailPage',
-        params: { id: item.id },
-      });
-    } else if (t === 'articles') {
-      router.pushUrl({
-        url: 'pages/ArticleDetailPage',
-        params: { id: item.id },
-      });
-    } else if (t === 'pins') {
-      router.pushUrl({
-        url: 'pages/PinDetailPage',
-        params: { id: item.id },
-      });
-    } else if (t === 'videos') {
-      router.pushUrl({
-        url: 'pages/VideoPage',
-        params: {
-          id: item.id,
-          title: item.title ?? '',
-          author: item.author?.name ?? '',
-          description: item.excerpt ?? '',
-        },
-      });
-    } else {
-      // 无法识别类型保留跳旧 DetailPage
-      router.pushUrl({
-        url: 'pages/DetailPage',
-        params: {
-          id: item.id,
-          type: item.type,
-          title: item.title,
-          excerpt: item.excerpt,
-          url: item.url ?? '',
-          questionId: item.questionId ?? '',
-        },
-      });
-    }
+    // 统一入口：宽屏（平板/PC）→ 右栏打开；竖屏 → 路由详情页
+    openFeedItem(item);
   }
 
   private openHotDetail(item: HotItem): void {
-    // v1.3.0：热榜条目均为问题，直接跳原生问题详情页（不再走旧 DetailPage/浏览器）
-    router.pushUrl({
-      url: 'pages/QuestionDetailPage',
-      params: { id: item.questionId.length > 0 ? item.questionId : item.id },
-    });
+    // v1.3.0：热榜条目均为问题；宽屏走右栏，竖屏路由问题详情页
+    openContentById('questions', item.questionId.length > 0 ? item.questionId : item.id);
   }
 
   @Builder

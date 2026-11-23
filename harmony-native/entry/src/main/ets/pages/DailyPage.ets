@@ -14,6 +14,7 @@ import {
 } from '../api/daily';
 import { ZhihuColors } from '../utils/theme';
 import { cacheWrite, cacheRead, CACHE_TWO_DAYS_MS, DailyCachePayload, writeContentCache } from '../utils/cacheStore';
+import { openContentById } from '../utils/contentOpener';
 import { getDailyDetail } from '../api/daily';
 
 /** 一期日报：日期 + 该期故事 */
@@ -213,10 +214,8 @@ export struct DailyPage {
   }
 
   private openStory(story: DailyStory): void {
-    router.pushUrl({
-      url: 'pages/DailyDetailPage',
-      params: { id: String(story.id), title: story.title ?? '' },
-    });
+    // 宽屏 → 右栏打开；竖屏 → 路由日报详情页
+    openContentById('daily', String(story.id), '', story.title ?? '');
   }
 
   @Builder

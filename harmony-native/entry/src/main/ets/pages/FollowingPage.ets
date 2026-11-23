@@ -20,6 +20,7 @@ import {
   ZhihuFeedResponse,
 } from '../api/feed';
 import { parseFollowingData } from '../api/feedParser';
+import { openFeedItem } from '../utils/contentOpener';
 import {
   fetchRecentMoments,
   RecentMomentItem,
@@ -150,40 +151,8 @@ export struct FollowingPage {
   }
 
   private openDetail(item: FeedItem): void {
-    const t: string = item.type;
-    if (t === 'questions') {
-      router.pushUrl({
-        url: 'pages/QuestionDetailPage',
-        params: { id: item.questionId ?? item.id },
-      });
-    } else if (t === 'answers') {
-      router.pushUrl({
-        url: 'pages/AnswerDetailPage',
-        params: { id: item.id },
-      });
-    } else if (t === 'articles') {
-      router.pushUrl({
-        url: 'pages/ArticleDetailPage',
-        params: { id: item.id },
-      });
-    } else if (t === 'pins') {
-      router.pushUrl({
-        url: 'pages/PinDetailPage',
-        params: { id: item.id },
-      });
-    } else {
-      router.pushUrl({
-        url: 'pages/DetailPage',
-        params: {
-          id: item.id,
-          type: item.type,
-          title: item.title,
-          excerpt: item.excerpt,
-          url: item.url ?? '',
-          questionId: item.questionId ?? '',
-        },
-      });
-    }
+    // 统一入口：宽屏（平板/PC）→ 右栏打开；竖屏 → 路由详情页
+    openFeedItem(item);
   }
 
   @Builder

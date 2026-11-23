@@ -1,5 +1,6 @@
 /**
  * components/detail/DetailNavBar —— 详情族自绘顶部栏：左侧返回 + 中间标题。
+ * onBack 不传时默认 router.back()；右栏（分栏）模式传入关闭内容栏。
  */
 
 import { router } from '@kit.ArkUI';
@@ -8,6 +9,9 @@ import { ZhihuColors } from '../../utils/theme';
 @Component
 export struct DetailNavBar {
   @Prop title: string = '';
+  onBack: () => void = (): void => {
+    router.back();
+  };
 
   build() {
     Row() {
@@ -16,7 +20,7 @@ export struct DetailNavBar {
         .fontColor(ZhihuColors.text)
         .padding({ left: 6, right: 10 })
         .onClick(() => {
-          router.back();
+          this.onBack();
         })
       Text(this.title)
         .fontSize(19)

@@ -30,6 +30,7 @@ import { ZhihuColors } from '../utils/theme';
 import { formatRelativeTime } from '../utils/date';
 import { isDarkNow } from '../utils/theme';
 import { stripHtml } from '../components/interaction/textUtil';
+import { isCommentLiked } from '../utils/voteState';
 
 interface RootChildState {
   rootKey: string;
@@ -179,8 +180,7 @@ struct CommentsPage {
   }
 
   private liked(item: CommentItem): boolean {
-    const rel = item.relationship;
-    return rel !== undefined && rel !== null && rel.voting === 1;
+    return isCommentLiked(item);
   }
 
   private disliked(item: CommentItem): boolean {

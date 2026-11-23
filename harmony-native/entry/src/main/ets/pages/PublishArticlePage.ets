@@ -9,7 +9,7 @@
  *       富文本/图片未移植，正文按行序列化为 <p> 段落 HTML。
  */
 
-import { router } from '@kit.ArkUI';
+import { router, promptAction } from '@kit.ArkUI';
 import {
   createArticleDraft,
   updateArticleDraft,
@@ -93,9 +93,18 @@ struct PublishArticlePage {
         can_reward: false,
       });
       if (andPublish) {
-        await publishArticleDraft(did, {}, false);
+        // 对齐上游 updateArticle：发布必须传 isPublished=true（false 只是存草稿，
+        // 服务端返回"标题和内容不能为空"且内容永远不会出现在主页）
+        const result = await publishArticleDraft(did, {}, true);
         clearPublishDraft(getContext(this), 'article');
-      router.back();
+        const id: string = result.id !== undefined ? String(result.id) : '';
+        if (id.length > 0) {
+          // 发布成功 → 直接进文章详情页（有可见反馈，避免"没报错但不知道成没成"）
+          router.replaceUrl({ url: 'pages/ArticleDetailPage', params: { id: id } });
+        } else {
+          promptAction.showToast({ message: '发布成功', duration: 2000 });
+          router.back();
+        }
       } else {
         this.notice = '草稿已保存';
       }

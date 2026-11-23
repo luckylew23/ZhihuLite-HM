@@ -9,6 +9,7 @@
  */
 
 import { zhihuClient, ApiResponse } from './httpClient';
+import { normalizeVoting } from '../utils/voteState';
 
 const API_V4: string = 'https://www.zhihu.com/api/v4';
 
@@ -136,7 +137,7 @@ export interface CommentItem {
   author: CommentAuthor;
   vote_count?: number;
   reply_to_author?: CommentAuthor | null;
-  voting?: boolean;
+  voting?: boolean | number;
   censor_status?: number;
   address_text?: string;
   child_comment_count: number;
@@ -145,6 +146,7 @@ export interface CommentItem {
   relationship?: {
     voting: number;
   };
+  is_liked?: boolean;
   is_visible_only_to_myself?: boolean;
   _?: object;
   level_tag?: number;
@@ -578,11 +580,31 @@ const normalizeComment = (raw: object): CommentItem => {
     out['vote_count'] = out['like_count'];
   }
 
-  // 4. 点赞状态（V5 是 liked）
-  if (out['relationship'] === undefined && typeof out['liked'] === 'boolean') {
-    out['relationship'] = {
-      voting: (out['liked'] as boolean) ? 1 : 0,
-    } as object;
+  // 4. 点赞状态：形态不统一（voting 可能是数字/字符串/布尔，V5 用 liked 布尔，
+  //    旧端点还有 is_liked）。统一归一化成 relationship.voting 数字，
+  //    展示层用 isCommentLiked() 兜底读取。
+  {
+    const rawRel = out['relationship'] as Record<string, object> | undefined;
+    if (rawRel !== undefined && rawRel !== null) {
+      rawRel['voting'] = normalizeVoting(rawRel['voting']) as unknown as object;
+    } else if (typeof out['liked'] === 'boolean') {
+      out['relationship'] = {
+        voting: (out['liked'] as boolean) ? 1 : 0,
+      } as object;
+    } else if (typeof out['is_liked'] === 'boolean') {
+      out['relationship'] = {
+        voting: (out['is_liked'] as boolean) ? 1 : 0,
+      } as object;
+    } else if (typeof out['voting'] === 'boolean') {
+      // 旧端点把 voting 当 liked 用
+      out['relationship'] = {
+        voting: (out['voting'] as boolean) ? 1 : 0,
+      } as object;
+    } else if (typeof out['voting'] === 'string' || typeof out['voting'] === 'number') {
+      out['relationship'] = {
+        voting: normalizeVoting(out['voting']),
+      } as object;
+    }
   }
 
   // 5. 递归处理子评论

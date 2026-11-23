@@ -100,8 +100,9 @@ export struct FeedCard {
       // 统计行
       Row({ space: 16 }) {
         Row({ space: 4 }) {
-          Text('▲')
-            .fontSize(14).fontColor(ZhihuColors.textTertiary)
+          Text(this.item.voted === 1 ? '▲' : '△')
+            .fontSize(14)
+            .fontColor(this.item.voted === 1 ? ZhihuColors.primary : ZhihuColors.textTertiary)
           Text(formatCount(this.item.voteCount))
             .fontSize(15).fontColor(ZhihuColors.textSecondary)
         }

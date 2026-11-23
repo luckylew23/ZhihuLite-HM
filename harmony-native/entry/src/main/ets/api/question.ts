@@ -213,10 +213,21 @@ export const createQuestion = async (
   title: string,
   html: string,
 ): Promise<PublishedContentResult> => {
+  // 与文章发布对齐：web 端 content/publish 都会带 extra_info.publisher=pc。
+  // 缺少该字段时服务端返回 4000「invalid character 'b'」伪装成 JSON 解析错误。
+  const businessParams: string = JSON.stringify({
+    commentPermission: 'anyone',
+    disclaimer_type: 'none',
+    disclaimer_status: 'close',
+  });
   const payload: Record<string, ESObject> = {
     action: 'question',
     data: {
       publish: { traceId: createPublishingTraceId() },
+      extra_info: {
+        publisher: 'pc',
+        pc_business_params: businessParams,
+      },
       draft: { isPublished: false, disabled: 1 },
       question: {
         title: title,

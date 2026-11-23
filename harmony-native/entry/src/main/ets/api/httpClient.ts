@@ -12,6 +12,7 @@
 
 import { http } from '@kit.NetworkKit';
 import { util } from '@kit.ArkTS';
+import { webview } from '@kit.ArkWeb';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { signRequest96, hmacSha1Hex, encryptZseV4, ZSE_VERSION } from './zse96/index';
@@ -271,6 +272,12 @@ class ZhihuHttpClient {
     if (this.jar.size() === 0 && authStore.cookies.length > 0) {
       this.jar.hydrate(authStore.cookies);
     }
+    if (url.indexOf('content/publish') >= 0) {
+      // 上游对齐：RN 版 cookie 来源是 WebView cookie store 镜像（cookie-manager），
+      // 知乎页面 JS 写入的 __zse_ck 等防爬 cookie 天然随请求带上；原生 jar 没有。
+      // 发布前从应用 WebView cookie store 合并一次（合并语义：同名覆盖、新名追加）。
+      this.syncWebViewCookies();
+    }
 
     const cookie = this.jar.cookieStringFor(url);
     const rawBody = options?.data ?? '';
@@ -308,9 +315,9 @@ class ZhihuHttpClient {
     }
     hilog.info(DOMAIN, TAG, 'req %{public}s %{public}s status=%{public}d len=%{public}d',
       method, url, resp.status, resp.body.length);
-    if (url.indexOf('content/publish') >= 0) {
-      hilog.info(DOMAIN, TAG, 'publish body=%{public}s',
-        resp.body.substring(0, 400));
+    // 发布接口的响应体必须落日志（发布结果形态多变，排查 200 但未发布成功的问题）
+    if (url.indexOf('content/publish') >= 0 || url.indexOf('/draft') >= 0) {
+      hilog.info(DOMAIN, TAG, 'publish resp body: %{public}s', resp.body.substring(0, 300));
     }
     return {
       status: resp.status,
@@ -342,12 +349,6 @@ class ZhihuHttpClient {
   ): Promise<{ status: number; headers: Record<string, string>; body: string }> {
     const req = http.createHttp();
     try {
-      const lower: Record<string, string> = {};
-      const keys = Object.keys(headers);
-      for (const k of keys) {
-        lower[k.toLowerCase()] = headers[k];
-      }
-      const ct: string = (lower['content-type'] ?? '').toLowerCase();
       const options: http.HttpRequestOptions = {
         method: this.toMethod(method),
         header: headers,
@@ -357,22 +358,16 @@ class ZhihuHttpClient {
         usingCache: false,
       };
       if (body && body.length > 0) {
-        // 表单正文必须用 UTF-8 ArrayBuffer 原样发送：鸿蒙 http 对 string extraData 会按表单
-        // 字段编码（wire 变成 body=type%3Dup，知乎解析失败 → 点赞/反对/关注类请求失败）。
-        // JSON 正文 string 原样发送已被评论/收藏等接口验证可用。
-        if (ct.indexOf('application/x-www-form-urlencoded') >= 0) {
-          const enc = new util.TextEncoder();
-          const bytes = enc.encodeInto(body);
-          const buf: ArrayBuffer = bytes.buffer.slice(0, bytes.byteLength) as ArrayBuffer;
-          options.extraData = buf;
-          hilog.info(DOMAIN, TAG, 'send %{public}s form buf=%{public}d %{public}s',
-            method, bytes.byteLength, body.substring(0, 80));
-        } else {
-          options.extraData = body;
-        }
-        if (url.indexOf('content/publish') >= 0) {
-          hilog.info(DOMAIN, TAG, 'send %{public}s %{public}s bodyFull=%{public}s', method, ct, body.substring(0, 200));
-        }
+        // 【根因修复】@ohos.net.http 对 string extraData 会做表单编码：wire 上变成
+        // "body=<urlencoded>"（JSON 整体被 urlencode，Content-Length 膨胀 256 字节）。
+        // 所有 POST body 一律走 UTF-8 ArrayBuffer 原样发送，与上游 axios raw body
+        // 行为一致（httpbin wire 级回显已双向验证：string 路径确实被改写、
+        // ArrayBuffer 路径字节原样到达）。注意：知乎 content/publish 对第三方客户端
+        // 直调已全面封禁（上游 RN 版同样失败），该接口请走 WebView 官方发布页。
+        const enc = new util.TextEncoder();
+        const bytes = enc.encodeInto(body);
+        const buf: ArrayBuffer = bytes.buffer.slice(0, bytes.byteLength) as ArrayBuffer;
+        options.extraData = buf;
       }
       let resp;
       try {
@@ -459,11 +454,16 @@ class ZhihuHttpClient {
     }
     headers['User-Agent'] = DESKTOP_UA;
     headers['Accept'] = 'application/json, text/plain, */*';
-    headers['Accept-Language'] = 'zh-CN,zh;q=0.9';
-    const oriHost: string = hostOf(url);
-    headers['Origin'] = oriHost === 'zhuanlan.zhihu.com'
-      ? 'https://zhuanlan.zhihu.com'
-      : 'https://www.zhihu.com';
+    // 上游 axios/XHR 对齐：RN XHR 从不发 Origin / Accept-Language。
+    // content/publish 风控敏感，这两个"浏览器味"多余头反而构成指纹差异
+    // （上游 client.ts buildZhihuAuthHeaders 无这两个头，仅 oauth 段有 Origin）。
+    if (url.indexOf('content/publish') < 0) {
+      headers['Accept-Language'] = 'zh-CN,zh;q=0.9';
+      const oriHost: string = hostOf(url);
+      headers['Origin'] = oriHost === 'zhuanlan.zhihu.com'
+        ? 'https://zhuanlan.zhihu.com'
+        : 'https://www.zhihu.com';
+    }
     if (extra) {
       const extraKeys = Object.keys(extra);
       for (const k of extraKeys) {
@@ -471,6 +471,28 @@ class ZhihuHttpClient {
       }
     }
     return headers;
+  }
+
+  /**
+   * 从应用 WebView cookie store 读取 zhihu.com 域 cookie 并合并进原生 jar。
+   * 上游 RN 版通过 react-native-cookie-manager 直接以 WebView store 为 cookie
+   * 来源，知乎页面 JS 写入的 __zse_ck 防爬 cookie 天然可用；原生 jar 拿不到。
+   */
+  private syncWebViewCookies(): void {
+    try {
+      const webCookie: string = webview.WebCookieManager.getCookie(ZHIHU_BASE);
+      if (webCookie && webCookie.length > 0) {
+        this.jar.hydrate(webCookie);
+        const hasZseCk = webCookie.indexOf('__zse_ck=') >= 0;
+        const hasZc0 = webCookie.indexOf('z_c0=') >= 0;
+        hilog.info(DOMAIN, TAG, 'webCookieSync len=%{public}d zseCk=%{public}d zc0=%{public}d',
+          webCookie.length, hasZseCk ? 1 : 0, hasZc0 ? 1 : 0);
+      } else {
+        hilog.info(DOMAIN, TAG, 'webCookieSync empty (no WebView cookies)');
+      }
+    } catch (e) {
+      hilog.warn(DOMAIN, TAG, 'webCookieSync failed: %{public}s', String(e));
+    }
   }
 
   private dc0Of(cookie: string): string {
@@ -568,12 +590,25 @@ class ZhihuHttpClient {
 
   // ---------- 工具 ----------
 
+  /**
+   * 保护 JSON 里的长整型 id（知乎 V5 评论/内容 id 是 19 位雪花 ID，
+   * 超过 Number.MAX_SAFE_INTEGER，JSON.parse 会丢精度 → 用错误 id 调
+   * /comments/{id}/like 导致部分评论点赞失败）。解析前把 id 类字段的
+   * 15 位以上整数值转成字符串；所有调用处都通过 String(id) 拼 URL，兼容。
+   */
+  private protectBigIntIds(text: string): string {
+    return text.replace(
+      /("(?:id|comment_id|reply_comment_id|reply_root_comment_id|root_comment_id|resource_id|answer_id|question_id|content_id|author_id|member_id|pin_id|child_comment_id)"\s*:\s*)(-?\d{15,})(?=\s*[,}\]])/g,
+      '$1"$2"',
+    );
+  }
+
   private tryParse(text: string): Record<string, object> {
     if (!text || text.length === 0) {
       return {};
     }
     try {
-      const obj = JSON.parse(text) as Record<string, object>;
+      const obj = JSON.parse(this.protectBigIntIds(text)) as Record<string, object>;
       return obj || {};
     } catch (e) {
       return {};
@@ -590,7 +625,7 @@ class ZhihuHttpClient {
       throw new ApiError('响应为空', 0, -1, text);
     }
     try {
-      const obj = JSON.parse(text) as Record<string, object>;
+      const obj = JSON.parse(this.protectBigIntIds(text)) as Record<string, object>;
       // 知乎业务错误：{"error":{"code":101,"name":"AuthenticationError","message":"ZERR_NOT_LOGIN"}}
       // HTTP 200 但业务失败（如未登录搜索）——统一抛 ApiError，页面可识别
       const err = obj['error'];

@@ -13,15 +13,18 @@ import { ZhihuColors } from '../utils/theme';
 import { formatDateTime } from '../utils/date';
 import { getZhihuErrorMessage } from '../utils/zhihuError';
 import { DetailNavBar } from '../components/detail/DetailNavBar';
+import { splitBack } from '../utils/contentOpener';
 import { StatusView } from '../components/detail/StatusView';
 import { formatCount, HtmlBlock, parseContent, readStringParam, blocksToMarkdown, saveMarkdownToFile } from '../components/detail/detailUtils';
 import { RichBody } from '../components/detail/RichBody';
 import { DetailActionBar } from '../components/detail/DetailActionBar';
 
-@Entry
+/** 想法详情视图（全屏页与宽屏右栏共用同一框架）。 */
 @Component
-struct PinDetailPage {
-  @State pinId: string = '';
+export struct PinDetailView {
+  @Prop @Watch('onIdChanged') pinId: string = '';
+  @Prop inSplit: boolean = false;
+  @Prop @Watch('onRefreshTick') refreshTick: number = 0;
   @State loading: boolean = true;
   @State error: string = '';
   @State pin: ZhihuPinDetail | null = null;
@@ -30,9 +33,23 @@ struct PinDetailPage {
   @State commentCount: number = 0;
 
   aboutToAppear(): void {
-    const p = router.getParams() as Record<string, object>;
-    this.pinId = readStringParam(p, 'id');
     this.load();
+  }
+
+  onIdChanged(): void {
+    this.load();
+  }
+
+  onRefreshTick(): void {
+    this.load();
+  }
+
+  private goBack(): void {
+    if (this.inSplit) {
+      splitBack();
+    } else {
+      router.back();
+    }
   }
 
   private async load(): Promise<void> {
@@ -83,7 +100,7 @@ struct PinDetailPage {
 
   build() {
     Column() {
-      DetailNavBar({ title: '想法' })
+      DetailNavBar({ title: '想法', onBack: (): void => { this.goBack(); } })
 
       if (this.loading) {
         StatusView({ loading: true })
@@ -144,5 +161,40 @@ struct PinDetailPage {
     .width('100%')
     .height('100%')
     .backgroundColor(ZhihuColors.background)
+    // 右滑返回：全屏 = router.back()；右栏 = splitBack() 逐层出栈。
+    // PanGesture + 位移判断（SwipeGesture 有速度阈值，慢速拖动无法触发）：
+    // 水平右移超过 60vp 且水平位移大于垂直位移才算右滑，避免与正文垂直滚动冲突。
+    .gesture(
+      PanGesture({ fingers: 1 })
+        .onActionEnd((e: GestureEvent) => {
+          if (e.offsetX > 60 && Math.abs(e.offsetX) > Math.abs(e.offsetY)) {
+            this.goBack();
+          }
+        })
+    )
+  }
+}
+
+
+// ---------------------------------------------------------------------------
+// 全屏壳页（路由 pages/PinDetailPage）
+// ---------------------------------------------------------------------------
+
+@Entry
+@Component
+struct PinDetailPage {
+  @State pinIdParam: string = '';
+
+  aboutToAppear(): void {
+    const p = router.getParams() as Record<string, object>;
+    this.pinIdParam = readStringParam(p, 'id');
+  }
+
+  build() {
+    Column() {
+      PinDetailView({ pinId: this.pinIdParam, inSplit: false })
+    }
+    .width('100%')
+    .height('100%')
   }
 }

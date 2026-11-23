@@ -17,20 +17,24 @@ import { formatDate } from '../utils/date';
 import { getZhihuErrorMessage } from '../utils/zhihuError';
 import { writeDebugLog } from '../utils/debugLog';
 import { DetailNavBar } from '../components/detail/DetailNavBar';
+import { splitBack } from '../utils/contentOpener';
 import { StatusView } from '../components/detail/StatusView';
 import { NetImage } from '../components/NetImage';
 import { formatCount, guardLogin, HtmlBlock, parseContent, readStringParam, blocksToMarkdown, saveMarkdownToFile } from '../components/detail/detailUtils';
 import { RichBody } from '../components/detail/RichBody';
 import { DetailActionBar } from '../components/detail/DetailActionBar';
+import { contentVotingOf } from '../utils/voteState';
 import { common } from '@kit.AbilityKit';
 
 
 interface CachedArticle { savedAt: number; data: ZhihuArticle; }
 
-@Entry
+/** 文章详情视图（全屏页与宽屏右栏共用同一框架）。 */
 @Component
-struct ArticleDetailPage {
-  @State articleId: string = '';
+export struct ArticleDetailView {
+  @Prop @Watch('onIdChanged') articleId: string = '';
+  @Prop inSplit: boolean = false;
+  @Prop @Watch('onRefreshTick') refreshTick: number = 0;
   @State loading: boolean = true;
   @State error: string = '';
   @State article: ZhihuArticle | null = null;
@@ -52,9 +56,23 @@ struct ArticleDetailPage {
   }
 
   aboutToAppear(): void {
-    const p = router.getParams() as Record<string, object>;
-    this.articleId = readStringParam(p, 'id');
     this.load();
+  }
+
+  onIdChanged(): void {
+    this.load();
+  }
+
+  onRefreshTick(): void {
+    this.load();
+  }
+
+  private goBack(): void {
+    if (this.inSplit) {
+      splitBack();
+    } else {
+      router.back();
+    }
   }
 
   private async refreshCollectionStatus(): Promise<void> {
@@ -120,7 +138,7 @@ struct ArticleDetailPage {
       const a = cached.data;
       this.article = a;
       this.upCount = a.voteup_count ?? 0;
-      this.upvoted = (a.relationship?.voting ?? 0) === 1;
+      this.upvoted = contentVotingOf(a) === 1;
       this.ccCount = a.comment_count ?? 0;
       this.bodyBlocks = parseContent(a.content);
       this.loading = false;
@@ -131,7 +149,7 @@ struct ArticleDetailPage {
       const a: ZhihuArticle = await getArticle(this.articleId);
       this.article = a;
       this.upCount = a.voteup_count ?? 0;
-      this.upvoted = (a.relationship?.voting ?? 0) === 1;
+      this.upvoted = contentVotingOf(a) === 1;
       this.ccCount = a.comment_count ?? 0;
       this.bodyBlocks = parseContent(a.content);
       writeContentCache('article', this.articleId, a as object);
@@ -173,7 +191,7 @@ struct ArticleDetailPage {
 
   build() {
     Column() {
-      DetailNavBar({ title: this.article ? this.article.title : '文章' })
+      DetailNavBar({ title: this.article ? this.article.title : '文章', onBack: (): void => { this.goBack(); } })
 
       if (this.loading) {
         StatusView({ loading: true })
@@ -234,5 +252,49 @@ struct ArticleDetailPage {
     .width('100%')
     .height('100%')
     .backgroundColor(ZhihuColors.background)
+    // 右滑返回：全屏 = router.back()；右栏 = splitBack() 逐层出栈。
+    // PanGesture + 位移判断（SwipeGesture 有速度阈值，慢速拖动无法触发）：
+    // 水平右移超过 60vp 且水平位移大于垂直位移才算右滑，避免与正文垂直滚动冲突。
+    .gesture(
+      PanGesture({ fingers: 1 })
+        .onActionEnd((e: GestureEvent) => {
+          if (e.offsetX > 60 && Math.abs(e.offsetX) > Math.abs(e.offsetY)) {
+            this.goBack();
+          }
+        })
+    )
+  }
+}
+
+
+// ---------------------------------------------------------------------------
+// 全屏壳页（路由 pages/ArticleDetailPage）
+// ---------------------------------------------------------------------------
+
+@Entry
+@Component
+struct ArticleDetailPage {
+  @State articleIdParam: string = '';
+  @State refreshTick: number = 0;
+  private shownOnce: boolean = false;
+
+  aboutToAppear(): void {
+    const p = router.getParams() as Record<string, object>;
+    this.articleIdParam = readStringParam(p, 'id');
+  }
+
+  onPageShow(): void {
+    if (this.shownOnce) {
+      this.refreshTick++;
+    }
+    this.shownOnce = true;
+  }
+
+  build() {
+    Column() {
+      ArticleDetailView({ articleId: this.articleIdParam, inSplit: false, refreshTick: this.refreshTick })
+    }
+    .width('100%')
+    .height('100%')
   }
 }

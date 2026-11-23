@@ -1,10 +1,10 @@
 {
   "app": {
-    "bundleName": "com.zhihulite.hmos",
+    "bundleName": "Mila.ZhihuLite.HM",
     "bundleType": "app",
     "vendor": "ZhihuLite-HM",
-    "versionCode": 154,
-    "versionName": "0.3.61",
+    "versionCode": 155,
+    "versionName": "0.3.62",
     "icon": "$media:app_icon",
     "label": "$string:app_name",
     "description": "$string:description_application"

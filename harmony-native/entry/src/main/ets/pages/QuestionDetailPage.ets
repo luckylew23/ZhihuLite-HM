@@ -23,6 +23,7 @@ import { readContentCache, writeContentCache } from '../utils/cacheStore';
 
 import { getZhihuErrorMessage } from '../utils/zhihuError';
 import { DetailNavBar } from '../components/detail/DetailNavBar';
+import { splitBack } from '../utils/contentOpener';
 import { AnswerCard } from '../components/detail/AnswerCard';
 import {
 
@@ -37,10 +38,12 @@ interface CachedQuestion { savedAt: number; data: ZhihuQuestionDetail; }
 const ANSWER_INCLUDE: string =
   'data[*].content,excerpt,voteup_count,comment_count,favlists_count,author.name,author.avatar_url,author.headline,author.is_following,relationship.voting,relationship.is_author,created_time,updated_time,ip_info,segment_infos';
 
-@Entry
+/** 问题详情视图（全屏页与宽屏右栏共用同一框架）。 */
 @Component
-struct QuestionDetailPage {
-  @State qId: string = '';
+export struct QuestionDetailView {
+  @Prop @Watch('onIdChanged') qId: string = '';
+  @Prop inSplit: boolean = false;
+  @Prop @Watch('onRefreshTick') refreshTick: number = 0;
   @State loadingQ: boolean = true;
   @State qError: string = '';
   @State question: ZhihuQuestionDetail | null = null;
@@ -58,20 +61,28 @@ struct QuestionDetailPage {
   private scroller: Scroller = new Scroller();
 
   aboutToAppear(): void {
-    const p = router.getParams() as Record<string, object>;
-    this.qId = readStringParam(p, 'id');
     this.loadQuestion();
     this.loadAnswers(true);
   }
 
-  // 从写回答/评论/点赞返回时刷新（首次由 aboutToAppear 加载，避免双请求）
-  onPageShow(): void {
-    if (this.shownOnce) {
-      this.loadQuestion();
-    }
-    this.shownOnce = true;
+  /** 右栏内切换到别的问题时重载 */
+  onIdChanged(): void {
+    this.loadQuestion();
+    this.loadAnswers(true);
   }
-  private shownOnce: boolean = false;
+
+  /** 全屏壳页 onPageShow 时 bump（从写回答/评论/点赞返回刷新） */
+  onRefreshTick(): void {
+    this.loadQuestion();
+  }
+
+  private goBack(): void {
+    if (this.inSplit) {
+      splitBack();
+    } else {
+      router.back();
+    }
+  }
 
   private async loadQuestion(): Promise<void> {
     this.loadingQ = true;
@@ -218,7 +229,8 @@ struct QuestionDetailPage {
 
   /** 从 detail HTML 中抽取图片地址（网友自述配图）。 */
   private detailImages(): string[] {
-    const raw: string = this.question?.detail ?? '';
+    // 知乎新发布问题的 detail 可能是 null（?? 只兜 undefined），必须显式判
+    const raw: string = (this.question?.detail ?? '') ?? '';
     const urls: string[] = [];
     if (raw.length === 0) {
       return urls;
@@ -238,6 +250,7 @@ struct QuestionDetailPage {
       return '';
     }
     const raw: string = this.detailExpanded ? (q.detail ?? '') : (q.excerpt ?? '');
+    if (raw === null || raw === undefined) { return ''; }
     return stripHtml(raw);
   }
 
@@ -299,7 +312,7 @@ struct QuestionDetailPage {
           .maxLines(this.detailExpanded ? 1000 : 6)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-        if ((this.question?.detail ?? '').length > 0) {
+        if (((this.question?.detail ?? '') ?? '').length > 0) {
           Text(this.detailExpanded ? '收起' : '展开全文')
             .fontSize(15)
             .fontWeight(FontWeight.Medium)
@@ -468,7 +481,7 @@ struct QuestionDetailPage {
 
   build() {
     Column() {
-      DetailNavBar({ title: this.question?.title ?? '问题' })
+      DetailNavBar({ title: this.question?.title ?? '问题', onBack: (): void => { this.goBack(); } })
 
       Stack({ alignContent: Alignment.TopStart }) {
         List({ space: 10, scroller: this.scroller }) {
@@ -528,5 +541,49 @@ struct QuestionDetailPage {
     .width('100%')
     .height('100%')
     .backgroundColor(ZhihuColors.background)
+    // 右滑返回：全屏 = router.back()；右栏 = splitBack() 逐层出栈。
+    // PanGesture + 位移判断（SwipeGesture 有速度阈值，慢速拖动无法触发）：
+    // 水平右移超过 60vp 且水平位移大于垂直位移才算右滑，避免与正文垂直滚动冲突。
+    .gesture(
+      PanGesture({ fingers: 1 })
+        .onActionEnd((e: GestureEvent) => {
+          if (e.offsetX > 60 && Math.abs(e.offsetX) > Math.abs(e.offsetY)) {
+            this.goBack();
+          }
+        })
+    )
+  }
+}
+
+
+// ---------------------------------------------------------------------------
+// 全屏壳页（路由 pages/QuestionDetailPage）
+// ---------------------------------------------------------------------------
+
+@Entry
+@Component
+struct QuestionDetailPage {
+  @State qIdParam: string = '';
+  @State refreshTick: number = 0;
+  private shownOnce: boolean = false;
+
+  aboutToAppear(): void {
+    const p = router.getParams() as Record<string, object>;
+    this.qIdParam = readStringParam(p, 'id');
+  }
+
+  onPageShow(): void {
+    if (this.shownOnce) {
+      this.refreshTick++;
+    }
+    this.shownOnce = true;
+  }
+
+  build() {
+    Column() {
+      QuestionDetailView({ qId: this.qIdParam, inSplit: false, refreshTick: this.refreshTick })
+    }
+    .width('100%')
+    .height('100%')
   }
 }

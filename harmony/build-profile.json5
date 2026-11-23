@@ -1,6 +1,20 @@
 {
   "app": {
-    "signingConfigs": [],
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "/Users/admin/.ohos/config/default_harmony_A9MfGnyM2UHm7O-KxSKb61X6lendEUpEvFNsIkJwasU=.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001B1B29F37C430E3144517D558EA5EC2832CFA3E40A6B49C50E718391A2B5593A29A9284DEDB193A0",
+          "profile": "/Users/admin/.ohos/config/default_harmony_A9MfGnyM2UHm7O-KxSKb61X6lendEUpEvFNsIkJwasU=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "/Users/admin/.ohos/config/default_harmony_A9MfGnyM2UHm7O-KxSKb61X6lendEUpEvFNsIkJwasU=.p12",
+          "storePassword": "0000001B4261A862B90039BFDF076809B126A0E84ACFF44A879D89FD19707FD9FB6AC592ACEB645A669633"
+        }
+      }
+    ],
     // 与 Tydora-HMOS（已验证可产出可安装 hap）保持一致的 SDK 设定：
     //   - runtimeOS: OpenHarmony —— 对应 local.properties 里的
     //     sdk.dir=/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony
@@ -22,8 +36,12 @@
       }
     ],
     "buildModeSet": [
-      { "name": "debug" },
-      { "name": "release" }
+      {
+        "name": "debug"
+      },
+      {
+        "name": "release"
+      }
     ]
   },
   "modules": [
@@ -31,7 +49,12 @@
       "name": "entry",
       "srcPath": "./entry",
       "targets": [
-        { "name": "default", "applyToProducts": ["default"] }
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
       ]
     }
   ]

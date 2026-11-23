@@ -94,5 +94,11 @@ export function parsePublishedContentResult(
   if (message.length > 0 && message.toLowerCase() !== 'success') {
     throw new Error(message);
   }
+
+  // 兜底：结果既没有 result 也没有报错 —— 说明知乎既没确认发布也没拒绝
+  // （常见于风控静默丢弃）。不能静默当作成功，否则 UI 无任何反馈。
+  if (data !== null && data['result'] === undefined) {
+    throw new Error('知乎未确认发布结果（可能被风控拦截），请稍后重试或改用网页版发布');
+  }
   return envelope as PublishedContentResult;
 }

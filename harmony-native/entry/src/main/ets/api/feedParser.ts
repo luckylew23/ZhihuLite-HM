@@ -13,6 +13,7 @@ import {
   RawFeedTarget,
 } from '../api/feed';
 import { formatRelativeTime } from '../utils/date';
+import { normalizeVoting } from '../utils/voteState';
 
 export interface HotItem {
   id: string;
@@ -138,7 +139,7 @@ export function parseFollowingData(item: RawFeedItem): FeedItem | null {
     voteCount: target.voteup_count || target.like_count || 0,
     commentCount: target.comment_count || 0,
     favlistsCount: target.favorite_count || 0,
-    voted: target.relationship?.voting || 0,
+    voted: normalizeVoting(target.relationship?.voting),
     type: appType,
     answerType: normalizeAnswerType(target),
     contentNeedTruncated: target.content_need_truncated,
@@ -170,7 +171,7 @@ export function parseRecommendData(item: RawFeedItem): FeedItem | null {
     voteCount: target.voteup_count || target.like_count || 0,
     commentCount: target.comment_count || 0,
     favlistsCount: target.favlists_count || target.favorite_count || 0,
-    voted: target.relationship?.voting || 0,
+    voted: normalizeVoting(target.relationship?.voting),
     type: appType,
     topics: mapTopics(target.topics),
     answerType: normalizeAnswerType(target),

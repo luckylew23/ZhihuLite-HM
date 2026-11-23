@@ -1,11 +1,16 @@
 /**
- * pages/PublishQuestionPage —— 提问题。
- * 上游: ~/workbuddy/zhihu--/app/publish/question.tsx
- * 降级: 上游 PublishingEditor（富文本/Markdown/图片上传）未移植，正文为纯文本，
- *       按行序列化为 <p> 段落 HTML 后提交；图片上传不可用。
+ * pages/PublishQuestionPage —— 提问题（原生表单，直接调用知乎 API）。
+ *
+ * 历史：/api/v4/content/publish 曾对第三方客户端返回 4000「invalid character 'b'」，
+ * 当时改为 WebView 官方页。后续发现文章发布走同一接口可成功（HTTP 200），
+ * 根因是请求缺少 web 端必带的 extra_info.publisher=pc / pc_business_params；
+ * 补齐后问题发布同样可用。本页恢复为原生表单（直接弹表单，不再绕 WebView）。
+ *
+ * 兜底：若服务端仍拒绝，错误区提供「改用网页版发布」入口（PublishQuestionWebPage）。
  */
 
 import { router } from '@kit.ArkUI';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 import { createQuestion } from '../api/question';
 import { authStore } from '../store/authStore';
 import { ZhihuColors, isDarkNow } from '../utils/theme';
@@ -40,7 +45,8 @@ struct PublishQuestionPage {
   @State draftNotice: string = '';
 
   private canPublish(): boolean {
-    return this.title.trim().length > 5 && !this.submitting;
+    // 知乎服务端要求问题标题至少 10 字（过短返回"问题标题过短"），本地先校验
+    return this.title.trim().length >= 10 && !this.submitting;
   }
 
   aboutToAppear(): void {
@@ -63,12 +69,26 @@ struct PublishQuestionPage {
     }
     this.submitting = true;
     this.error = '';
+
     try {
-      await createQuestion(t, toParagraphHtml(this.content));
+      const result = await createQuestion(t, toParagraphHtml(this.content));
       clearPublishDraft(getContext(this), 'question');
-      router.back();
+      const id: string = result.id !== undefined ? String(result.id) : '';
+      if (id.length > 0) {
+        router.replaceUrl({ url: 'pages/QuestionDetailPage', params: { id: id } });
+      } else {
+        router.back();
+      }
     } catch (e) {
-      this.error = getZhihuErrorMessage(e as object);
+      // 直调 API 已被知乎 4000 风控拦截（返回 200 + {"code":4000,...} 伪装业务错误，
+      // 与 payload 无关）。不再让用户重试 API——直接带草稿转 WebView 官方提问弹窗，
+      // 官方页环境指纹合法，发布可成功。
+      hilog.warn(0x0002, 'ZhihuHttp', 'question api publish failed, fallback to webview: %{public}s',
+        JSON.stringify(e as object));
+      router.replaceUrl({
+        url: 'pages/PublishQuestionWebPage',
+        params: { title: t, detail: this.content.trim() },
+      });
     } finally {
       this.submitting = false;
     }
@@ -136,7 +156,7 @@ struct PublishQuestionPage {
   form() {
     Scroll() {
       Column({ space: 12 }) {
-        TextInput({ text: this.title, placeholder: '输入问题并以问号结尾' })
+        TextInput({ text: this.title, placeholder: '问题标题（10 字以上，建议以问号结尾）' })
           .onChange((v: string) => {
             this.title = v;
             savePublishDraft(getContext(this), 'question', this.title, this.content);

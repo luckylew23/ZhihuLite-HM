@@ -40,6 +40,7 @@ interface ProfileTab {
 
 const TABS: ProfileTab[] = [
   { key: 'answers', label: '回答' },
+  { key: 'questions', label: '提问' },
   { key: 'articles', label: '文章' },
   { key: 'pins', label: '想法' },
   { key: 'following', label: '关注' },
@@ -51,6 +52,9 @@ const ARTICLES_INCLUDE =
   'data[*].comment_count,content,voteup_count,favlists_count,created,updated,title,excerpt,reaction,relationship.voting;data[*].author';
 const PINS_INCLUDE =
   'data[*].content,reaction_count,comment_count,created,reaction,relationship.voting;data[*].author';
+// 提问列表（对齐上游 user/[id] questions tab 的 include）
+const QUESTIONS_INCLUDE =
+  'data[*].created,answer_count,follower_count,admin_closed_comment,title,excerpt,reaction,relationship.is_following;data[*].author';
 
 function formatCount(count: number): string {
   if (count >= 100000000) {
@@ -173,11 +177,12 @@ export struct PeoplePage {
     this.loadingList = true;
     try {
       const tab = this.activeTab;
-      if (tab === 'answers' || tab === 'articles' || tab === 'pins') {
-        const relType = tab as 'answers' | 'articles' | 'pins';
+      if (tab === 'answers' || tab === 'articles' || tab === 'pins' || tab === 'questions') {
+        const relType = tab as 'answers' | 'articles' | 'pins' | 'questions';
         const include = relType === 'answers'
           ? MEMBER_ANSWERS_INCLUDE
-          : (relType === 'articles' ? ARTICLES_INCLUDE : PINS_INCLUDE);
+          : (relType === 'articles' ? ARTICLES_INCLUDE
+            : (relType === 'pins' ? PINS_INCLUDE : QUESTIONS_INCLUDE));
         const resp = await getMemberRelations(this.token, relType, {
           limit: 20,
           offset: this.pageOffset,
@@ -290,8 +295,12 @@ export struct PeoplePage {
   }
 
   // ---------------- UI ----------------
+  /**
+   * 统计项。tabKey: 'followers'|'following'|'questions'|'answers' → 切对应 tab；
+   * 'likes' → 仅本人可点，进"我赞过的内容"页。
+   */
   @Builder
-  statItem(value: string, label: string) {
+  statItem(value: string, label: string, tabKey: string) {
     Column({ space: 2 }) {
       Text(value)
         .fontSize(18)
@@ -302,6 +311,20 @@ export struct PeoplePage {
         .fontColor(ZhihuColors.textSecondary)
     }
     .layoutWeight(1)
+    .onClick(() => {
+      if (tabKey === 'likes') {
+        if (this.isMe) {
+          router.pushUrl({ url: 'pages/UserLikesPage' });
+        }
+        return;
+      }
+      if (tabKey.length > 0 && tabKey !== this.activeTab) {
+        this.selectTab(tabKey);
+      } else if (tabKey.length > 0) {
+        // 已在该 tab 时滚回顶部
+        this.scroller.scrollToIndex(0);
+      }
+    })
   }
 
   @Builder
@@ -386,12 +409,13 @@ export struct PeoplePage {
           .padding({ left: 16, right: 16, bottom: 8 })
       }
 
-      // 统计行
+      // 统计行（可点击切换 tab；赞同仅本人可查看）
       Row() {
-        this.statItem(String(this.followerCount), '关注者')
-        this.statItem(String(this.member?.following_count ?? 0), '关注')
-        this.statItem(String(this.member?.voteup_count ?? 0), '赞同')
-        this.statItem(String(this.member?.answer_count ?? 0), '回答')
+        this.statItem(String(this.followerCount), '关注者', 'followers')
+        this.statItem(String(this.member?.following_count ?? 0), '关注', 'following')
+        this.statItem(String(this.member?.voteup_count ?? 0), '赞同', 'likes')
+        this.statItem(String(this.member?.answer_count ?? 0), '回答', 'answers')
+        this.statItem(String(this.member?.question_count ?? 0), '提问', 'questions')
       }
       .width('100%')
       .padding({ left: 16, right: 16, top: 4, bottom: 12 })

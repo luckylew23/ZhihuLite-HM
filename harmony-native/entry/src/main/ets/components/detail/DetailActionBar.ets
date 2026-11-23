@@ -51,7 +51,7 @@ export struct DetailActionBar {
           .fontColor(this.upvoted ? ZhihuColors.primary : ZhihuColors.textTertiary)
         Text(formatCount(this.upvoteCount))
           .fontSize(13)
-          .fontColor(ZhihuColors.textSecondary)
+          .fontColor(this.upvoted ? ZhihuColors.primary : ZhihuColors.textSecondary)
       }
       .layoutWeight(1)
       .justifyContent(FlexAlign.Center)
@@ -90,7 +90,7 @@ export struct DetailActionBar {
         Row({ space: 3 }) {
           Text(this.collected ? '★' : '☆')
             .fontSize(15)
-            .fontColor(this.collected ? ZhihuColors.primary : ZhihuColors.textTertiary)
+            .fontColor(this.collected ? ZhihuColors.warning : ZhihuColors.textTertiary)
         }
         .layoutWeight(1)
         .justifyContent(FlexAlign.Center)

@@ -17,3 +17,7 @@ harmony/signing/
 harmony/entry/src/main/resources/rawfile/
 node_modules/
 c*.jpeg
+a*.jpeg
+l*.jpeg
+v*.jpeg
+.idea/

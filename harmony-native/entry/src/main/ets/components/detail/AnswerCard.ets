@@ -10,11 +10,13 @@ import { AnswerDetail, voteAnswer } from '../../api/answer';
 import { getAnswerCollectionStatus, removeFromCollection } from '../../api/collection';
 import { ZhihuColors } from '../../utils/theme';
 import { formatCount, guardLogin, stripHtml } from './detailUtils';
+import { contentVotingOf } from '../../utils/voteState';
+import { openContentById } from '../../utils/contentOpener';
 import { AnswerActionBar } from './AnswerActionBar';
 
 @Component
 export struct AnswerCard {
-  @Prop item: AnswerDetail = {
+  @Prop @Watch('onItemChanged') item: AnswerDetail = {
     id: '',
     author: { id: '', name: '', avatar_url: '', type: '' },
     content: '',
@@ -38,11 +40,24 @@ export struct AnswerCard {
   }
 
   aboutToAppear(): void {
-    this.voted = this.item.relationship?.voting ?? 0;
+    this.syncFromItem();
+    this.refreshCollectionStatus();
+  }
+
+  /**
+   * ForEach 复用组件时 aboutToAppear 不会再触发，只有 item 变化；
+   * 不在这里同步会让上一个回答的"已赞同"残留到下一个卡片。
+   */
+  onItemChanged(): void {
+    this.syncFromItem();
+    this.refreshCollectionStatus();
+  }
+
+  private syncFromItem(): void {
+    this.voted = contentVotingOf(this.item);
     this.voteCount = this.item.voteup_count ?? 0;
     const fromExcerpt: string = stripHtml(this.item.excerpt);
     this.summary = fromExcerpt.length > 0 ? fromExcerpt : stripHtml(this.item.content);
-    this.refreshCollectionStatus();
   }
 
   /** 查询该回答是否已被收藏（对齐上游 collectedStatusMap） */
@@ -63,10 +78,8 @@ export struct AnswerCard {
   }
 
   private openAnswer(): void {
-    router.pushUrl({
-      url: 'pages/AnswerDetailPage',
-      params: { id: String(this.item.id) },
-    });
+    // 宽屏 → 右栏打开；竖屏 → 路由全屏（contentOpener 自动分发）
+    openContentById('answers', String(this.item.id), '', '', '', '', 'push');
   }
 
   private onDisagree(): void {

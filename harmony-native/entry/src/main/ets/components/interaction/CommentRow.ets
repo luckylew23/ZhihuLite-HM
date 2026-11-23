@@ -8,6 +8,7 @@ import { CommentItem } from '../../api/comment';
 import { ZhihuColors } from '../../utils/theme';
 import { formatRelativeTime } from '../../utils/date';
 import { stripHtml } from './textUtil';
+import { isCommentLiked } from '../../utils/voteState';
 
 @Component
 export struct CommentRow {
@@ -44,8 +45,7 @@ export struct CommentRow {
   }
 
   private liked(): boolean {
-    const rel = this.item.relationship;
-    return rel !== undefined && rel !== null && rel.voting === 1;
+    return isCommentLiked(this.item);
   }
 
   private likeCount(): number {

@@ -23,6 +23,8 @@ import { FeedListPage } from './FeedListPage';
 import { FollowingPage } from './FollowingPage';
 import { DailyPage } from './DailyPage';
 import { ProfilePage } from './ProfilePage';
+import { SplitDetailView } from '../components/detail/SplitDetailView';
+import { WIDE_BREAKPOINT_VP } from '../utils/contentOpener';
 
 @Entry
 @Component
@@ -39,6 +41,10 @@ struct Index {
   // 登录态版本号：登录/登出翻转时 +1 → 下方 Tabs/ProfilePage 的 key 变化 → 强制重建，
   // 各列表页重新 aboutToAppear 用最新 cookie 加载（登录后状态刷新）
   @StorageProp('loginVersion') loginVersion: number = 0;
+  // 宽屏（平板横屏/PC 窗口 ≥ 840vp）：首页变两栏，内容在右主栏打开
+  @State isWide: boolean = false;
+  // 右栏当前内容类型（空 = 未打开内容 → 右栏不占布局，左栏单栏占满）
+  @StorageProp('splitType') splitType: string = '';
 
   /** 顶栏允许出现的栏目（固定顺序；publish/profile 不在其中） */
   private topTabOrder: string[] = ['following', 'recommend', 'hot', 'daily'];
@@ -261,32 +267,64 @@ struct Index {
   }
 
   build() {
-    Column() {
-      // 首页组与个人中心常驻（Visibility 切换），避免条件渲染反复销毁/重建
-      // 整个 Tabs 树（4 个列表页重发请求）——这是“切换慢/点击卡”的根因之一。
-      Stack() {
+    // 底部工具栏不挂在全局：宽屏时只在左栏底部（不延伸到右侧内容栏下方），
+    // 竖屏单栏 / 个人中心各自自带底栏。
+    Stack() {
+      // 宽屏：两栏（左=顶栏+栏目列表+底栏 / 右=内容主栏）。
+      // 未点内容时右栏 None（左栏单栏占满）；点回答/文章等后右栏出现。
+      Row() {
         Column() {
           this.topNavBar()
           this.homeTabs()
+          this.bottomBar()
         }
-        .width('100%')
+        .layoutWeight(1)
         .height('100%')
-        .visibility(this.outerIndex === 0 ? Visibility.Visible : Visibility.None)
 
+        Column() {
+          SplitDetailView()
+        }
+        .layoutWeight(2)
+        .height('100%')
+        .visibility(this.splitType.length > 0 ? Visibility.Visible : Visibility.None)
+      }
+      .width('100%')
+      .height('100%')
+      .visibility((this.outerIndex === 0 && this.isWide) ? Visibility.Visible : Visibility.None)
+
+      Column() {
+        this.topNavBar()
+        this.homeTabs()
+        this.bottomBar()
+      }
+      .width('100%')
+      .height('100%')
+      .visibility((this.outerIndex === 0 && !this.isWide) ? Visibility.Visible : Visibility.None)
+
+      Column() {
         Column() {
           ProfilePage({ loginVersion: this.loginVersion })
         }
-          .width('100%')
-          .height('100%')
-          .visibility(this.outerIndex === 1 ? Visibility.Visible : Visibility.None)
+        .layoutWeight(1)
+        .width('100%')
+        this.bottomBar()
       }
       .width('100%')
-      .layoutWeight(1)
-
-      this.bottomBar()
+      .height('100%')
+      .visibility(this.outerIndex === 1 ? Visibility.Visible : Visibility.None)
     }
     .width('100%')
     .height('100%')
     .backgroundColor(ZhihuColors.background)
+    // 宽屏检测：根节点实际宽度（vp）≥ 840（HarmonyOS lg 断点）→ 两栏；
+    // PC 自由窗口拖拽宽度时实时切换。同步给 contentOpener 判断走右栏还是路由。
+    .onAreaChange((_old: Area, now: Area) => {
+      const w: number = Number(now.width);
+      const wide: boolean = w >= WIDE_BREAKPOINT_VP;
+      if (wide !== this.isWide) {
+        this.isWide = wide;
+        AppStorage.setOrCreate('isWideScreen', wide);
+      }
+    })
   }
 }

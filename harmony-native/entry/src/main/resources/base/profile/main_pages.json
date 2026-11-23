@@ -21,6 +21,7 @@
     "pages/CollectionDetailPage",
     "pages/VotersPage",
     "pages/PublishQuestionPage",
+    "pages/PublishQuestionWebPage",
     "pages/PublishAnswerPage",
     "pages/PublishArticlePage",
     "pages/PublishPinPage",

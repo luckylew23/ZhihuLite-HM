@@ -15,6 +15,7 @@ import {
 import { readContentCache, writeContentCache } from '../utils/cacheStore';
 import { ZhihuColors } from '../utils/theme';
 import { DetailNavBar } from '../components/detail/DetailNavBar';
+import { splitBack } from '../utils/contentOpener';
 import { StatusView } from '../components/detail/StatusView';
 import { HtmlBlock, parseContent, readStringParam, parseInline, InlinePart, blocksToMarkdown, saveMarkdownToFile } from '../components/detail/detailUtils';
 import { DetailActionBar } from '../components/detail/DetailActionBar';
@@ -26,10 +27,12 @@ import { guardLogin } from '../components/detail/detailUtils';
 
 interface CachedDaily { savedAt: number; data: DailyDetailResponse; }
 
-@Entry
+/** 日报详情视图（全屏页与宽屏右栏共用同一框架）。 */
 @Component
-struct DailyDetailPage {
-  @State storyId: string = '';
+export struct DailyDetailView {
+  @Prop @Watch('onIdChanged') storyId: string = '';
+  @Prop inSplit: boolean = false;
+  @Prop @Watch('onRefreshTick') refreshTick: number = 0;
   @State loading: boolean = true;
   @State error: string = '';
   @State detail: DailyDetailResponse | null = null;
@@ -125,10 +128,23 @@ struct DailyDetailPage {
   }
 
   aboutToAppear(): void {
-    const p = router.getParams() as Record<string, object>;
-    this.storyId = readStringParam(p, 'id');
-    this.fallbackTitle = readStringParam(p, 'title');
     this.load();
+  }
+
+  onIdChanged(): void {
+    this.load();
+  }
+
+  onRefreshTick(): void {
+    this.load();
+  }
+
+  private goBack(): void {
+    if (this.inSplit) {
+      splitBack();
+    } else {
+      router.back();
+    }
   }
 
   private async load(): Promise<void> {
@@ -324,7 +340,7 @@ struct DailyDetailPage {
 
   build() {
     Column() {
-      DetailNavBar({ title: this.detail ? this.detail.title : (this.fallbackTitle.length > 0 ? this.fallbackTitle : '日报') })
+      DetailNavBar({ title: this.detail ? this.detail.title : (this.fallbackTitle.length > 0 ? this.fallbackTitle : '日报'), onBack: (): void => { this.goBack(); } })
 
       if (this.loading) {
         StatusView({ loading: true })
@@ -423,5 +439,56 @@ struct DailyDetailPage {
     .width('100%')
     .height('100%')
     .backgroundColor(ZhihuColors.background)
+    // 右滑返回：全屏 = router.back()；右栏 = splitBack() 逐层出栈。
+    // PanGesture + 位移判断（SwipeGesture 有速度阈值，慢速拖动无法触发）：
+    // 水平右移超过 60vp 且水平位移大于垂直位移才算右滑，避免与正文垂直滚动冲突。
+    .gesture(
+      PanGesture({ fingers: 1 })
+        .onActionEnd((e: GestureEvent) => {
+          if (e.offsetX > 60 && Math.abs(e.offsetX) > Math.abs(e.offsetY)) {
+            this.goBack();
+          }
+        })
+    )
+  }
+}
+
+
+// ---------------------------------------------------------------------------
+// 全屏壳页（路由 pages/DailyDetailPage）
+// ---------------------------------------------------------------------------
+
+@Entry
+@Component
+struct DailyDetailPage {
+  @State storyIdParam: string = '';
+  @State fallbackTitleParam: string = '';
+  @State refreshTick: number = 0;
+  private shownOnce: boolean = false;
+
+  aboutToAppear(): void {
+    const p = router.getParams() as Record<string, object>;
+    this.storyIdParam = readStringParam(p, 'id');
+    this.fallbackTitleParam = readStringParam(p, 'title');
+  }
+
+  onPageShow(): void {
+    if (this.shownOnce) {
+      this.refreshTick++;
+    }
+    this.shownOnce = true;
+  }
+
+  build() {
+    Column() {
+      DailyDetailView({
+        storyId: this.storyIdParam,
+        inSplit: false,
+        refreshTick: this.refreshTick,
+        fallbackTitle: this.fallbackTitleParam,
+      })
+    }
+    .width('100%')
+    .height('100%')
   }
 }
