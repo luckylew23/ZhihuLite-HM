@@ -1,15 +1,16 @@
 /**
- * pages/CommentsPage —— 评论页（对齐 Android v0.6.0 截图 03，移植自上游 app/comments）。
+ * pages/CommentsPage —— 评论区（官方布局：评论列在内容下方，如回答详情页内嵌评论区）。
+ * - CommentsView：可复用评论区组件（区块标题「评论 (N)」+ 一级评论 + 二级回复 + 输入条）。
+ *   无内部滚动，由父容器滚动；AnswerDetailView 直接内嵌在回答正文之后。
+ * - CommentsPage：全屏壳页（问题/文章/想法的评论仍走路由此页）。
  * 入参（router params）：
  *   resourceType: 'answers' | 'questions' | 'articles' | 'pins'
  *   resourceId:    string
  *   text?:        string（可选，顶部引用的正文摘要）
- * 结构：顶部栏(返回 + 评论(N) + 排序入口) + 一级评论卡片(头像/名字/正文/时间·地点/▲赞同/回复)
- *       + 二级回复(缩进卡片,「作者: 内容」) + 折叠「查看全部 N 条回复 →」 + 底部固定输入条(发布)。
- * 数据请求/点赞/发表评论逻辑沿用既有函数，仅重排 UI。
+ * 数据请求/点赞/发表评论逻辑沿用既有函数。
  */
 
-import { router } from '@kit.ArkUI';
+import { router, promptAction } from '@kit.ArkUI';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import {
   CommentItem,
@@ -23,26 +24,20 @@ import {
   getChildCommentsV5,
   createCommentV5,
   voteComment,
-  dislikeComment,
 } from '../api/comment';
 import { authStore } from '../store/authStore';
-import { ZhihuColors } from '../utils/theme';
+import { ZhihuColors, isDarkNow } from '../utils/theme';
 import { formatRelativeTime } from '../utils/date';
-import { isDarkNow } from '../utils/theme';
 import { stripHtml } from '../components/interaction/textUtil';
 import { isCommentLiked } from '../utils/voteState';
 
-interface RootChildState {
-  rootKey: string;
-  children: CommentItem[];
-}
-
-@Entry
+/** 可复用评论区：被回答详情内嵌，也可在全屏壳页中使用。 */
 @Component
-struct CommentsPage {
-  @State resourceType: string = 'answers';
-  @State resourceId: string = '';
-  @State quote: string = '';
+export struct CommentsView {
+  /** 内容 id；右栏内切换内容（父级 @Prop 变化）时自动重载 */
+  @Prop @Watch('onResourceIdChanged') resourceId: string = '';
+  @Prop resourceType: string = 'answers';
+  @Prop quote: string = '';
 
   @State orderBy: string = 'score';
   @State comments: CommentItem[] = [];
@@ -60,19 +55,17 @@ struct CommentsPage {
   @State replyToId: string = '';
   @State replyToName: string = '';
   @State submitting: boolean = false;
-  @State toast: string = '';
 
   private cursor: string = '';
   private inFlight: boolean = false;
-  private scroller: Scroller = new Scroller();
+  private inputController: TextInputController = new TextInputController();
 
   aboutToAppear(): void {
-    const p = router.getParams() as Record<string, object>;
-    if (p) {
-      this.resourceType = String(p['resourceType'] ?? 'answers');
-      this.resourceId = String(p['resourceId'] ?? '');
-      this.quote = stripHtml(String(p['text'] ?? ''));
-    }
+    this.loadFirst();
+  }
+
+  /** 内嵌模式下父级切换内容（如右栏回答→回答）时重载评论 */
+  onResourceIdChanged(): void {
     this.loadFirst();
   }
 
@@ -105,6 +98,9 @@ struct CommentsPage {
   }
 
   async loadFirst(): Promise<void> {
+    if (this.resourceId.length === 0) {
+      return;
+    }
     this.loading = true;
     this.error = '';
     this.inFlight = true;
@@ -278,38 +274,7 @@ struct CommentsPage {
     }
   }
 
-  // ---------------- 点踩 ----------------
-  async handleDislike(item: CommentItem): Promise<void> {
-    hilog.info(0x3100, 'ZhihuLiteDBG', 'COMMENT dislike CLICK id=%{public}s login=%{public}s',
-      String(item.id), String(authStore.isLoggedIn));
-    if (!authStore.isLoggedIn) {
-      this.gotoLogin();
-      return;
-    }
-    const currently: boolean = this.disliked(item);
-    const action: 'down' | 'neutral' = currently ? 'neutral' : 'down';
-    try {
-      await dislikeComment(item.id, action);
-      this.patchItem(item, (c: CommentItem) => {
-        const cloned: CommentItem = this.cloneComment(c);
-        cloned.disliked = !currently;
-        if (!currently) {
-          // 踩与赞互斥：清除点赞态并回退计数
-          if (this.liked(c)) {
-            cloned.relationship = { voting: 0 };
-            const base = c.vote_count === undefined ? 0 : c.vote_count;
-            cloned.vote_count = Math.max(0, base - 1);
-          }
-        }
-        return cloned;
-      });
-      hilog.info(0x3100, 'ZhihuLiteDBG', 'COMMENT dislike OK id=%{public}s action=%{public}s', String(item.id), action);
-    } catch (e) {
-      const err: Error = e as Error;
-      hilog.info(0x3100, 'ZhihuLiteDBG', 'COMMENT dislike FAIL id=%{public}s err=%{public}s', String(item.id), err.message);
-      this.showToast('操作失败');
-    }
-  }
+  // ---------------- 点踩（知乎 V5 评论无公开踩接口，官方网页版评论区也仅有赞+回复，故不提供） ----------------
 
   // ---------------- 回复 ----------------
   handleReply(item: CommentItem): void {
@@ -322,6 +287,8 @@ struct CommentsPage {
     this.replyToId = String(item.id);
     const m = item.author === undefined ? undefined : item.author.member;
     this.replyToName = m === undefined ? '' : m.name;
+    // 聚焦底部输入框：键盘弹出 + 滚动到输入条，给出可见反馈
+    focusControl.requestFocus('commentInput');
   }
 
   cancelReply(): void {
@@ -443,7 +410,8 @@ struct CommentsPage {
   }
 
   private showToast(msg: string): void {
-    this.toast = msg;
+    // 全局 toast：评论区内嵌时页面内 toast 可能滚出视野
+    promptAction.showToast({ message: msg, duration: 2000 });
   }
 
   toggleOrder(): void {
@@ -477,17 +445,11 @@ struct CommentsPage {
               .fontSize(12)
               .fontColor(ZhihuColors.textTertiary)
           }
-          .padding({ top: 2, bottom: 2 })
+          .padding({ top: 6, bottom: 6, left: 8, right: 8 })
+          .margin({ top: -4, bottom: -4 })
           .onClick(() => {
             this.handleLike(child);
           })
-          Text('▽')
-            .fontSize(12)
-            .fontColor(this.disliked(child) ? ZhihuColors.primary : ZhihuColors.textTertiary)
-            .padding({ top: 2, bottom: 2 })
-            .onClick(() => {
-              this.handleDislike(child);
-            })
         }
       }
       .alignItems(HorizontalAlign.Start)
@@ -591,24 +553,18 @@ struct CommentsPage {
               .fontSize(14)
               .fontColor(ZhihuColors.textTertiary)
           }
-          .padding({ left: 8, right: 8 })
+          .padding({ left: 12, right: 12, top: 6, bottom: 6 })
+          .margin({ top: -6, bottom: -6 })
           .onClick(() => {
             this.handleLike(item);
           })
-
-          Text('▽')
-            .fontSize(14)
-            .fontColor(this.disliked(item) ? ZhihuColors.primary : ZhihuColors.textTertiary)
-            .padding({ left: 8, right: 8 })
-            .onClick(() => {
-              this.handleDislike(item);
-            })
         }
 
         Text('回复')
           .fontSize(14)
           .fontColor(ZhihuColors.textTertiary)
-          .padding({ left: 8, right: 4 })
+          .padding({ left: 12, right: 8, top: 6, bottom: 6 })
+          .margin({ top: -6, bottom: -6 })
           .onClick(() => {
             this.handleReply(item);
           })
@@ -658,6 +614,7 @@ struct CommentsPage {
         }
         Row({ space: 10 }) {
           TextInput({ placeholder: '既然来了，就留下点什么吧...', text: this.inputText })
+            .id('commentInput')
             .layoutWeight(1)
             .height(42)
             .backgroundColor(isDarkNow() ? '#3a3a44' : '#f5f6f7')
@@ -690,7 +647,147 @@ struct CommentsPage {
 
   build() {
     Column() {
-      // 顶部栏：返回 + 标题「评论 (N)」 + 右侧排序入口
+      // 区块标题：评论 (N) + 排序入口
+      Row() {
+        Text('评论 (' + this.commentTotal + ')')
+          .fontSize(17)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(ZhihuColors.text)
+          .layoutWeight(1)
+        Text(this.orderBy === 'score' ? '默认排序' : '最新排序')
+          .fontSize(15)
+          .fontColor(ZhihuColors.primary)
+          .padding(6)
+          .onClick(() => {
+            this.toggleOrder();
+          })
+      }
+      .width('100%')
+      .padding({ top: 4, bottom: 4 })
+
+      if (this.quote.length > 0) {
+        Column({ space: 4 }) {
+          Text('正在讨论')
+            .fontSize(14)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(ZhihuColors.primary)
+          Text(this.quote)
+            .fontSize(15)
+            .fontColor(ZhihuColors.textSecondary)
+            .maxLines(3)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+            .width('100%')
+            .textAlign(TextAlign.Start)
+        }
+        .width('100%')
+        .padding(12)
+        .backgroundColor(ZhihuColors.backgroundTertiary)
+        .borderRadius(10)
+        .alignItems(HorizontalAlign.Start)
+      }
+
+      if (this.loading && this.comments.length === 0) {
+        Row({ space: 8 }) {
+          LoadingProgress().width(22).height(22).color(ZhihuColors.textTertiary)
+          Text('评论加载中…')
+            .fontSize(15)
+            .fontColor(ZhihuColors.textTertiary)
+        }
+        .width('100%')
+        .justifyContent(FlexAlign.Center)
+        .padding(24)
+      } else if (this.error.length > 0 && this.comments.length === 0) {
+        Column({ space: 12 }) {
+          Text(this.error)
+            .fontSize(15)
+            .fontColor(ZhihuColors.textTertiary)
+          Button('重试')
+            .backgroundColor(ZhihuColors.primary)
+            .onClick(() => {
+              this.loadFirst();
+            })
+        }
+        .width('100%')
+        .padding(24)
+      } else if (this.comments.length === 0) {
+        Text('还没有评论，来抢沙发～')
+          .fontSize(15)
+          .fontColor(ZhihuColors.textTertiary)
+          .width('100%')
+          .textAlign(TextAlign.Center)
+          .padding(24)
+      } else {
+        // 一级评论列表（无内部滚动：由父容器 Scroll 统一滚动）
+        Column() {
+          ForEach(this.comments, (item: CommentItem) => {
+            Column() {
+              this.rootComment(item)
+              if (item.child_comment_count > 0) {
+                this.childBlock(item)
+              }
+              Divider().strokeWidth(0.5).color(ZhihuColors.border)
+            }
+            .width('100%')
+          }, (item: CommentItem) => this.rootKey(item))
+        }
+        .width('100%')
+
+        // 翻页脚注：加载更多 / 结束标记
+        Column({ space: 6 }) {
+          if (this.loadingMore) {
+            Row({ space: 8 }) {
+              LoadingProgress().width(16).height(16).color(ZhihuColors.textTertiary)
+              Text('加载中…')
+                .fontSize(14)
+                .fontColor(ZhihuColors.textTertiary)
+            }
+          } else if (this.isEnd) {
+            Text('— 没有更多评论了 —')
+              .fontSize(14)
+              .fontColor(ZhihuColors.textTertiary)
+          } else {
+            Text('查看更多评论 →')
+              .fontSize(15)
+              .fontColor(ZhihuColors.primary)
+              .onClick(() => {
+                this.loadMore();
+              })
+          }
+        }
+        .width('100%')
+        .padding(14)
+        .alignItems(HorizontalAlign.Center)
+      }
+
+      this.inputBar()
+    }
+    .width('100%')
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 全屏壳页（路由 pages/CommentsPage）：问题/文章/想法的评论仍走独立页
+// ---------------------------------------------------------------------------
+
+@Entry
+@Component
+struct CommentsPage {
+  @State resourceType: string = 'answers';
+  @State resourceId: string = '';
+  @State quote: string = '';
+
+  aboutToAppear(): void {
+    const p = router.getParams() as Record<string, object>;
+    if (p) {
+      this.resourceType = String(p['resourceType'] ?? 'answers');
+      this.resourceId = String(p['resourceId'] ?? '');
+      this.quote = stripHtml(String(p['text'] ?? ''));
+    }
+  }
+
+  build() {
+    Column() {
+      // 顶部栏：返回 + 标题
       Row() {
         Text('‹')
           .fontSize(26)
@@ -699,118 +796,28 @@ struct CommentsPage {
           .onClick(() => {
             router.back();
           })
-        Text('评论 (' + this.commentTotal + ')')
+        Text('评论')
           .fontSize(19)
           .fontWeight(FontWeight.Bold)
           .fontColor(ZhihuColors.text)
           .layoutWeight(1)
-        Text(this.orderBy === 'score' ? '默认' : '最新')
-          .fontSize(16)
-          .fontColor(ZhihuColors.primary)
-          .padding(8)
-          .onClick(() => {
-            this.toggleOrder();
-          })
       }
       .width('100%')
       .height(52)
       .padding({ left: 12, right: 12 })
       .backgroundColor(ZhihuColors.backgroundSecondary)
 
-      if (this.loading && this.comments.length === 0) {
-        Column({ space: 8 }) {
-          LoadingProgress().width(40).height(40).color(ZhihuColors.primary)
-          Text('评论加载中…')
+      Scroll() {
+        Column() {
+          CommentsView({ resourceType: this.resourceType, resourceId: this.resourceId, quote: this.quote })
         }
         .width('100%')
-        .layoutWeight(1)
-        .justifyContent(FlexAlign.Center)
-      } else if (this.error.length > 0 && this.comments.length === 0) {
-        Column({ space: 16 }) {
-          Text(this.error)
-          Button('重试')
-            .backgroundColor(ZhihuColors.primary)
-            .onClick(() => {
-              this.loadFirst();
-            })
-        }
-        .width('100%')
-        .layoutWeight(1)
-        .justifyContent(FlexAlign.Center)
-      } else {
-        List({ scroller: this.scroller }) {
-          if (this.quote.length > 0) {
-            ListItem() {
-              Column({ space: 4 }) {
-                Text('正在讨论')
-                  .fontSize(14)
-                  .fontWeight(FontWeight.Bold)
-                  .fontColor(ZhihuColors.primary)
-                Text(this.quote)
-                  .fontSize(15)
-                  .fontColor(ZhihuColors.textSecondary)
-                  .maxLines(3)
-                  .textOverflow({ overflow: TextOverflow.Ellipsis })
-                  .width('100%')
-                  .textAlign(TextAlign.Start)
-              }
-              .width('100%')
-              .padding(12)
-              .backgroundColor(ZhihuColors.backgroundTertiary)
-              .borderRadius(10)
-              .alignItems(HorizontalAlign.Start)
-            }
-          }
-
-          ForEach(this.comments, (item: CommentItem) => {
-            ListItem() {
-              Column() {
-                this.rootComment(item)
-                if (item.child_comment_count > 0) {
-                  this.childBlock(item)
-                }
-                Divider().strokeWidth(0.5).color(ZhihuColors.border)
-              }
-              .width('100%')
-            }
-          }, (item: CommentItem) => this.rootKey(item))
-
-          ListItem() {
-            Column({ space: 6 }) {
-              if (this.loadingMore) {
-                Row({ space: 8 }) {
-                  LoadingProgress().width(16).height(16).color(ZhihuColors.textTertiary)
-                  Text('加载中…')
-                }
-              } else if (this.isEnd && this.comments.length > 0) {
-                Text('— 没有更多评论了 —')
-                  .fontSize(14)
-                  .fontColor(ZhihuColors.textTertiary)
-              }
-            }
-            .width('100%')
-            .padding(14)
-          }
-        }
-        .layoutWeight(1)
-        .width('100%')
-        .scrollBar(BarState.Off)
-        .onReachEnd(() => {
-          this.loadMore();
-        })
-        .padding({ left: 14, right: 14 })
+        .padding({ left: 14, right: 14, top: 8, bottom: 8 })
       }
-
-      if (this.toast.length > 0) {
-        Text(this.toast)
-          .fontSize(14)
-          .fontColor(ZhihuColors.textInverse)
-          .backgroundColor('#b3000000')
-          .borderRadius(6)
-          .padding({ left: 10, right: 10, top: 5, bottom: 5 })
-      }
-
-      this.inputBar()
+      .layoutWeight(1)
+      .width('100%')
+      .scrollBar(BarState.Off)
+      .align(Alignment.Top)
     }
     .width('100%')
     .height('100%')

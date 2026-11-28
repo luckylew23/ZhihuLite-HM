@@ -22,6 +22,7 @@ import { formatCount, guardLogin, HtmlBlock, parseContent, readStringParam, bloc
 import { NetImage } from '../components/NetImage';
 import { RichBody } from '../components/detail/RichBody';
 import { DetailActionBar } from '../components/detail/DetailActionBar';
+import { CommentsView } from './CommentsPage';
 import { contentVotingOf } from '../utils/voteState';
 import { common } from '@kit.AbilityKit';
 
@@ -47,6 +48,9 @@ export struct AnswerDetailView {
   @State collectionId: string = '';
   @StorageLink('collectPicked') @Watch('onCollectPicked') collectPicked: string = '';
   @State bodyBlocks: HtmlBlock[] = [];
+  /** 评论区在滚动内容中的偏移（vp）：操作条「评论」按钮滚动定位用 */
+  @State commentsTop: number = 0;
+  private scroller: Scroller = new Scroller();
 
   onCollectPicked(): void {
     const prefix: string = this.answerId + ':';
@@ -163,9 +167,12 @@ export struct AnswerDetailView {
   }
 
   private onComment(): void {
-    router.pushUrl({
-      url: 'pages/CommentsPage',      params: { resourceType: 'answers', resourceId: this.answerId },
-    });
+    // 评论已内嵌在回答下方（官方布局）：滚动到评论区而不是跳页
+    if (this.commentsTop > 0) {
+      this.scroller.scrollTo({ xOffset: 0, yOffset: this.commentsTop, animation: true });
+    } else {
+      this.scroller.scrollEdge(Edge.Bottom);
+    }
   }
 
   /** 查询该回答是否已被收藏 */
@@ -251,7 +258,7 @@ export struct AnswerDetailView {
       } else if (this.error.length > 0) {
         StatusView({ error: this.error, onRetry: () => { this.load(); } })
       } else if (this.answer !== null) {
-        Scroll() {
+        Scroll(this.scroller) {
           Column({ space: 12 }) {
             // 所属问题
             if (this.answer.question !== undefined && this.answer.question.title.length > 0) {
@@ -307,6 +314,20 @@ export struct AnswerDetailView {
                 .fontColor(ZhihuColors.textTertiary)
                 .width('100%')
             }
+
+            // 评论区（官方布局：评论列在回答后面，不单独开页）
+            Column() {
+              Divider().strokeWidth(0.5).color(ZhihuColors.border)
+              CommentsView({ resourceType: 'answers', resourceId: this.answerId })
+            }
+            .width('100%')
+            .onAreaChange((_old: Area, n: Area) => {
+              // position 相对滚动内容 Column，即目标滚动偏移（vp）
+              const y: number = Number(n.position.y);
+              if (y > 0) {
+                this.commentsTop = y;
+              }
+            })
           }
           .width('100%')
           .padding(16)
