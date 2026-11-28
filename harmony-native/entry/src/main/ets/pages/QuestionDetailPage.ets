@@ -6,7 +6,7 @@
  * 数据请求与字段映射沿用既有 getQuestion/getQuestionAnswers/followQuestion，仅调整布局。
  */
 
-import { router } from '@kit.ArkUI';
+import { router, promptAction } from '@kit.ArkUI';
 import { NetImage } from '../components/NetImage';
 import { Want, common } from '@kit.AbilityKit';
 import {
@@ -154,14 +154,18 @@ export struct QuestionDetailView {
     this.following = !prev;
     this.followerCount = prev ? Math.max(0, prevCount - 1) : prevCount + 1;
     try {
-      if (prev) {
-        await unfollowQuestion(this.qId);
-      } else {
-        await followQuestion(this.qId);
+      const resp: object = prev
+        ? await unfollowQuestion(this.qId)
+        : await followQuestion(this.qId);
+      // 服务端若返回真实关注数，以服务端为准，避免本地 ±1 漂移
+      const rc = resp as Record<string, object>;
+      if (rc !== null && rc !== undefined && typeof rc['follower_count'] === 'number') {
+        this.followerCount = rc['follower_count'] as number;
       }
     } catch (e) {
       this.following = prev;
       this.followerCount = prevCount;
+      promptAction.showToast({ message: getZhihuErrorMessage(e as object) });
     }
   }
 
@@ -424,10 +428,21 @@ export struct QuestionDetailView {
           .width('100%')
 
         // 6. 操作行：关注问题 / 评论 / 写回答
+        // 关注按钮必须直接读 this.following：@Builder 按值传参时状态变化不会刷新其内部 UI，
+        // 此前走 actionButton(label, ...) 导致点击后文案永远停在「关注问题」。
         Row({ space: 10 }) {
-          this.actionButton(this.following ? '已关注' : '关注问题', this.following, (): void => {
-            this.toggleFollow();
-          })
+          Text(this.following ? '已关注' : '关注问题')
+            .fontSize(15)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(this.following ? ZhihuColors.textSecondary : ZhihuColors.primary)
+            .layoutWeight(1)
+            .textAlign(TextAlign.Center)
+            .padding({ top: 10, bottom: 10 })
+            .borderRadius(20)
+            .backgroundColor(this.following ? ZhihuColors.backgroundTertiary : '#1a0084ff')
+            .onClick(() => {
+              this.toggleFollow();
+            })
           this.actionButton(formatCount(this.question?.comment_count ?? 0) + ' 条评论', false, (): void => {
             this.openComments();
           })

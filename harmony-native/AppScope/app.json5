@@ -3,8 +3,8 @@
     "bundleName": "Mila.ZhihuLite.HM",
     "bundleType": "app",
     "vendor": "ZhihuLite-HM",
-    "versionCode": 155,
-    "versionName": "0.3.62",
+    "versionCode": 156,
+    "versionName": "0.3.63",
     "icon": "$media:app_icon",
     "label": "$string:app_name",
     "description": "$string:description_application"
